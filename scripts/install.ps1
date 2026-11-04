@@ -76,7 +76,7 @@ $script:BoundParams = $PSBoundParameters
 # Under iex, script scope is the caller's session and outlives a run; start
 # each run without the previous run's answer (see Set-LauncherUserPath).
 $script:BinDirOnCallerPath = $null
-$RepoUrl = if ($env:HERMES_REPO_URL) { $env:HERMES_REPO_URL } else { "https://github.com/NousResearch/hermes-agent.git" }
+$RepoUrl = if ($env:HERMES_REPO_URL) { $env:HERMES_REPO_URL } else { "https://github.com/ArzakaRaffan/routster-agent.git" }
 
 # --- BEGIN GENERATED: bootstrap pins (scripts/gen-bootstrap-pins.py) ---
 # Derived from pm/lock.json. DO NOT EDIT BY HAND:
@@ -1379,7 +1379,7 @@ function Invoke-SourceCompletion([bool]$Desktop) {
         Pop-Location
     }
     if ($code) { Fail "app products or command publication failed (exit $code)" products_build_failed }
-    Write-Ok "app products and hermes command ready"
+    Write-Ok "app products and routster command ready"
 }
 
 function Publish-UserCommand {
@@ -1390,14 +1390,14 @@ function Publish-UserCommand {
     $bootPy = Get-BootstrapPython
     Push-Location $InstallDir
     try {
-        Invoke-Logged "Publishing the hermes command" { & $bootPy -I -X utf8 hermes_cli/_launchers.py $binDir }
+        Invoke-Logged "Publishing the routster command" { & $bootPy -I -X utf8 hermes_cli/_launchers.py $binDir }
         $code = $LASTEXITCODE
     } finally {
         Pop-Location
     }
     if ($code) { Fail "launcher staging failed" products_build_failed }
     Set-LauncherUserPath $binDir
-    Write-Ok "hermes command installed at $binDir"
+    Write-Ok "routster command installed at $binDir"
 }
 
 function Test-DesktopProductPresent {
@@ -1489,6 +1489,9 @@ function Stage-Setup {
 }
 
 function Stage-Gateway {
+    # Routster fork: the messaging gateway is opt-in (`routster gateway install`); a coding CLI
+    # install never registers a background service.
+    return
     if ($NonInteractive) { return }
     # Setup installs the service when it handles the gateway; ask only if it did not.
     Invoke-InstalledHermes @('gateway', 'install', '--if-missing')
@@ -1562,7 +1565,7 @@ function Stage-Complete {
         $marker | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $InstallDir ".hermes-bootstrap-complete") -Encoding UTF8
     }
     if ($Channel) { Invoke-InstalledHermes @('update', '--set-channel', $Channel) }
-    if ($commit) { Write-Ok "Hermes Agent install complete (pinned $commit). Run: hermes" }
+    if ($commit) { Write-Ok "Routster Agent install complete (pinned $commit). Run: routster" }
 }
 
 function New-DesktopShortcuts {

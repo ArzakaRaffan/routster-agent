@@ -20,7 +20,7 @@ set -u
 # hygiene can't break the locked sync the way it used to before pm owned it.
 export UV_NO_CONFIG=1
 
-REPO_URL="${HERMES_REPO_URL:-https://github.com/NousResearch/hermes-agent.git}"
+REPO_URL="${HERMES_REPO_URL:-https://github.com/ArzakaRaffan/routster-agent.git}"
 BRANCH="main"
 INSTALL_COMMIT=""
 # The update channel to install: stable (the latest published release, the default for the
@@ -1116,11 +1116,11 @@ stage_products() {
     if [ "$INCLUDE_DESKTOP" = true ] || desktop_product_present; then
         args+=(--desktop)
     fi
-    (cd "$INSTALL_DIR" && run_logged "Building the hermes command and apps" \
+    (cd "$INSTALL_DIR" && run_logged "Building the routster command and apps" \
         "$boot_py" -I -B -X utf8 hermes_cli/source_completion.py "${args[@]}") \
         || fail "app products or command publication failed" products_build_failed
     wire_shell_path
-    log_success "app products and hermes command ready"
+    log_success "app products and routster command ready"
 }
 
 stage_desktop() {
@@ -1153,13 +1153,16 @@ has_terminal() { (: </dev/tty) 2>/dev/null; }
 stage_setup() {
     if [ "$NON_INTERACTIVE" = true ]; then return 0; fi
     if ! has_terminal; then
-        log "setup skipped (no terminal); run 'hermes setup' after install"
+        log "setup skipped (no terminal); run 'routster setup' after install"
         return 0
     fi
     "$INSTALL_DIR/.hermes/bin/hermes" setup </dev/tty || fail "setup failed" setup_failed
 }
 
 stage_gateway() {
+    # Routster fork: the messaging gateway is opt-in (`routster gateway install`); a coding CLI
+    # install never registers a background service.
+    return 0
     if [ "$NON_INTERACTIVE" = true ]; then return 0; fi
     if ! has_terminal; then
         log "gateway setup skipped (no terminal); run 'hermes gateway install' after install"
@@ -1182,7 +1185,7 @@ stage_complete() {
         "$INSTALL_DIR/.hermes/bin/hermes" update --set-channel "$CHANNEL" \
             || fail "could not save the $CHANNEL update channel" other
     fi
-    log_success "Hermes Agent install complete. Run: hermes"
+    log_success "Routster Agent install complete. Run: routster"
 }
 
 print_path_reload_hint() {
