@@ -468,7 +468,9 @@ def _admit_plugin_provider(pp) -> None:
     entry = ProviderEntry(pp.name, label, pp.description or f"{label} (direct API)")
     slugs = [p.slug for p in CANONICAL_PROVIDERS]
     anchor = pp.picker_after
-    CANONICAL_PROVIDERS.insert(slugs.index(anchor) + 1 if anchor in slugs else len(slugs), entry)
+    # ``"^"`` (Routster Agent) puts the row first, ahead of every built-in provider.
+    index = 0 if anchor == "^" else slugs.index(anchor) + 1 if anchor in slugs else len(slugs)
+    CANONICAL_PROVIDERS.insert(index, entry)
     _canonical_slugs.add(pp.name)
     _PROVIDER_LABELS[pp.name] = label
     if pp.picker_group:
@@ -485,13 +487,17 @@ _PROVIDER_LABELS: dict[str, str] = {p.slug: p.label for p in CANONICAL_PROVIDERS
 _PROVIDER_LABELS["custom"] = "Custom endpoint"  # special case: not a named provider
 
 
+FORK_UNOFFERED_PROVIDERS = frozenset({"nous"})
+
+
 def listed_canonical_providers() -> list[ProviderEntry]:
     """``CANONICAL_PROVIDERS`` minus pre-release profiles the user has not opted into: what a provider
     LIST offers. Typed paths (``provider:model``, labels, ``--provider``) keep the full table."""
     from hermes_cli import models  # the binding every list consumer read before this filter existed
     from providers import unlisted_provider_names
     hidden = unlisted_provider_names()
-    return [p for p in models.CANONICAL_PROVIDERS if p.slug not in hidden]
+    # Routster Agent: Nous Portal is not offered; it still resolves by name (``--provider nous``, config.yaml).
+    return [p for p in models.CANONICAL_PROVIDERS if p.slug not in hidden | FORK_UNOFFERED_PROVIDERS]
 
 
 # ---------------------------------------------------------------------------

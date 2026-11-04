@@ -78,11 +78,8 @@ def test_guest_identity_shows_free_tier_row_with_only_welcome_model(guest_home, 
     rendered = repr(row).lower()
     assert "guest" not in rendered and "anonymous" not in rendered
 
-    # The `hermes model` provider picker applies the same rule from the same helper.
-    cli_rows = _cli_nous_rows({})
-    assert len(cli_rows) == 1
-    assert "free tier" in cli_rows[0][1]
-    assert "guest" not in cli_rows[0][1].lower() and "anonymous" not in cli_rows[0][1].lower()
+    # Routster Agent: the `routster model` provider picker does not offer Nous Portal at all.
+    assert _cli_nous_rows({}) == []
 
 
 def test_guest_identity_with_guest_off_hides_the_nous_row(guest_home, monkeypatch):

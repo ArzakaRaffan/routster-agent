@@ -79,7 +79,10 @@ def test_every_hermes_model_provider_is_configurable_in_desktop():
         "providers shown in `hermes model` but not configurable in the desktop "
         f"Providers tabs: {missing}"
     )
-    leaked = sorted(gui & ({e.slug for e in CANONICAL_PROVIDERS} - listed))
+    # Routster Agent: providers the fork stops offering (FORK_UNOFFERED_PROVIDERS) keep their desktop
+    # rows; the desktop app is not part of the fork's product surface.
+    from hermes_cli.models_catalog_static import FORK_UNOFFERED_PROVIDERS
+    leaked = sorted(gui & ({e.slug for e in CANONICAL_PROVIDERS} - listed - FORK_UNOFFERED_PROVIDERS))
     assert not leaked, f"unlisted pre-release providers on the desktop Providers tabs: {leaked}"
 
 

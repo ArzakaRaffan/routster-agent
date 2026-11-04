@@ -260,6 +260,7 @@ routster = RoutsterProfile(
     default_max_tokens=ROUTSTER_DEFAULT_MAX_TOKENS,
     classify_api_error=classify_routster_error,
     model_setup_flow=routster_model_setup_flow,
+    picker_after="^",  # first row of every provider list
     # The CLI identifies as itself, never as another client.
     default_headers=LazyHeaders({"User-Agent": lambda: hermes_user_agent("routster-agent")}),
 )
