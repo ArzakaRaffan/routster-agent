@@ -87,57 +87,58 @@ def _inherited_flag(parser, *args, **kwargs):
     return action
 
 
+
+def hide_fork_subcommands(subparsers):
+    """Routster fork: drop ``routster_fork.HIDDEN_SUBCOMMANDS`` from ``--help`` (argparse has no
+    public API for it). They still dispatch: internals relaunch ``gateway`` / ``serve``."""
+    from hermes_cli.routster_fork import HIDDEN_SUBCOMMANDS
+
+    subparsers._choices_actions = [
+        action for action in subparsers._choices_actions if action.dest not in HIDDEN_SUBCOMMANDS]
+    return subparsers
+
 _EPILOGUE = """
 Examples:
-    hermes                        Start interactive chat
-    hermes chat -q "Hello"        Single query mode
-    hermes --tui                  Launch the modern TUI (or set display.interface: tui)
-    hermes --cli                  Force the classic REPL (overrides display.interface: tui)
-    hermes -c                     Resume the most recent session
-    hermes -c "my project"        Resume a session by name (latest in lineage)
-    hermes --resume <session_id>  Resume a specific session by ID
-    hermes --resume latest        Resume the most recent session (same as -c)
-    hermes --tui --resume latest --in ./dir   Resume ./dir's latest session in the TUI
-    hermes setup                  Run setup wizard
-    hermes logout                 Clear stored authentication
-    hermes auth add <provider>    Add a pooled credential
-    hermes auth list              List pooled credentials
-    hermes auth remove <p> <t>    Remove pooled credential by index, id, or label
-    hermes auth reset <p> [t]     Clear exhaustion status for a provider, or one credential
-    hermes auth priority <p> <t> <n>  Move a pooled credential to priority n (0 = tried first)
-    hermes auth refresh <p> [t]   Refresh a pooled OAuth credential and clear its cooldown
-    hermes model                  Select default model
-    hermes fallback [list]        Show fallback provider chain
-    hermes fallback add           Add a fallback provider (same picker as `hermes model`)
-    hermes fallback remove        Remove a fallback provider from the chain
-    hermes config                 View configuration
-    hermes config edit            Edit config in $EDITOR
-    hermes config set model gpt-4 Set a config value
-    hermes gateway                Run messaging gateway
-    hermes gateway install        Install gateway background service
-    hermes gateway start          Start the installed gateway service
-    hermes gateway stop           Stop the gateway service
-    hermes gateway status         Show gateway status
-    hermes -p <profile> <cmd>     Run any command against a named profile's
-                                  home (also --profile) — e.g. hermes -p coder gateway stop
-    hermes -s hermes-agent-dev,github-auth
-    hermes -w                     Start in isolated git worktree
-    hermes sessions list          List past sessions
-    hermes sessions browse        Interactive session picker
-    hermes sessions rename ID T   Rename/title a session
-    hermes logs                   View agent.log (last 50 lines)
-    hermes logs -f                Follow agent.log in real time
-    hermes logs errors            View errors.log
-    hermes logs --since 1h        Lines from the last hour
-    hermes debug share             Upload debug report for support
-    hermes console                Open the safe Hermes command console
-    hermes update                 Update to latest version
-    hermes dashboard              Start web UI dashboard (port 9119)
-    hermes dashboard --stop       Stop running dashboard processes
-    hermes dashboard --status     List running dashboard processes
+    routster                      Start interactive chat
+    routster chat -q "Hello"      Single query mode
+    routster --tui                Launch the modern TUI (or set display.interface: tui)
+    routster --cli                Force the classic REPL (overrides display.interface: tui)
+    routster -c                   Resume the most recent session
+    routster -c "my project"      Resume a session by name (latest in lineage)
+    routster --resume <session_id>  Resume a specific session by ID
+    routster --resume latest      Resume the most recent session (same as -c)
+    routster --tui --resume latest --in ./dir  Resume ./dir's latest session in the TUI
+    routster login                Sign in with your Routster API key
+    routster setup                Run setup wizard
+    routster logout               Clear stored authentication
+    routster auth add <provider>  Add a pooled credential
+    routster auth list            List pooled credentials
+    routster auth remove <p> <t>  Remove pooled credential by index, id, or label
+    routster auth reset <p> [t]   Clear exhaustion status for a provider, or one credential
+    routster auth priority <p> <t> <n>  Move a pooled credential to priority n (0 = tried first)
+    routster auth refresh <p> [t] Refresh a pooled OAuth credential and clear its cooldown
+    routster model                Select default model
+    routster fallback [list]      Show fallback provider chain
+    routster fallback add         Add a fallback provider (same picker as `routster model`)
+    routster fallback remove      Remove a fallback provider from the chain
+    routster config               View configuration
+    routster config edit          Edit config in $EDITOR
+    routster config set model gpt-4 Set a config value
+    routster -w                   Start in isolated git worktree
+    routster sessions list        List past sessions
+    routster sessions browse      Interactive session picker
+    routster sessions rename ID T Rename/title a session
+    routster logs                 View agent.log (last 50 lines)
+    routster logs -f              Follow agent.log in real time
+    routster logs errors          View errors.log
+    routster logs --since 1h      Lines from the last hour
+    routster update               Update to latest version
+    routster dashboard            Start web UI dashboard (port 9119)
+    routster dashboard --stop     Stop running dashboard processes
+    routster dashboard --status   List running dashboard processes
 
 For more help on a command:
-    hermes <command> --help
+    routster <command> --help
 """
 
 
@@ -227,7 +228,7 @@ def _build_chat_parser(subparsers) -> argparse.ArgumentParser:
     """
     chat_parser = subparsers.add_parser(
         "chat", help="Interactive chat with the agent",
-        description="Start an interactive chat session with Hermes Agent")
+        description="Start an interactive chat session with Routster Agent")
     add, inherited, SUPPRESS = chat_parser.add_argument, _inherited_flag, argparse.SUPPRESS
     _query_group = chat_parser.add_mutually_exclusive_group()
     _query_group.add_argument("-q", "--query", help=(

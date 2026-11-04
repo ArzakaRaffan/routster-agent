@@ -510,6 +510,7 @@ async def test_the_drain_never_touches_the_shared_executor(monkeypatch):
 
 
 
+@pytest.mark.skip(reason="Routster fork: /login (Nous sign-in) is not in the slash registry (hermes_cli/routster_fork.py)")
 @pytest.mark.asyncio
 async def test_login_dispatches_mid_turn():
     runner = object.__new__(GatewayRunner)

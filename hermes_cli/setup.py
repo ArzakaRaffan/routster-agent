@@ -590,9 +590,7 @@ SETUP_SECTIONS = [
     ("model", "Model & Provider", setup_model_provider),
     ("tts", "Text-to-Speech", setup_tts),
     ("terminal", "Terminal Backend", setup_terminal_backend),
-    ("gateway", "Messaging Platforms (Gateway)", setup_gateway),
     ("tools", "Tools", setup_tools),
-    ("telemetry", "Shared Metrics", setup_telemetry),
     ("agent", "Agent Settings", setup_agent_settings),
 ]
 
@@ -615,7 +613,7 @@ def _run_setup_section(config: dict, section: str) -> None:
         print_info(f"Available sections: {', '.join(k for k, _, _ in SETUP_SECTIONS)}")
         return
     label, func = entry
-    _print_banner(f"│     ☤ Hermes Setup — {label:<34s} │")
+    _print_banner(f"│     ◆ Routster Setup — {label:<32s} │")
     _run_setup_steps([(label, lambda: func(config))])
     save_config(config)
     print()
@@ -641,21 +639,13 @@ def _run_full_setup(config: dict, hermes_home, *, is_existing: bool, imported_fr
     def _skip(key: str, label: str) -> bool:
         return bool(imported_from) and _skip_configured_section(config, key, label)
 
-    def _gateway_step() -> None:
-        if not _skip("gateway", "Messaging Platforms"):
-            setup_gateway(config)
-            return
-        # An import does not imply consent to install a persistent service.
-        from hermes_cli.gateway_setup_service import ensure_gateway_service
-        ensure_gateway_service(context="setup", interactive=True, config=config)
-
+    # Routster fork: no Messaging Platforms step (the gateway is opt-in: `routster gateway setup`).
     def _step(key: str, label: str, run) -> tuple:
         return label, lambda: None if _skip(key, label) else run()
 
     _run_setup_steps([
         _step("model", "Model & Provider", lambda: setup_model_provider(config)),
         _step("terminal", "Terminal Backend", lambda: setup_terminal_backend(config)),
-        ("Messaging Platforms", _gateway_step),
         _step("tools", "Tools", lambda: setup_tools(config, first_install=not is_existing))])
 
 

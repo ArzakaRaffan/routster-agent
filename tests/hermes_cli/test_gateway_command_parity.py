@@ -26,7 +26,8 @@ def test_committed_parity_table_matches_every_client_verdict():
     assert len(rows) == len(COMMAND_REGISTRY)
     # Per-session settings run their gateway handler for a local session (an admission-fenced control;
     # tests/gateway/test_session_setting_commands.py proves each lands on the session).
-    for name in gen.TOGGLES:
+    registered = {cmd.name for cmd in COMMAND_REGISTRY}  # Routster fork hides some (routster_fork.py)
+    for name in (n for n in gen.TOGGLES if n in registered):
         row = next(line for line in rows if line.startswith(f"| `/{name}`"))
         assert row.split(" | ")[1] == "control" and "per-session setting (gateway handler)" in row, row
 

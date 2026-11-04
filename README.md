@@ -15,7 +15,22 @@ mengulang sampai tugasnya selesai.
 
 1. **Ambil API key.** Daftar di <https://routster.trackster.dev>, top up saldo (QRIS), lalu salin
    API key dari [dashboard](https://routster.trackster.dev/dashboard).
-2. **Instal dari source** (butuh `git` dan [`uv`](https://docs.astral.sh/uv/); repo-nya besar, sekitar 300 MB):
+2. **Instal (satu baris):**
+
+   ```bash
+   # macOS / Linux / WSL
+   curl -fsSL https://raw.githubusercontent.com/ArzakaRaffan/routster-agent/main/scripts/install.sh | bash
+   ```
+
+   ```powershell
+   # Windows (PowerShell)
+   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArzakaRaffan/routster-agent/main/scripts/install.ps1)))
+   ```
+
+   Installer menyiapkan Python lewat `uv`, meng-clone repo ini, lalu memasang perintah `routster`
+   (dan alias `hermes`). Tidak ada service background yang dipasang.
+
+   <details><summary>Instal manual dari source</summary>
 
    ```bash
    git clone https://github.com/ArzakaRaffan/routster-agent.git
@@ -25,8 +40,9 @@ mengulang sampai tugasnya selesai.
    mkdir -p ~/.local/bin && ln -sf ~/.local/share/routster-agent/venv/bin/routster ~/.local/bin/routster
    ```
 
-   Pastikan `~/.local/bin` ada di `PATH`. `pip install`/`uv tool install` biasa **tidak** bisa
-   dipakai, karena pin dependensi upstream hanya bisa di-resolve lewat `uv.lock` + PM.
+   `pip install`/`uv tool install` biasa **tidak** bisa dipakai, karena pin dependensi upstream
+   hanya bisa di-resolve lewat `uv.lock` + PM.
+   </details>
 
 3. **Login dan mulai:**
 
@@ -34,8 +50,6 @@ mengulang sampai tugasnya selesai.
    routster login     # tempel API key (input disembunyikan), divalidasi tanpa memotong saldo
    routster           # mulai sesi di folder project kamu
    ```
-
-Paket instal satu baris (`pipx`/`uv tool install`) belum tersedia. Lihat bagian *Status* di bawah.
 
 ## Perintah penting
 
@@ -47,6 +61,9 @@ Paket instal satu baris (`pipx`/`uv tool install`) belum tersedia. Lihat bagian 
 | `routster model` | Pilih model. Multiplier input/output tiap model ditampilkan |
 | `routster setup` | Wizard setup lengkap (Quick Setup = Routster) |
 | `routster doctor` | Cek konfigurasi |
+| `routster update` | Update ke versi terbaru dari repo ini (branch `main`) |
+| `routster dashboard` | Dashboard web lokal (port 9119) |
+| `routster auth add <provider>` | Sambungkan API key provider kamu sendiri |
 
 ## Model dan biaya
 
@@ -85,11 +102,10 @@ config. Routster cuma jadi default.
 
 Ini versi awal. Yang belum dikerjakan:
 
-- Teks dan banner di TUI sebagian masih bertuliskan "Hermes".
-- `routster update` masih menarik update dari repo Hermes upstream, jadi **jangan dipakai dulu**.
-  Untuk update: `git pull`, hapus folder venv, lalu jalankan lagi perintah `pm.build_env` di atas.
-- Installer satu baris (`curl … | bash`) belum ada.
+- Installer satu baris belum diuji end-to-end di mesin bersih.
 - Saldo belum tampil di status bar, karena gateway belum punya endpoint saldo berbasis API key.
+- Fitur bawaan Hermes yang tidak relevan (messaging gateway, kanban, cron, desktop app, akun Nous)
+  disembunyikan dari menu, tapi kodenya masih ada. Detail di [FORK.md](FORK.md).
 
 ## Lisensi
 

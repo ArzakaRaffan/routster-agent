@@ -339,7 +339,7 @@ COMMAND_REGISTRY: list[CommandDef] = [
                cli_only=True, args_hint="<path>", desktop="terminal"),
     CommandDef("update", "Update Hermes Agent to the latest version", "Info",
                busy_policy="dispatch", desktop="terminal"),
-    CommandDef("version", "Show Hermes Agent version", "Info", aliases=("v",),
+    CommandDef("version", "Show Routster Agent version", "Info", aliases=("v",),
                busy_policy="dispatch", execute="version"),
     CommandDef("debug", "Upload debug report (system info + logs) and get shareable links", "Info",
                args_hint="[nous|local]"),
@@ -347,6 +347,11 @@ COMMAND_REGISTRY: list[CommandDef] = [
     # Exit
     CommandDef("quit", "Exit the CLI (use --delete to also remove session history)", "Exit",
                cli_only=True, aliases=("exit",), args_hint="[--delete]", desktop="terminal")]
+
+# Routster fork: messaging, Nous-account and novelty commands are not offered (routster_fork.py).
+from hermes_cli.routster_fork import HIDDEN_SLASH_COMMANDS as _FORK_HIDDEN
+
+COMMAND_REGISTRY = [cmd for cmd in COMMAND_REGISTRY if cmd.name not in _FORK_HIDDEN]
 
 
 # Distinguishes ``mixed`` (subcommands plus free-text) from ``options``; no subcommands => ``text``.

@@ -35,6 +35,19 @@ Most Routster behaviour lives in a file upstream never edits:
 | Tests adapted to the fork | `tests/hermes_cli/test_setup_quick_import.py`, `test_provider_parity.py`, `test_anon_picker.py`; `test_cli_provider_resolution.py::test_cmd_model_forwards_nous_login_tls_options` skipped (Nous is not in the picker) |
 | `tests/fixtures/provider_wire_snapshot.json` | Routster wire entries (regenerate: `HERMES_UPDATE_WIRE_SNAPSHOT=1 python -m pytest tests/agent/transports/test_provider_wire_snapshot.py`) |
 | `scripts/routster_smoke.py` | optional live smoke test (spends balance; never run by CI) |
+| `hermes_cli/routster_fork.py` (new) | **one place** listing the hidden subcommands and slash commands |
+| `hermes_cli/main.py::_build_cli_parser` | `_parser.hide_fork_subcommands()` drops hidden ones from `--help` (they still parse: internals relaunch `gateway`/`serve`) |
+| `hermes_cli/commands.py` | `COMMAND_REGISTRY` filtered by `HIDDEN_SLASH_COMMANDS` (Nous account, messaging, pets, kanban, cron) |
+| `hermes_cli/setup.py` | no Messaging Platforms step, no `gateway`/`telemetry` sections; banner text |
+| `hermes_cli/_parser.py` | help examples say `routster`, no gateway/profile/console lines |
+| `hermes_cli/skin_engine.py` | new built-in `routster` skin (palette of routster.trackster.dev, mint accent, no kaomoji); unset `display.skin` falls back to it; Hermes-named skins carry the Routster persona |
+| `hermes_cli/config_defaults.py`, `cli-config.yaml.example`, `gateway/session_config.py`, `tui_gateway/methods_config.py`, `hermes_cli/web_server_config.py` | default skin `routster`; `tui_status_indicator: unicode` |
+| `hermes_cli/banner.py`, `ui-tui/src/banner.ts`, `ui-tui/src/theme.ts` | ROUTSTER wordmark + routing hero replace HERMES-AGENT / caduceus; "Routster Agent v…" labels |
+| `acp_adapter/commands.py`, `agent/legacy_cli.py`, `hermes_cli/_startup_fast.py`, `hermes_cli/gateway_chat_view.py` | version / welcome text |
+| `web/` (`index.html`, `index.css`, `themes/presets.ts`, `App.tsx`, `i18n/*.ts`) | dashboard default theme = Routster palette, brand text, no Cron/Channels/Webhooks/Pairing nav items |
+| `hermes_cli/update_cmd_git.py`, `hermes_cli/update_cmd_zip.py` | "official" repo = ArzakaRaffan/routster-agent (no Hermes upstream prompt or push for users; ZIP fallback and repair hints point at the fork) |
+| `hermes_cli/_launchers.py`, `hermes_cli/_install_repair.py` | `routster` launcher next to `hermes` / `hermes-acp` |
+| `scripts/install.sh`, `scripts/install.ps1` | default repo = the fork, `routster` wording, gateway service stage disabled |
 
 ## Routster gateway contract (what the profile relies on)
 
@@ -61,15 +74,14 @@ Most Routster behaviour lives in a file upstream never edits:
 
 ## Not done yet
 
-- One-line install. Plain `uv tool install` fails to resolve (upstream pins conflict outside
-  `uv.lock`). `scripts/install.sh` honours `HERMES_REPO_URL`/`--branch` but publishes a `hermes`
-  launcher only (`hermes_cli/_launchers.py`); `source ./activate` defines a checkout-bound dev
-  function. The verified path today is `pm.build_env` (README), whose venv has `bin/routster`.
-
-- Full rename of user-facing "Hermes" text, banner/ASCII art, docs links.
-- `routster update` still pulls from NousResearch/hermes-agent (`hermes_cli/update_cmd_git.py`,
-  installer URLs): must be redirected or disabled before distributing.
+- Live smoke test (`scripts/routster_smoke.py`) has not been run: needs `ROUTSTER_API_KEY`.
+- Dashboard / TUI TypeScript changes are not type-checked locally (repo wants Node 26; `npm ci`
+  not run). The edits are strings, palette values, four nav items and three icon imports.
+- Hidden ≠ deleted: messaging gateway, kanban, cron, desktop app and Nous code still ship (the
+  dashboard, TUI and upstream merges depend on them). Many hints still say `hermes <cmd>`; the
+  `hermes` command keeps working, so they are cosmetic.
+- `routster debug share` still uploads to paste.rs/dpaste and points at Nous support.
+- One-line install is wired (`scripts/install.sh` / `install.ps1` default to this fork, follow
+  `main`, publish `routster`) but has not been run end-to-end on a clean machine.
 - `routster` with no model configured and only `ROUTSTER_API_KEY` in the environment fails with
   upstream's `storage_unavailable`; `routster login` (Enter keeps the env key) fixes it.
-- Messaging gateway, desktop app, cron, kanban and Nous-only commands (`portal`) are still
-  registered; only setup and provider lists hide Nous.

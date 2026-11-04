@@ -67,14 +67,15 @@ export function webPresetFromShared(
 
 export const defaultTheme: DashboardTheme = {
   name: "default",
-  label: "Hermes Teal",
-  description: "Classic dark teal — the canonical Hermes look",
+  // Routster fork: the default theme matches https://routster.trackster.dev (dark).
+  label: "Routster",
+  description: "Near-black with a mint accent — the Routster look",
   palette: {
-    background: { hex: "#041c1c", alpha: 1 },
-    midground: { hex: "#ffe6cb", alpha: 1 },
+    background: { hex: "#0a0b0a", alpha: 1 },
+    midground: { hex: "#eceeec", alpha: 1 },
     foreground: { hex: "#ffffff", alpha: 0 },
-    warmGlow: "rgba(255, 189, 56, 0.35)",
-    noiseOpacity: 1,
+    warmGlow: "rgba(143, 230, 179, 0.3)",
+    noiseOpacity: 0.4,
   },
   typography: DEFAULT_TYPOGRAPHY,
   layout: DEFAULT_LAYOUT,

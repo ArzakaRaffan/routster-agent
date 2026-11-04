@@ -57,8 +57,9 @@ def _wings(*glyphs) -> list[list[str]]:
 
 
 # Branding shared by every Hermes-named built-in (mono/daylight override help_header).
+# Routster fork: the Hermes-named built-ins carry the Routster persona.
 _HERMES_BRANDING: dict[str, str] = _branding(
-    "Hermes", "☤", "Goodbye! ☤", prompt="❯", help_header="(^_^)? Available Commands")
+    "Routster", "◆", "Sampai jumpa! ◆", prompt="❯", help_header="(^_^)? Available Commands")
 
 _BUILTIN_SKINS: dict[str, dict[str, Any]] = {
     "default": {
@@ -138,6 +139,51 @@ _BUILTIN_SKINS: dict[str, dict[str, Any]] = {
 [#DD4A3A]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⚔⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
 [dim #6B1717]⠀⠀⠀⠀⠀⠀⠀⠀war god online⠀⠀⠀⠀⠀⠀⠀⠀[/]""",
     },
+    # Routster fork: the default skin, matching https://routster.trackster.dev (near-black panels,
+    # neutral greys, mint accent; light palette = the site's light theme).
+    "routster": {
+        "name": "routster", "description": "Routster — near-black, neutral greys, mint accent",
+        "colors": {
+            "banner_border": "#2B302D", "banner_title": "#ECEEEC", "banner_accent": "#8FE6B3",
+            "banner_dim": "#69716C", "banner_text": "#A2AAA5", "ui_accent": "#8FE6B3",
+            "ui_label": "#A2AAA5", "ui_ok": "#6FD69A", "ui_error": "#F2776F", "ui_warn": "#E8B85A",
+            "prompt": "#ECEEEC", "input_rule": "#2B302D", "response_border": "#8FE6B3",
+            "status_bar_bg": "#131614", "status_bar_text": "#A2AAA5",
+            "status_bar_strong": "#ECEEEC", "status_bar_dim": "#69716C",
+            "status_bar_good": "#6FD69A", "status_bar_warn": "#E8B85A", "status_bar_bad": "#F2776F",
+            "status_bar_critical": "#F2776F", "session_label": "#A2AAA5",
+            "session_border": "#2B302D", "completion_menu_bg": "#131614",
+            "completion_menu_current_bg": "#191C1A", "selection_bg": "#1E2220",
+            "shell_dollar": "#86A9F5", "voice_status_bg": "#131614"},
+        "light_colors": {
+            "banner_border": "#CFD4CC", "banner_title": "#0D100E", "banner_accent": "#0B7A43",
+            "banner_dim": "#7D857F", "banner_text": "#4A524D", "ui_accent": "#0B7A43",
+            "ui_label": "#4A524D", "ui_ok": "#138A4C", "ui_error": "#C43A32", "ui_warn": "#A86A00",
+            "prompt": "#0D100E", "input_rule": "#CFD4CC", "response_border": "#0B7A43",
+            "status_bar_bg": "#F0F2EE", "status_bar_text": "#4A524D",
+            "status_bar_strong": "#0D100E", "status_bar_dim": "#7D857F",
+            "status_bar_good": "#138A4C", "status_bar_warn": "#A86A00", "status_bar_bad": "#C43A32",
+            "status_bar_critical": "#C43A32", "session_label": "#4A524D",
+            "session_border": "#CFD4CC", "completion_menu_bg": "#F0F2EE",
+            "completion_menu_current_bg": "#E9ECE7", "selection_bg": "#E2E5DF",
+            "shell_dollar": "#2E62C9", "voice_status_bg": "#F0F2EE"},
+        "spinner": {
+            "waiting_faces": ["◐", "◓", "◑", "◒"],
+            "thinking_faces": ["◐", "◓", "◑", "◒"],
+            "thinking_verbs": ["routing", "thinking", "reading", "planning", "checking", "writing"]},
+        "branding": {**_HERMES_BRANDING, "help_header": "Available Commands"},
+        "tool_prefix": "│",
+        "banner_logo": """[bold #ECEEEC]██████╗  ██████╗ ██╗   ██╗████████╗███████╗████████╗███████╗██████╗[/]
+[bold #ECEEEC]██╔══██╗██╔═══██╗██║   ██║╚══██╔══╝██╔════╝╚══██╔══╝██╔════╝██╔══██╗[/]
+[#A2AAA5]██████╔╝██║   ██║██║   ██║   ██║   ███████╗   ██║   █████╗  ██████╔╝[/]
+[#A2AAA5]██╔══██╗██║   ██║██║   ██║   ██║   ╚════██║   ██║   ██╔══╝  ██╔══██╗[/]
+[#69716C]██║  ██║╚██████╔╝╚██████╔╝   ██║   ███████║   ██║   ███████╗██║  ██║[/]
+[#69716C]╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝[/]""",
+        "banner_hero": """[#69716C]  ●──────╮[/]
+[#A2AAA5]         ├──▶ [#8FE6B3]●[/][/]
+[#8FE6B3]  ●──────┤[/]
+[#A2AAA5]         ├──▶ [#8FE6B3]●[/][/]
+[#69716C]  ●──────╯[/]"""},
     "mono": {
         "name": "mono", "description": "Monochrome — clean grayscale",
         "colors": {
@@ -470,7 +516,7 @@ def get_active_skin_name() -> str:
 def init_skin_from_config(config: dict) -> None:
     """Initialize the active skin from CLI config at startup."""
     display = config.get("display") or {}
-    skin_name = display.get("skin", "default") if isinstance(display, dict) else "default"
+    skin_name = display.get("skin", "routster") if isinstance(display, dict) else "routster"
     set_active_skin(skin_name.strip() if isinstance(skin_name, str) and skin_name.strip() else "default")
 
 

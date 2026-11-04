@@ -3287,7 +3287,7 @@ def _build_cli_parser():
     live in ``hermes_cli/subcommands/<group>.py`` with handlers injected so
     those modules never import main.
     """
-    from hermes_cli._parser import build_top_level_parser
+    from hermes_cli._parser import build_top_level_parser, hide_fork_subcommands
 
     parser, subparsers, chat_parser = build_top_level_parser()
     chat_parser.set_defaults(func=cmd_chat)
@@ -3387,7 +3387,7 @@ def _build_cli_parser():
     build_gui_parser(subparsers, cmd_gui=cmd_gui)
     build_logs_parser(subparsers, cmd_logs=cmd_logs)
     build_prompt_size_parser(subparsers, cmd_prompt_size=cmd_prompt_size)
-    return parser, subparsers
+    return parser, hide_fork_subcommands(subparsers)
 
 
 def _parse_cli_args(parser, subparsers, argv):
