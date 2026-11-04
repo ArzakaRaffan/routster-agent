@@ -2368,10 +2368,22 @@ def _reset_config_provider() -> Path:
 
 
 def login_command(args) -> None:
-    """Deprecated: use 'hermes model' or 'hermes setup' instead."""
-    print("The 'hermes login' command has been removed.\nUse 'hermes auth' to manage credentials,\n"
-          "'hermes model' to select a provider, or 'hermes setup' for full setup.")
-    raise SystemExit(0)
+    """``routster login``: validate + save a Routster API key and make Routster the default provider.
+
+    Other providers keep their own setup (``routster model`` / ``routster auth``)."""
+    requested = str(getattr(args, "provider", None) or "routster").strip().lower()
+    if requested != "routster":
+        print(f"`login` only signs in to Routster. For {requested}, use `routster model` or `routster auth add {requested}`.")
+        raise SystemExit(2)
+    from hermes_cli.config import load_config
+    from providers import get_provider_profile
+
+    flow = getattr(get_provider_profile("routster"), "model_setup_flow", None)
+    model_cfg = load_config().get("model")
+    current = str((model_cfg.get("default") if isinstance(model_cfg, dict) else model_cfg) or "")
+    if flow is None or flow({}, current, args, pick_model=False) is None:
+        raise SystemExit(1)
+    print("\n  Siap! Jalankan `routster` untuk mulai, atau `routster model` untuk ganti model.")
 
 
 def get_minimax_oauth_auth_status() -> dict[str, Any]:

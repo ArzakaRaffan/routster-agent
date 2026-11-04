@@ -584,6 +584,9 @@ requires = ["setuptools==84.1.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project.scripts]
+# Routster Agent's user-facing command. ``hermes`` stays registered because core code relaunches
+# itself through ``shutil.which("hermes")`` (relaunch, gateway, kanban dispatch, local terminal).
+routster = "hermes_cli.main:main"
 hermes = "hermes_cli.main:main"
 hermes-agent = "agent.legacy_cli:main"
 hermes-acp = "acp_adapter.entry:main"
