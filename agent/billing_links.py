@@ -42,6 +42,7 @@ class _Provider:
 # Hosts back the OpenAI-compatible fallback where the slug is a generic bucket but
 # base_url reveals the real upstream. Unknown providers get a readable label, no URL.
 _PROVIDERS: tuple[_Provider, ...] = (
+    _Provider("Routster", "https://routster.trackster.dev/dashboard", ("routster",), ("routster.trackster.dev",)),
     _Provider("OpenAI", "https://platform.openai.com/settings/organization/billing", ("openai",), ("api.openai.com",)),
     _Provider("Anthropic", "https://console.anthropic.com/settings/billing", ("anthropic",), ("api.anthropic.com",)),
     _Provider("OpenRouter", "https://openrouter.ai/settings/credits", ("openrouter",), ("openrouter.ai",)),

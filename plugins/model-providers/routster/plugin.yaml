@@ -1,0 +1,5 @@
+name: routster-provider
+kind: model-provider
+version: 1.0.0
+description: Routster — Indonesian AI API gateway (OpenAI-compatible, Rupiah billing)
+author: Routster

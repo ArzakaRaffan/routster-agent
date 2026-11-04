@@ -6472,10 +6472,13 @@ def _forwards_max_tokens(provider: str, provider_norm: str, model: str, effectiv
     quirks). Forward only where mandatory or honored: Anthropic Messages wire (400 without it);
     NVIDIA NIM (empty choices[] when omitted); MoA reference slots; Gemini native (fixed 65,535
     ceiling otherwise); OpenRouter (budgets the FULL window when omitted → 402 on low credit);
-    managed local llama-server (uncapped decode with no EOS burns the GPU to the context window).
+    managed local llama-server (uncapped decode with no EOS burns the GPU to the context window);
+    Routster (silently caps an omitted max_tokens at 1024, truncating compression summaries).
     """
     return (
-        _is_anthropic_compat_endpoint(provider, effective_base)
+        provider_norm == "routster"
+        or base_url_host_matches(effective_base, "routster.trackster.dev")
+        or _is_anthropic_compat_endpoint(provider, effective_base)
         or _nous_on_messages_wire(provider_norm, model)
         or provider_norm in _NVIDIA_PROVIDER_NAMES
         or base_url_host_matches(effective_base, "integrate.api.nvidia.com")
