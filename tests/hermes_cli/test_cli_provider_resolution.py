@@ -749,6 +749,7 @@ def test_model_flow_custom_persists_selected_api_mode(monkeypatch):
     assert saved_env[key_env] == "test-key"
 
 
+@pytest.mark.skip(reason="Routster Agent: Nous Portal is not offered in the provider picker (FORK.md)")
 def test_cmd_model_forwards_nous_login_tls_options(monkeypatch):
     monkeypatch.setattr(hermes_main, "_require_tty", lambda *a: None)
     monkeypatch.setattr(

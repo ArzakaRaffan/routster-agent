@@ -10053,6 +10053,188 @@
    ]
   }
  },
+ "routster": {
+  "api_mode": "chat_completions",
+  "base_url": "https://routster.trackster.dev/v1",
+  "high": {
+   "max_tokens": 8192,
+   "messages": [
+    {
+     "content": "You are a test agent.",
+     "role": "system"
+    },
+    {
+     "content": "list files",
+     "role": "user"
+    },
+    {
+     "content": "",
+     "reasoning_content": " ",
+     "role": "assistant",
+     "tool_calls": [
+      {
+       "function": {
+        "arguments": "{\"command\": \"ls\"}",
+        "name": "terminal"
+       },
+       "id": "call_1",
+       "type": "function"
+      }
+     ]
+    },
+    {
+     "content": "a.txt\nb.txt",
+     "role": "tool",
+     "tool_call_id": "call_1"
+    },
+    {
+     "content": "thanks, now summarize",
+     "role": "user"
+    }
+   ],
+   "model": "routster/deepseek-v4.1-flash",
+   "timeout": 1800.0,
+   "tools": [
+    {
+     "function": {
+      "description": "Run a shell command.",
+      "name": "terminal",
+      "parameters": {
+       "properties": {
+        "command": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "command"
+       ],
+       "type": "object"
+      }
+     },
+     "type": "function"
+    }
+   ]
+  },
+  "model": "routster/deepseek-v4.1-flash",
+  "off": {
+   "max_tokens": 8192,
+   "messages": [
+    {
+     "content": "You are a test agent.",
+     "role": "system"
+    },
+    {
+     "content": "list files",
+     "role": "user"
+    },
+    {
+     "content": "",
+     "reasoning_content": " ",
+     "role": "assistant",
+     "tool_calls": [
+      {
+       "function": {
+        "arguments": "{\"command\": \"ls\"}",
+        "name": "terminal"
+       },
+       "id": "call_1",
+       "type": "function"
+      }
+     ]
+    },
+    {
+     "content": "a.txt\nb.txt",
+     "role": "tool",
+     "tool_call_id": "call_1"
+    },
+    {
+     "content": "thanks, now summarize",
+     "role": "user"
+    }
+   ],
+   "model": "routster/deepseek-v4.1-flash",
+   "timeout": 1800.0,
+   "tools": [
+    {
+     "function": {
+      "description": "Run a shell command.",
+      "name": "terminal",
+      "parameters": {
+       "properties": {
+        "command": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "command"
+       ],
+       "type": "object"
+      }
+     },
+     "type": "function"
+    }
+   ]
+  },
+  "unset": {
+   "max_tokens": 8192,
+   "messages": [
+    {
+     "content": "You are a test agent.",
+     "role": "system"
+    },
+    {
+     "content": "list files",
+     "role": "user"
+    },
+    {
+     "content": "",
+     "reasoning_content": " ",
+     "role": "assistant",
+     "tool_calls": [
+      {
+       "function": {
+        "arguments": "{\"command\": \"ls\"}",
+        "name": "terminal"
+       },
+       "id": "call_1",
+       "type": "function"
+      }
+     ]
+    },
+    {
+     "content": "a.txt\nb.txt",
+     "role": "tool",
+     "tool_call_id": "call_1"
+    },
+    {
+     "content": "thanks, now summarize",
+     "role": "user"
+    }
+   ],
+   "model": "routster/deepseek-v4.1-flash",
+   "timeout": 1800.0,
+   "tools": [
+    {
+     "function": {
+      "description": "Run a shell command.",
+      "name": "terminal",
+      "parameters": {
+       "properties": {
+        "command": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "command"
+       ],
+       "type": "object"
+      }
+     },
+     "type": "function"
+    }
+   ]
+  }
+ },
  "solstice": {
   "api_mode": "chat_completions",
   "base_url": "https://generativelanguage.googleapis.com/v1alpha",

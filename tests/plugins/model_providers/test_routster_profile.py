@@ -27,7 +27,7 @@ CATALOG = {"object": "list", "data": [
 
 @pytest.fixture
 def routster():
-    import model_tools  # noqa: F401  (plugin discovery registers the profile)
+    import model_tools  # plugin discovery registers the profile
     import providers
 
     profile = providers.get_provider_profile("routster")
@@ -155,7 +155,7 @@ def test_catalog_notes_show_multipliers(plugin_module, gateway):
 
 class TestLogin:
     def test_login_saves_key_and_makes_routster_the_default(self, gateway):
-        from hermes_cli.auth import login_command
+        from hermes_cli.auth_routster_login import login_command
         from hermes_cli.config import get_env_value, load_config
 
         login_command(SimpleNamespace(provider=None, base_url=gateway.base_url, model=None, api_key=GOOD_KEY))
@@ -169,7 +169,7 @@ class TestLogin:
         assert oct(env_file.stat().st_mode & 0o777) == "0o600"
 
     def test_rejected_key_saves_nothing(self, gateway):
-        from hermes_cli.auth import login_command
+        from hermes_cli.auth_routster_login import login_command
         from hermes_cli.config import get_env_value
 
         with pytest.raises(SystemExit):
@@ -177,7 +177,7 @@ class TestLogin:
         assert not get_env_value("ROUTSTER_API_KEY")
 
     def test_other_providers_are_pointed_elsewhere(self, gateway):
-        from hermes_cli.auth import login_command
+        from hermes_cli.auth_routster_login import login_command
 
         with pytest.raises(SystemExit) as exc:
             login_command(SimpleNamespace(provider="openrouter", base_url=None, model=None, api_key=None))

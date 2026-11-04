@@ -12,7 +12,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def _providers():
-    import model_tools  # noqa: F401  (plugin discovery)
+    import model_tools  # plugin discovery
 
 
 def test_routster_leads_the_provider_picker_and_nous_is_not_offered():
