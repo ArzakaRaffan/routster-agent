@@ -124,6 +124,11 @@ def _restart_managed_dashboard_service(reason: str, unit: str = _DASHBOARD_SYSTE
 
     if scope is None:
         return False
+    # Routster fork: the unit name is shared with a Hermes install on the same account; only
+    # restart a unit running this install's home (same gate as the update fleet restart).
+    from hermes_cli.update_cmd_fleet import _systemd_unit_owned_by_update
+    if not _systemd_unit_owned_by_update(["systemctl", *scope], unit):
+        return True  # handled: never fall back to killing another install's PID
 
     try:
         active = _systemctl(*scope, "is-active", unit)

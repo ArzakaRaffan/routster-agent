@@ -13,7 +13,7 @@ import shlex
 import stat
 from typing import NoReturn
 
-from hermes_constants import HOME_DIRNAME
+from hermes_constants import HOME_DIRNAME, WINDOWS_HOME_DIRNAME
 
 
 SYSTEMD_IDENTITY_PROPERTIES = (
@@ -48,11 +48,23 @@ def _install_root(home: Path) -> Path:
     return home.parent
 
 
+_HERMES_VS_ROUTSTER = ({".hermes", HOME_DIRNAME}, {"hermes", WINDOWS_HOME_DIRNAME})
+
+
+def _profile_root(home: Path) -> Path:
+    """The install home a profile belongs to: ``<root>`` for ``<root>/profiles/<name>``, else itself."""
+    return home.parents[1] if len(home.parts) >= 3 and home.parent.name == "profiles" else home
+
+
 def verify_home(home: Path, configured: str) -> None:
     ours, theirs = home.resolve(), _absolute(configured)
     if os.path.normcase(str(theirs)) == os.path.normcase(str(ours)):
         return
     if os.path.normcase(str(_install_root(theirs))) != os.path.normcase(str(_install_root(ours))):
+        raise ForeignRoot("foreign_root")
+    # Routster fork: ~/.hermes and ~/.routster share a HOME but are separate installs, so a
+    # hermes-gateway unit pinned to the other one neither serves nor blocks this home.
+    if {_profile_root(theirs).name.lower(), _profile_root(ours).name.lower()} in _HERMES_VS_ROUTSTER:
         raise ForeignRoot("foreign_root")
     raise ValueError("profile_mismatch")
 
