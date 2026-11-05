@@ -28,10 +28,10 @@ def test_remove_dashboard_launchd_jobs_boots_out_and_deletes_matching_plists(
         }))
         return path
 
-    dashboard = job("com.user.hermes-dashboard",
+    dashboard = job("com.user.routster-dashboard",
                     ["/Users/u/.hermes/hermes-agent/venv/bin/hermes", "dashboard", "--port", "9200"],
                     agents_dir)
-    serve = job("com.user.hermes-serve", ["hermes", "serve"], agents_dir)
+    serve = job("com.user.routster-serve", ["hermes", "serve"], agents_dir)
     unrelated = job("com.user.keep", ["/usr/bin/say", "hello"], agents_dir)
     daemon = job("io.nousresearch.hermes-agent.dashboard", ["hermes_cli.main", "dashboard"],
                  daemons_dir)
@@ -47,7 +47,7 @@ def test_remove_dashboard_launchd_jobs_boots_out_and_deletes_matching_plists(
     assert not dashboard.exists() and not serve.exists() and not daemon.exists()
     assert unrelated.exists()  # non-Hermes job is never touched
     domains = {tuple(cmd[2].rsplit("/", 1)) for cmd in booted}
-    assert ("com.user.hermes-dashboard", "gui/501") in domains or \
+    assert ("com.user.routster-dashboard", "gui/501") in domains or \
         {d for d, _ in domains} >= {"gui/501", "user/501"} or booted  # bootout attempted per domain
     assert all(cmd[:2] == ["launchctl", "bootout"] for cmd in booted)
 

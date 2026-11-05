@@ -372,7 +372,7 @@ def cmd_sync(args: argparse.Namespace) -> int:
     print_table(console, (("Name", {"style": "cyan"}), "Action"), rows, warnings)
     if not args.apply:
         console.print("\n  This was a dry-run — secrets are picked up automatically on the "
-                      "next [cyan]hermes[/cyan] invocation.  Re-run with [cyan]--apply[/cyan] "
+                      "next [cyan]routster[/cyan] invocation.  Re-run with [cyan]--apply[/cyan] "
                       "to export into the current shell instead.")
     else:
         console.print(f"\n  [green]Exported {applied} secret(s) into current process.[/green]")

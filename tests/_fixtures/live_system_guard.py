@@ -185,7 +185,7 @@ def _live_system_guard(request, monkeypatch):
 
     # ── Subprocess command-string inspection (whole-line) ──────────
     _HERMES_TOKENS = (
-        "hermes-gateway",
+        "routster-gateway",
         "hermes.service",
         "hermes_cli.main gateway",
         "hermes_cli/main.py gateway",
@@ -259,7 +259,7 @@ def _live_system_guard(request, monkeypatch):
         name = word.rsplit("/", 1)[-1].lower()
         for suffix in (".service", ".timer", ".socket"):
             name = name.removesuffix(suffix)
-        return name == "hermes" or name.startswith("hermes-")
+        return name in ("hermes", "routster") or name.startswith(("hermes-", "routster-"))
 
     def _is_blocked_systemctl(cmd) -> bool:
         cmd_str = _cmd_to_string(cmd)
@@ -357,8 +357,8 @@ def _live_system_guard(request, monkeypatch):
             raise RuntimeError(
                 f"tests/conftest.py live-system guard: blocked "
                 f"subprocess.{name}({cmd!r}) — would mutate a live "
-                "Routster systemd unit (hermes-gateway*, hermes-dashboard*, "
-                "hermes-serve*, ...). Mock "
+                "Routster systemd unit (routster-gateway*, routster-dashboard*, "
+                "routster-serve*, ...). Mock "
                 "subprocess.run / _run_systemctl in the test, or "
                 "mark with @pytest.mark.live_system_guard_bypass."
             )

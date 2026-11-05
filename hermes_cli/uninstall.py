@@ -299,7 +299,7 @@ def _remove_systemd_gateway() -> bool:
 # installed. An uninstall must sweep BOTH — a stale agent keeps respawning the
 # gateway after the code tree is gone (#62209).
 _LAUNCHD_GATEWAY_PLIST_PATTERNS = (
-    "ai.hermes.gateway*.plist",
+    "ai.routster.gateway*.plist",
     "io.nousresearch.hermes-agent.gateway*.plist",
 )
 

@@ -454,7 +454,7 @@ def test_clean_update_escalates_surviving_serve_as_unaccounted(
 
     def _match(p, **kw):
         kw["restarted_services"] = list(kw.get("restarted_services") or []) + [
-            "hermes-gateway.service"
+            "routster-gateway.service"
         ]
         return real_match(p, **kw)
 
@@ -530,7 +530,7 @@ def test_clean_update_defers_desktop_owned_serve_and_clears_marker(
 
     def _match(p, **kw):
         kw["restarted_services"] = list(kw.get("restarted_services") or []) + [
-            "hermes-gateway.service"
+            "routster-gateway.service"
         ]
         return real_match(p, **kw)
 
@@ -870,7 +870,7 @@ def test_startup_warn_silent_when_failed_receipt_already_restarted_fleet(monkeyp
                 "stop_reason": "AttributeError: module 'hermes_cli.main_dashboard' has no attribute 'x'",
                 "pre_update": {"sha": pre}, "post_update": {"sha": pulled},
                 "gateway_restart": {
-                    "restarted_services": ["hermes-gateway"], "relaunched_profiles": [],
+                    "restarted_services": ["routster-gateway"], "relaunched_profiles": [],
                     "externally_supervised_profiles": [], "killed_pids": [], "failed_units": [],
                     "incomplete": False, "phase_error": "",
                 },
@@ -907,7 +907,7 @@ def test_startup_warn_silent_when_completed_update_fleet_restarted_onto_moved_ch
                 "outcome": "success", "exit_code": 0,
                 "pre_update": {"sha": pre}, "post_update": {"sha": pulled},
                 "gateway_restart": {
-                    "restarted_services": ["hermes-gateway"], "relaunched_profiles": [],
+                    "restarted_services": ["routster-gateway"], "relaunched_profiles": [],
                     "externally_supervised_profiles": [], "killed_pids": [], "failed_units": [],
                     "incomplete": False, "phase_error": "",
                 },

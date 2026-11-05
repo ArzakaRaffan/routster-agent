@@ -28,17 +28,17 @@ def test_status_warns_and_uninstall_removes_pre_suffix_launchers(tmp_path, monke
     monkeypatch.setattr(gateway_windows, "_print_start_attestation_warning", lambda: None)
 
     current = gateway_windows.get_task_name()
-    assert current != "Hermes_Gateway", "a temp home must carry a profile suffix"
-    legacy_pair = home / "gateway-service" / "Hermes_Gateway.vbs"
+    assert current != "Routster_Gateway", "a temp home must carry a profile suffix"
+    legacy_pair = home / "gateway-service" / "Routster_Gateway.vbs"
     legacy_pair.write_text("' pre-suffix launcher\r\n", encoding="utf-8")
     # Both objects must point INTO this home: a bare-named task/entry targeting another home is a
     # sibling install (the default profile's live gateway) and is deliberately left alone.
-    legacy_vbs = startup / "Hermes_Gateway.vbs"
+    legacy_vbs = startup / "Routster_Gateway.vbs"
     legacy_vbs.write_text(gateway_windows._build_startup_launcher(legacy_pair.with_suffix(".cmd")), encoding="utf-8")
 
     schtasks = shutil.which("schtasks") or "schtasks"
     create = subprocess.run(
-        [schtasks, "/Create", "/F", "/TN", "Hermes_Gateway", "/SC", "ONLOGON", "/TR", f"wscript.exe //B {legacy_pair}"],
+        [schtasks, "/Create", "/F", "/TN", "Routster_Gateway", "/SC", "ONLOGON", "/TR", f"wscript.exe //B {legacy_pair}"],
         capture_output=True, text=True, timeout=60,
         check=False,
     )
@@ -46,20 +46,20 @@ def test_status_warns_and_uninstall_removes_pre_suffix_launchers(tmp_path, monke
     try:
         gateway_windows.status()
         out = capsys.readouterr().out
-        assert "legacy pre-suffix Scheduled Task still installed: Hermes_Gateway" in out
+        assert "legacy pre-suffix Scheduled Task still installed: Routster_Gateway" in out
         assert f"legacy pre-suffix Windows login item still installed: {legacy_vbs}" in out
         assert f"legacy pre-suffix task launcher still installed: {legacy_pair}" in out
         assert "routster gateway uninstall" in out
 
         gateway_windows.uninstall()
         out = capsys.readouterr().out
-        assert "Removed legacy pre-suffix Scheduled Task 'Hermes_Gateway'" in out
+        assert "Removed legacy pre-suffix Scheduled Task 'Routster_Gateway'" in out
         assert not legacy_vbs.exists()
         assert not legacy_pair.exists()
-        query = subprocess.run([schtasks, "/Query", "/TN", "Hermes_Gateway"], capture_output=True, text=True, timeout=60, check=False)
+        query = subprocess.run([schtasks, "/Query", "/TN", "Routster_Gateway"], capture_output=True, text=True, timeout=60, check=False)
         assert query.returncode != 0, "the pre-suffix task must be gone after uninstall"
 
         gateway_windows.status()
         assert "legacy pre-suffix" not in capsys.readouterr().out
     finally:
-        subprocess.run([schtasks, "/Delete", "/F", "/TN", "Hermes_Gateway"], capture_output=True, text=True, timeout=60, check=False)
+        subprocess.run([schtasks, "/Delete", "/F", "/TN", "Routster_Gateway"], capture_output=True, text=True, timeout=60, check=False)

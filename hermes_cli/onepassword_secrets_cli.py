@@ -357,7 +357,7 @@ def cmd_sync(args: argparse.Namespace) -> int:
                 ((name, action(name)) for name in sorted(references)), warnings)
     console.print(
         "\n  This was a dry-run — references resolve automatically on the next "
-        "[cyan]hermes[/cyan] invocation.  Re-run with [cyan]--apply[/cyan] to export "
+        "[cyan]routster[/cyan] invocation.  Re-run with [cyan]--apply[/cyan] to export "
         "into the current shell instead."
     )
     return 0

@@ -100,7 +100,7 @@ def test_supervised_serve_row_never_vetoes_gateway_discharge(monkeypatch, superv
     (directory / "latest.json").write_text(json.dumps({
         "outcome": "failed",
         "post_update": {"sha": "pulled"},
-        "gateway_restart": {"restarted_services": ["hermes-gateway"], "incomplete": False},
+        "gateway_restart": {"restarted_services": ["routster-gateway"], "incomplete": False},
         "plan": {"runtimes": [
             {"kind": "gateway", "profile": "default", "code_sha": "old", "supervisor": "manual"},
             {"kind": "dashboard", "profile": "default", "code_sha": None, "supervisor": supervisor, "restart_via": "respawn-argv"},

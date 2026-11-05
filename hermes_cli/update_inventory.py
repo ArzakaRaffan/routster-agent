@@ -383,7 +383,7 @@ def _serve_unit_matches_profile(profile: str, unit: object) -> bool:
     """
     name = str(unit).removesuffix(".service").rsplit("/", 1)[-1]
     suffix = "" if profile == "default" else f"-{profile}"
-    return name in {f"hermes-serve{suffix}", f"hermes-dashboard{suffix}"}
+    return name in {f"routster-serve{suffix}", f"routster-dashboard{suffix}"}
 
 
 def _gateway_service_matches_profile(profile: str, service: object) -> bool:
@@ -397,8 +397,8 @@ def _gateway_service_matches_profile(profile: str, service: object) -> bool:
     """
     name = str(service).removesuffix(".service").rsplit("/", 1)[-1]
     if profile == "default":
-        return name in {"hermes-gateway", "ai.hermes.gateway", "gateway", "gateway-default"}
-    return name in {f"hermes-gateway-{profile}", f"ai.hermes.gateway-{profile}", f"gateway-{profile}"}
+        return name in {"routster-gateway", "ai.routster.gateway", "gateway", "gateway-default"}
+    return name in {f"routster-gateway-{profile}", f"ai.routster.gateway-{profile}", f"gateway-{profile}"}
 
 
 def _gateway_named_in(r: RuntimeRecord, names: set) -> bool:
@@ -615,7 +615,7 @@ def report_unaccounted_runtimes(outcomes: list[dict[str, Any]]) -> bool:
                     print(f"      {command}   # pid {o['pid']}")
         if any(o.get("kind") in _SERVE_KINDS and not o.get("systemd_unit") for o in missed):
             if sys.platform == "linux":
-                print("      systemctl --user restart hermes-serve.service   # unit-managed serve")
+                print("      systemctl --user restart routster-serve.service   # unit-managed serve")
             print("      relaunch `routster serve` / `routster dashboard`")
     return True
 

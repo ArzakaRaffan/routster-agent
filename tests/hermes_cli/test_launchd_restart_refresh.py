@@ -29,10 +29,10 @@ import hermes_cli.gateway as gateway_cli
 def launchd_seam(monkeypatch, tmp_path):
     """Neutralize process-side effects; record every launchctl invocation."""
     calls = []
-    plist_path = tmp_path / "ai.hermes.gateway.plist"
+    plist_path = tmp_path / "ai.routster.gateway.plist"
     plist_path.write_text("<plist>whatever</plist>", encoding="utf-8")
 
-    monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.hermes.gateway")
+    monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.routster.gateway")
     monkeypatch.setattr(gateway_cli, "_launchd_domain", lambda: "gui/501")
     monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
     monkeypatch.setattr("gateway.status.get_running_pid", lambda *a, **k: None)

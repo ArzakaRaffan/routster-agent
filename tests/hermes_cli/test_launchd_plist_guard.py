@@ -31,7 +31,7 @@ MALFORMED_PLIST = (
 
 GOOD_PLIST = (
     '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0">\n<dict>\n'
-    "  <key>Label</key>\n  <string>ai.hermes.dashboard.test</string>\n"
+    "  <key>Label</key>\n  <string>ai.routster.dashboard.test</string>\n"
     "  <key>ProgramArguments</key>\n  <array>\n"
     "    <string>/usr/local/bin/hermes</string>\n    <string>dashboard</string>\n"
     "    <string>--port</string>\n    <string>9119</string>\n"
@@ -51,7 +51,7 @@ def test_malformed_plist_is_skipped_not_fatal(tmp_path):
 
 def test_malformed_sibling_does_not_hide_the_good_job(tmp_path):
     (tmp_path / "com.example.bad.plist").write_text(MALFORMED_PLIST, encoding="utf-8")
-    (tmp_path / "ai.hermes.dashboard.test.plist").write_text(GOOD_PLIST, encoding="utf-8")
+    (tmp_path / "ai.routster.dashboard.test.plist").write_text(GOOD_PLIST, encoding="utf-8")
     with mock.patch(
         "hermes_cli.gateway._launchd_print_service_pid", return_value=(True, 4321)
     ) as probe:
@@ -59,10 +59,10 @@ def test_malformed_sibling_does_not_hide_the_good_job(tmp_path):
     assert jobs == [
         (
             f"gui/{os.getuid()}",  # windows-footgun: ok — platforms("macos") file
-            "ai.hermes.dashboard.test",
+            "ai.routster.dashboard.test",
             ["/usr/local/bin/hermes", "dashboard", "--port", "9119"],
             4321,
         )
     ]
     # Only the well-formed label was probed against launchd.
-    assert [c.args[1] for c in probe.call_args_list] == ["ai.hermes.dashboard.test"]
+    assert [c.args[1] for c in probe.call_args_list] == ["ai.routster.dashboard.test"]

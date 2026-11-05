@@ -37,7 +37,7 @@ def test_manual_deferral_survives_receipt_rotation(monkeypatch, capsys, kind, co
     elif condition == "missing-identity":
         runtime.detail.clear()
     elif condition == "failed-unit":
-        restart.failed_or_stale_units.append("hermes-serve-work.service")
+        restart.failed_or_stale_units.append("routster-serve-work.service")
         restart.incomplete = True
     if condition != "alive":
         # Contract C3: a restart that is still owed no longer fails the committed update (was
@@ -54,7 +54,7 @@ def test_manual_deferral_survives_receipt_rotation(monkeypatch, capsys, kind, co
     receipt = update_receipt.read_latest_receipt()
     assert receipt["runtime_outcomes"][0]["outcome"] == "deferred"
     assert not fleet._fleet_restart_obligation_armed()
-    assert "hermes-serve.service" not in capsys.readouterr().out
+    assert "routster-serve.service" not in capsys.readouterr().out
     update_receipt.begin_update_receipt()
     update_receipt.finalize_update_receipt("success", fleet=[])
     fleet._warn_pending_fleet_restart_on_startup()

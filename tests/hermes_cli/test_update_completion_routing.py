@@ -23,7 +23,7 @@ from tests.compat.old_updater_support import fresh_child, no_external_work
         "node_failures": ["dashboard"], "desktop_build_ok": False, "pre_update_version": "0.20.1"}),
     (update_cmd_maint._finish_dashboard_update_cleanup, ([],), {}),
     (update_cmd_maint._finish_dashboard_update_cleanup, (["dashboard"],), {
-        "already_restarted_units": {"hermes-serve"}}),
+        "already_restarted_units": {"routster-serve"}}),
 ])
 def test_historical_completion_hook_never_reports_success(hook, args, kwargs, fresh_child, capsys):
     if hook in {update_cmd._prepare_updated_checkout, update_cmd._reload_config_modules,

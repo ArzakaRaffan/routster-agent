@@ -30,11 +30,11 @@ def launch_agents(fake_home, monkeypatch):
     agents.mkdir(parents=True)
     monkeypatch.setattr(
         uninstall, "get_launchd_plist_path",
-        lambda: agents / "ai.hermes.gateway.plist", raising=False,
+        lambda: agents / "ai.routster.gateway.plist", raising=False,
     )
     # _remove_launchd_gateway imports it from hermes_cli.gateway at call time.
     from hermes_cli import gateway
-    monkeypatch.setattr(gateway, "get_launchd_plist_path", lambda: agents / "ai.hermes.gateway.plist")
+    monkeypatch.setattr(gateway, "get_launchd_plist_path", lambda: agents / "ai.routster.gateway.plist")
     return agents
 
 
@@ -46,8 +46,8 @@ def _fake_launchctl(monkeypatch, calls):
 
 
 def test_remove_launchd_gateway_sweeps_both_label_patterns(launch_agents, monkeypatch):
-    current = launch_agents / "ai.hermes.gateway.plist"
-    profiled = launch_agents / "ai.hermes.gateway-work.plist"
+    current = launch_agents / "ai.routster.gateway.plist"
+    profiled = launch_agents / "ai.routster.gateway-work.plist"
     legacy = launch_agents / "io.nousresearch.hermes-agent.gateway.plist"
     unrelated = launch_agents / "com.other.agent.plist"
     for p in (current, profiled, legacy, unrelated):
@@ -60,7 +60,7 @@ def test_remove_launchd_gateway_sweeps_both_label_patterns(launch_agents, monkey
     assert not current.exists() and not profiled.exists() and not legacy.exists()
     assert unrelated.exists()  # never touch another app's agent
     labels = {c[-1].rsplit("/", 1)[-1] for c in calls if c[1] == "bootout"}
-    assert labels == {"ai.hermes.gateway", "ai.hermes.gateway-work",
+    assert labels == {"ai.routster.gateway", "ai.routster.gateway-work",
                       "io.nousresearch.hermes-agent.gateway"}
     assert all(c[1] == "unload" for c in calls if c[1] == "unload")
 

@@ -33,7 +33,7 @@ def test_selected_sqlite_controls_completion_and_action_receipt(tmp_path, monkey
         assert f'=== hermes-update completed {action_id} ===' in output
 
 
-@pytest.mark.parametrize('already_restarted_units', [None, {'hermes-serve'}])
+@pytest.mark.parametrize('already_restarted_units', [None, {'routster-serve'}])
 def test_dashboard_refresh_preserves_restart_bookkeeping(already_restarted_units, monkeypatch, capsys):
     calls = []
     monkeypatch.setattr(update_cmd, '_m', lambda: SimpleNamespace(

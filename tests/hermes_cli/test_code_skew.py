@@ -87,7 +87,7 @@ class TestDashboardCodeSkewGuard:
         assert msg is not None
         assert "Desktop-owned backend" in msg
         assert "systemctl" not in msg
-        assert "hermes-dashboard" not in msg
+        assert "routster-dashboard" not in msg
 
 
 class TestModelOptionsSkewGuard:

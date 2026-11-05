@@ -843,7 +843,7 @@ class TestGatewayProtection:
 
     def test_systemctl_restart_flagged(self):
         """systemctl restart kills running agents and should require approval."""
-        cmd = "systemctl --user restart hermes-gateway"
+        cmd = "systemctl --user restart routster-gateway"
         dangerous, _key, desc = detect_dangerous_command(cmd)
         assert dangerous is True
         assert "stop/restart" in desc
@@ -1142,10 +1142,10 @@ class TestLaunchctlGatewayLifecycle:
 
     def test_launchctl_against_hermes_label_detected(self):
         for cmd in (
-            "launchctl stop ai.hermes.gateway",
-            "launchctl kickstart -k system/ai.hermes.gateway",
-            "launchctl bootout system/ai.hermes.gateway",
-            "launchctl unload ~/Library/LaunchAgents/ai.hermes.gateway.plist",
+            "launchctl stop ai.routster.gateway",
+            "launchctl kickstart -k system/ai.routster.gateway",
+            "launchctl bootout system/ai.routster.gateway",
+            "launchctl unload ~/Library/LaunchAgents/ai.routster.gateway.plist",
         ):
             dangerous, _, _desc = detect_dangerous_command(cmd)
             assert dangerous is True, cmd
@@ -1168,12 +1168,12 @@ class TestLaunchctlGatewayLifecycle:
         deliberately does not touch, so they auto-approved.
         """
         for cmd in (
-            'launchctl kick"start" -k gui/501/ai.hermes.gateway',
-            "launchctl kick'start' -k gui/501/ai.hermes.gateway",
-            'launchctl boot"out" gui/501/ai.hermes.gateway',
-            'launchctl bootout gui/501/ai.hermes."gateway"',
+            'launchctl kick"start" -k gui/501/ai.routster.gateway',
+            "launchctl kick'start' -k gui/501/ai.routster.gateway",
+            'launchctl boot"out" gui/501/ai.routster.gateway',
+            'launchctl bootout gui/501/ai.routster."gateway"',
             'routster gateway re"start"',
-            'systemctl re"start" hermes-gateway',
+            'systemctl re"start" routster-gateway',
         ):
             dangerous, _, _ = detect_dangerous_command(cmd)
             assert dangerous is True, cmd
@@ -1196,8 +1196,8 @@ class TestLaunchctlGatewayLifecycle:
         "hermes"/"ai.hermes" to appear AFTER the verb and missed this
         entirely, restarting 4 gateways with zero approval."""
         cmd = (
-            "uid=$(id -u); for item in 'ai.hermes.gateway-apollo:/a.plist' "
-            "'ai.hermes.gateway:/Users/botuser/Library/LaunchAgents/ai.hermes.gateway.plist'; "
+            "uid=$(id -u); for item in 'ai.routster.gateway-apollo:/a.plist' "
+            "'ai.routster.gateway:/Users/botuser/Library/LaunchAgents/ai.routster.gateway.plist'; "
             "do label=${item%%:*}; plist=${item#*:}; "
             'launchctl bootout "gui/$uid/$label"; '
             'launchctl bootstrap "gui/$uid" "$plist"; done'

@@ -81,6 +81,11 @@ A machine can run Hermes (`~/.hermes`, `hermes` on PATH) and Routster side by si
   default to `~/.hermes`, so `routster update` never restarts Hermes services.
 - `gateway/status.py::_get_lock_dir` is `~/.local/state/routster/locks`: a shared rendezvous made
   `routster` attach to the Hermes gateway (`Gateway inaccessible: profile_mismatch`).
+- Service names are Routster's own (`scripts/routster_service_names.py`, rerun after upstream
+  merges; `--check` exits 1 if anything is left): systemd `routster-gateway*`/`routster-serve*`/`routster-dashboard*`,
+  launchd `ai.routster.gateway*`, Scheduled Task `Routster_Gateway`. A Hermes unit is never listed,
+  installed over, started or restarted. `gateway_runtime_service_identity.verify_home` also treats a
+  unit pinned to `~/.hermes` as another install (`ForeignRoot`), never `profile_mismatch`.
 - Self-relaunch, kanban workers, profile wrapper scripts, the TUI's external commands, the agent
   terminal's PATH bin dir and `pm.environments.cli_command_name` resolve `routster`, never
   `which("hermes")` (that is the other install).

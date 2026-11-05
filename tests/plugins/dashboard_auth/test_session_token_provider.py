@@ -116,7 +116,7 @@ class TestRegister:
 
     def test_resolves_file_prefix(self, plugin, monkeypatch, tmp_path):
         token = _token()
-        token_file = tmp_path / "hermes-gateway-token"
+        token_file = tmp_path / "routster-gateway-token"
         token_file.write_text(f"\ufeff{token}\n", encoding="utf-8")  # BOM + newline
         monkeypatch.setenv("HERMES_DASHBOARD_SESSION_TOKEN", f"file:{token_file}")
         monkeypatch.setattr(plugin, "_load_session_token_auth_section", dict)

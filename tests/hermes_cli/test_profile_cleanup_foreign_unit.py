@@ -30,7 +30,7 @@ def test_profile_delete_from_scratch_home_leaves_the_accounts_profile_unit(tmp_p
     account, scratch = tmp_path / "account", tmp_path / "scratch"
     profile_dir = scratch / ".hermes" / "profiles" / "coder"
     profile_dir.mkdir(parents=True)
-    real_unit = account / ".config" / "systemd" / "user" / "hermes-gateway-coder.service"
+    real_unit = account / ".config" / "systemd" / "user" / "routster-gateway-coder.service"
     _unit(real_unit, account / ".hermes" / "profiles" / "coder")
     monkeypatch.delenv("HERMES_HOME", raising=False)
     monkeypatch.delenv("XDG_CONFIG_HOME", raising=False)

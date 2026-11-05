@@ -35,7 +35,7 @@ import plugins.dashboard_auth.self_hosted as oidc_plugin
 from hermes_cli.dashboard_auth import InvalidCodeError, ProviderError
 
 _ISSUER = "https://auth.example.com/application/o/hermes"
-_CLIENT_ID = "hermes-dashboard"
+_CLIENT_ID = "routster-dashboard"
 _PORTAL = "https://portal.example.com"
 _DISCOVERY_DOC = {
     "issuer": _ISSUER,

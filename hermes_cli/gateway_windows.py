@@ -54,7 +54,7 @@ _ACCESS_DENIED_PATTERN = re.compile(rf"({_ACCESS_DENIED_WORDS})", re.IGNORECASE)
 # shell exits. Dict (not bare bool) so the flag is mutable without ``global``.
 _LAST_SPAWN_BREAKAWAY_FALLBACK: dict = {"fallback": False}
 
-_TASK_NAME_DEFAULT = "Hermes_Gateway"
+_TASK_NAME_DEFAULT = "Routster_Gateway"
 _TASK_DESCRIPTION = "Routster Agent Gateway - Messaging Platform Integration"
 _TASK_LOGON_DELAY = "PT30S"
 _TASK_RESTART_INTERVAL = "PT1M"
@@ -139,7 +139,7 @@ def hermes_owns_windows_service(name: str, binpath: str, hermes_roots: tuple[str
     ``svchost.exe`` hosting ``Schedule``; without this gate the updater took Task Scheduler for the
     gateway's supervisor and ``sc.exe stop Schedule`` aborted every update (#97208)."""
     normalized_name = "".join(char for char in name.casefold() if char.isalnum())
-    if normalized_name.startswith("hermes"):
+    if normalized_name.startswith("routster"):  # Routster fork: a hermes* service is the Hermes install's
         return True
     candidate = _normalize_windows_path(binpath)
     return any(candidate.startswith(_normalize_windows_path(root) + "/") for root in hermes_roots if root)

@@ -232,7 +232,7 @@ def test_inventory_classifies_launchd_job_owned_serve(monkeypatch):
         ledger_entries=lambda **k: [entry],
         spawner_is_dead=lambda e: True,  # bootstrap shell provably gone
     )
-    jobs = [("gui/501", "ai.hermes.dashboard",
+    jobs = [("gui/501", "ai.routster.dashboard",
              ["hermes", "serve", "--host", "100.94.65.93", "--port", "9119"], None)]
     monkeypatch.setitem(sys.modules, "hermes_cli.process_identity", fake_pi)
     with patch.object(main_dashboard, "_loaded_launchd_backend_jobs", return_value=jobs), \
@@ -244,4 +244,4 @@ def test_inventory_classifies_launchd_job_owned_serve(monkeypatch):
     assert row.supervisor == "launchd"
     assert row.restart_via == "launchd"
     assert row.detail["launchd_domain"] == "gui/501"
-    assert row.detail["launchd_label"] == "ai.hermes.dashboard"
+    assert row.detail["launchd_label"] == "ai.routster.dashboard"

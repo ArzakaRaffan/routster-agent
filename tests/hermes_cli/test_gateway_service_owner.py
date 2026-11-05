@@ -27,7 +27,7 @@ def unit(tmp_path, monkeypatch):
     scratch = tmp_path / "scratch" / "fakehome" / ".hermes"
     real.mkdir(parents=True)
     scratch.mkdir(parents=True)
-    path = tmp_path / "systemd" / "hermes-gateway.service"
+    path = tmp_path / "systemd" / "routster-gateway.service"
     path.parent.mkdir()
     path.write_text(UNIT.format(home=real), encoding="utf-8")
     calls = []

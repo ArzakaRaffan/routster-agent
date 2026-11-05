@@ -63,8 +63,8 @@ _VERIFY_TIMEOUT = 15
 from hermes_constants import PROFILE_ID_RE as _PROFILE_ID_RE
 
 _SUPERVISOR_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,31}$")
-_UNIT_RE = re.compile(r"^hermes-(serve|dashboard)(-[a-z0-9][a-z0-9_-]{0,63})?\.service$")
-_SERVE_UNIT_PATTERNS = ("hermes-serve*", "hermes-dashboard*")
+_UNIT_RE = re.compile(r"^routster-(serve|dashboard)(-[a-z0-9][a-z0-9_-]{0,63})?\.service$")
+_SERVE_UNIT_PATTERNS = ("routster-serve*", "routster-dashboard*")
 _SCOPE_LABELS = ("user", "system")
 _UNIT_RESTART_TIMEOUT = 60
 _UNIT_SETTLE_ATTEMPTS = 10
@@ -148,8 +148,8 @@ def _run_profile_restart(profile: str, *, run: Callable[..., Any]) -> bool:
 def _systemd_unit_candidates(profile: str) -> tuple[str, ...]:
     """Unit names the existing systemd gateway lifecycle produces per profile."""
     if profile == "default":
-        return ("hermes-gateway.service", "gateway.service", "gateway-default.service")
-    return (f"hermes-gateway-{profile}.service", f"gateway-{profile}.service")
+        return ("routster-gateway.service", "gateway.service", "gateway-default.service")
+    return (f"routster-gateway-{profile}.service", f"gateway-{profile}.service")
 
 
 def _systemd_verified_active(profile: str, *, run: Callable[..., Any]) -> bool:

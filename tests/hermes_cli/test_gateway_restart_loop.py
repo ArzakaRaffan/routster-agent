@@ -49,7 +49,7 @@ class TestGatewayLifecyclePattern:
         "hermes.cmd gateway stop",
         r'"C:\Program Files\hermes.exe" gateway restart',
         "taskkill /F /IM hermes-gateway.exe",
-        "Stop-Process -Name hermes-gateway -Force",
+        "Stop-Process -Name routster-gateway -Force",
     ])
     def test_interpreter_and_windows_kill_forms_are_blocked(self, text):
         assert _contains_gateway_lifecycle_command(text), f"Should match: {text!r}"
@@ -84,18 +84,18 @@ class TestGatewayLifecyclePattern:
         # #62891: a blocked direct restart/kill laundered through a NEW
         # launchd keepalive job wrapping a helper script, instead of a
         # direct kickstart/unload/stop/restart on the existing service.
-        "launchctl submit -l ai.hermes.gateway-hard-restart-no-photon-notice -- /bin/sh ~/.hermes/scripts/hard_restart_gateway_no_photon_notice.sh",
-        "launchctl submit -l hermes-gateway-restart-helper -- /bin/sh helper.sh",
+        "launchctl submit -l ai.routster.gateway-hard-restart-no-photon-notice -- /bin/sh ~/.hermes/scripts/hard_restart_gateway_no_photon_notice.sh",
+        "launchctl submit -l routster-gateway-restart-helper -- /bin/sh helper.sh",
         # bootstrap loads an arbitrary plist — same laundering shape.
-        "launchctl bootstrap gui/501 ~/Library/LaunchAgents/ai.hermes.gateway.restart-once.plist",
-        "launchctl bootout gui/501/ai.hermes.gateway",
+        "launchctl bootstrap gui/501 ~/Library/LaunchAgents/ai.routster.gateway.restart-once.plist",
+        "launchctl bootout gui/501/ai.routster.gateway",
         # The exact reported shape: split across shell line-continuations
         # (`\` immediately followed by a newline). `[^\n]*` alone can't span
         # that, so the verb and the gateway-label token land on different
         # physical lines unless continuations are normalized first.
         (
             "launchctl submit \\\n"
-            "  -l ai.hermes.gateway-hard-restart-no-photon-notice \\\n"
+            "  -l ai.routster.gateway-hard-restart-no-photon-notice \\\n"
             "  -- /bin/sh ~/.hermes/scripts/hard_restart_gateway_no_photon_notice.sh"
         ),
     ])
@@ -111,9 +111,9 @@ class TestGatewayLifecyclePattern:
         label text to appear AFTER the verb IN THE SAME SEGMENT and never
         sees it — restarted 4 gateways with zero approval."""
         cmd = (
-            "uid=$(id -u); for item in 'ai.hermes.gateway-apollo:/a.plist' "
-            "'ai.hermes.gateway-cronus:/c.plist' 'ai.hermes.gateway-plutus:/p.plist' "
-            "'ai.hermes.gateway:/Users/botuser/Library/LaunchAgents/ai.hermes.gateway.plist'; "
+            "uid=$(id -u); for item in 'ai.routster.gateway-apollo:/a.plist' "
+            "'ai.routster.gateway-cronus:/c.plist' 'ai.routster.gateway-plutus:/p.plist' "
+            "'ai.routster.gateway:/Users/botuser/Library/LaunchAgents/ai.routster.gateway.plist'; "
             "do label=${item%%:*}; plist=${item#*:}; "
             'launchctl bootout "gui/$uid/$label"; '
             'launchctl bootstrap "gui/$uid" "$plist"; done'
@@ -137,17 +137,17 @@ class TestGatewayLifecyclePattern:
         # the blocked `kickstart` form. Raw-text matching sees the quote (or
         # backslash) wedged between the verb's halves and misses it, leaving
         # the bypassable approval layer as the only cover.
-        'launchctl kick"start" -k gui/501/ai.hermes.gateway',
-        "launchctl kick'start' -k gui/501/ai.hermes.gateway",
-        "launchctl kick\\start -k gui/501/ai.hermes.gateway",
-        'launchctl "kickstart" -k gui/501/ai.hermes.gateway',
+        'launchctl kick"start" -k gui/501/ai.routster.gateway',
+        "launchctl kick'start' -k gui/501/ai.routster.gateway",
+        "launchctl kick\\start -k gui/501/ai.routster.gateway",
+        'launchctl "kickstart" -k gui/501/ai.routster.gateway',
         # Splices on the newer/legacy unload spellings this PR added.
-        'launchctl boot"out" gui/501/ai.hermes.gateway',
-        "launchctl dis\\able gui/501/ai.hermes.gateway",
+        'launchctl boot"out" gui/501/ai.routster.gateway',
+        "launchctl dis\\able gui/501/ai.routster.gateway",
         # The gateway identifier itself can be spliced just as easily.
-        'launchctl bootout gui/501/ai.hermes."gateway"',
+        'launchctl bootout gui/501/ai.routster."gateway"',
         # Same class on the systemctl and hermes-CLI branches.
-        'systemctl re"start" hermes-gateway',
+        'systemctl re"start" routster-gateway',
         'routster gateway re"start"',
     ])
     def test_shell_token_spliced_lifecycle_verbs(self, text):
@@ -165,7 +165,7 @@ class TestGatewayLifecyclePattern:
             contains_gateway_lifecycle_command_or_referenced_script,
         )
 
-        command = 'sh -c \'launchctl kick"start" -k gui/501/ai.hermes.gateway\''
+        command = 'sh -c \'launchctl kick"start" -k gui/501/ai.routster.gateway\''
         assert contains_gateway_lifecycle_command_or_referenced_script(command)
 
     @pytest.mark.parametrize("text", [
@@ -271,9 +271,9 @@ class TestGatewayLifecyclePattern:
     @pytest.mark.parametrize("text", [
         # #68289: execute_code payloads carry the argv as a Python list —
         # brackets/commas separate the words the OS will exec.
-        'import subprocess\nsubprocess.run(["launchctl", "bootout", "gui/501/ai.hermes.gateway"])',
+        'import subprocess\nsubprocess.run(["launchctl", "bootout", "gui/501/ai.routster.gateway"])',
         'subprocess.run(["hermes", "gateway", "restart"])',
-        'os.system("launchctl kickstart -k gui/501/ai.hermes.gateway")',
+        'os.system("launchctl kickstart -k gui/501/ai.routster.gateway")',
     ])
     def test_python_argv_list_forms_blocked(self, text):
         assert _contains_gateway_lifecycle_command(text), f"Should match: {text!r}"
@@ -529,17 +529,17 @@ class TestTerminalToolGatewayLifecycleGuard:
         )
 
     @pytest.mark.parametrize("cmd", [
-        "systemctl restart hermes-gateway",
-        "systemctl --user restart hermes-gateway",
-        "systemctl stop hermes-gateway.service",
+        "systemctl restart routster-gateway",
+        "systemctl --user restart routster-gateway",
+        "systemctl stop routster-gateway.service",
         "routster gateway restart",
         "routster gateway uninstall",
-        "launchctl kickstart gui/501/ai.hermes.gateway",
-        "launchctl bootout gui/501/ai.hermes.gateway",
+        "launchctl kickstart gui/501/ai.routster.gateway",
+        "launchctl bootout gui/501/ai.routster.gateway",
         # #62891 exact reported shape and its bootstrap sibling.
-        "launchctl submit -l ai.hermes.gateway-hard-restart-no-photon-notice -- /bin/sh ~/.hermes/scripts/hard_restart_gateway_no_photon_notice.sh",
+        "launchctl submit -l ai.routster.gateway-hard-restart-no-photon-notice -- /bin/sh ~/.hermes/scripts/hard_restart_gateway_no_photon_notice.sh",
         "launchctl submit -l com.foo -- /path/gateway",
-        "launchctl bootstrap gui/501 ~/Library/LaunchAgents/ai.hermes.gateway.restart-once.plist",
+        "launchctl bootstrap gui/501 ~/Library/LaunchAgents/ai.routster.gateway.restart-once.plist",
         "pkill -f hermes.*gateway",
     ])
     def test_blocks_lifecycle_commands_inside_gateway(self, monkeypatch, cmd):
@@ -556,7 +556,7 @@ class TestTerminalToolGatewayLifecycleGuard:
         self._patch_env(monkeypatch, self._make_fake_env(), inside_gateway=True)
 
         result = json.loads(tt.terminal_tool(
-            command="systemctl restart hermes-gateway", force=True
+            command="systemctl restart routster-gateway", force=True
         ))
 
         assert result["exit_code"] == 1
@@ -1000,7 +1000,7 @@ class TestLifecycleGuardModule:
         scripts_dir = tmp_path / ".hermes" / "scripts"
         scripts_dir.mkdir(parents=True)
         (scripts_dir / "restart.sh").write_text(
-            "launchctl kickstart -k gui/501/ai.hermes.gateway\n"
+            "launchctl kickstart -k gui/501/ai.routster.gateway\n"
         )
         with pytest.raises(GatewayLifecycleBlocked):
             check_gateway_lifecycle("daily", "restart.sh")
@@ -1514,10 +1514,10 @@ class TestRelativePathDoesNotDisableDataExemption:
         return contains_gateway_lifecycle_command_or_referenced_script(command)
 
     @pytest.mark.parametrize("command", [
-        "grep -r 'systemctl restart hermes-gateway' .",
+        "grep -r 'systemctl restart routster-gateway' .",
         "grep -rn 'routster gateway restart' ./logs",
         "rg 'routster gateway restart' ../archive",
-        "grep -c 'systemctl stop hermes-gateway' ./var/log/syslog",
+        "grep -c 'systemctl stop routster-gateway' ./var/log/syslog",
         "sqlite3 ./stats.db \"SELECT restart_reason FROM hermes_gateway_restarts\"",
     ])
     def test_relative_path_operands_keep_the_exemption(self, command):
@@ -1527,15 +1527,15 @@ class TestRelativePathDoesNotDisableDataExemption:
         # Narrowing the dot test must not open an execution route: every
         # escape hatch still fires with a relative-path operand present.
         'sqlite3 ./db ".shell routster gateway restart"',
-        'sqlite3 ./db ".system systemctl restart hermes-gateway"',
-        'psql ./x -c "\\! systemctl restart hermes-gateway"',
+        'sqlite3 ./db ".system systemctl restart routster-gateway"',
+        'psql ./x -c "\\! systemctl restart routster-gateway"',
         "grep -r 'routster gateway restart' . | sh",
         "grep -r 'routster gateway restart' ./logs | bash",
         "grep -r 'routster gateway restart' . | sudo sh",
         "grep -r 'x' . ; routster gateway restart",
-        "grep -r 'x' . && systemctl restart hermes-gateway",
+        "grep -r 'x' . && systemctl restart routster-gateway",
         'grep -r "$(routster gateway restart)" .',
-        "rg 'x' ./logs | xargs systemctl restart hermes-gateway",
+        "rg 'x' ./logs | xargs systemctl restart routster-gateway",
     ])
     def test_relative_path_does_not_open_an_execution_route(self, command):
         assert self._scan(command) is True
@@ -1746,13 +1746,13 @@ class TestLifecycleGuardDataArgumentExemption:
         # Exact live false-positive shapes: SQL string literals carrying the
         # full lifecycle command as text.
         'sqlite3 db "SELECT msg FROM log WHERE msg LIKE '
-        "'%systemctl restart hermes-gateway%'\"",
+        "'%systemctl restart routster-gateway%'\"",
         'psql -c "SELECT * FROM events WHERE cmd = '
-        "'systemctl stop hermes-gateway'\"",
+        "'systemctl stop routster-gateway'\"",
         # grep/rg pattern arguments hunting for the lifecycle string.
-        "grep -c 'systemctl restart hermes-gateway' /var/log/syslog",
+        "grep -c 'systemctl restart routster-gateway' /var/log/syslog",
         "rg 'routster gateway restart' /home/user/.hermes/logs/",
-        "journalctl -u hermes-gateway --grep 'systemctl restart hermes-gateway'",
+        "journalctl -u routster-gateway --grep 'systemctl restart routster-gateway'",
         # SQL with stop/restart column/value words but no command shape.
         'sqlite3 stats.db "SELECT stop_time, restart_reason FROM '
         'hermes_gateway_restarts"',
@@ -1765,15 +1765,15 @@ class TestLifecycleGuardDataArgumentExemption:
     @pytest.mark.parametrize("command", [
         # Execution smuggled through or around a data sink must still block.
         'sqlite3 db ".shell routster gateway restart"',
-        'psql -c "\\! systemctl restart hermes-gateway"',
-        "grep 'systemctl restart hermes-gateway' cmds.txt | sh",
-        "grep gateway f | xargs systemctl restart hermes-gateway",
-        'grep "$(systemctl restart hermes-gateway)" f',
-        "grep 'restart' log; systemctl restart hermes-gateway",
+        'psql -c "\\! systemctl restart routster-gateway"',
+        "grep 'systemctl restart routster-gateway' cmds.txt | sh",
+        "grep gateway f | xargs systemctl restart routster-gateway",
+        'grep "$(systemctl restart routster-gateway)" f',
+        "grep 'restart' log; systemctl restart routster-gateway",
         'sqlite3 db "SELECT 1"; routster gateway stop',
         # Plain lifecycle commands are unaffected by the exemption.
         "routster gateway restart",
-        "sudo systemctl stop hermes-gateway",
+        "sudo systemctl stop routster-gateway",
     ])
     def test_command_position_lifecycle_still_blocked(self, command):
         assert self._scan(command) is True
@@ -1791,7 +1791,7 @@ class TestLifecycleGuardDataArgumentExemption:
         script.write_text("print('nightly report')\n", encoding="utf-8")
         prompt = (
             'sqlite3 db "SELECT msg FROM log '
-            "WHERE msg LIKE '%systemctl restart hermes-gateway%'\""
+            "WHERE msg LIKE '%systemctl restart routster-gateway%'\""
         )
         check_gateway_lifecycle(prompt, str(script))
 

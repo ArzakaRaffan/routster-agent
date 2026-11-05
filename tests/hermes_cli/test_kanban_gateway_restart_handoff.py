@@ -254,7 +254,7 @@ def test_real_user_systemd_scope_preserves_worker_context(
         assert payload["source"] == 'kanban'
         assert payload["terminal_cwd"] == str(workspace)
         assert unit in payload["cgroup"]
-        assert "hermes-gateway.service" not in payload["cgroup"]
+        assert "routster-gateway.service" not in payload["cgroup"]
         import psutil
         assert psutil.Process(pid).wait(timeout=5) == 0
     finally:

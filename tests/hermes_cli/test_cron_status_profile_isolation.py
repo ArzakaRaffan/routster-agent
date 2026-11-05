@@ -49,29 +49,29 @@ class TestGetServicePidsProfileScope:
             cmd_str = " ".join(str(a) for a in args)
             if "list-units" in cmd_str:
                 # systemctl now filters: return only the unit that matches the pattern
-                if "hermes-gateway-jarvis" in cmd_str:
-                    stdout = "hermes-gateway-jarvis.service loaded active running\n"
-                elif "hermes-gateway-coder" in cmd_str:
-                    stdout = "hermes-gateway-coder.service loaded active running\n"
-                elif "hermes-gateway*" in cmd_str:
+                if "routster-gateway-jarvis" in cmd_str:
+                    stdout = "routster-gateway-jarvis.service loaded active running\n"
+                elif "routster-gateway-coder" in cmd_str:
+                    stdout = "routster-gateway-coder.service loaded active running\n"
+                elif "routster-gateway*" in cmd_str:
                     stdout = (
-                        "hermes-gateway-jarvis.service loaded active running\n"
-                        "hermes-gateway-coder.service loaded active running\n"
+                        "routster-gateway-jarvis.service loaded active running\n"
+                        "routster-gateway-coder.service loaded active running\n"
                     )
                 else:
                     stdout = ""
                 return MagicMock(returncode=0, stdout=stdout, stderr="")
             if "show" in cmd_str and "MainPID" in cmd_str:
-                if "hermes-gateway-jarvis" in cmd_str:
+                if "routster-gateway-jarvis" in cmd_str:
                     return MagicMock(returncode=0, stdout="123\n", stderr="")
-                elif "hermes-gateway-coder" in cmd_str:
+                elif "routster-gateway-coder" in cmd_str:
                     return MagicMock(returncode=0, stdout="456\n", stderr="")
             return MagicMock(returncode=0, stdout="", stderr="")
 
         with (
             patch("hermes_cli.gateway.is_macos", return_value=False),
             patch("hermes_cli.gateway.supports_systemd_services", return_value=True),
-            patch("hermes_cli.gateway.get_service_name", return_value="hermes-gateway-jarvis"),
+            patch("hermes_cli.gateway.get_service_name", return_value="routster-gateway-jarvis"),
             patch("subprocess.run", side_effect=_run_side_effect),
         ):
             pids = gateway_mod._get_service_pids()
@@ -87,22 +87,22 @@ class TestGetServicePidsProfileScope:
                 return MagicMock(
                     returncode=0,
                     stdout=(
-                        "hermes-gateway.service loaded active running\n"
-                        "hermes-gateway-profile-b.service loaded active running\n"
+                        "routster-gateway.service loaded active running\n"
+                        "routster-gateway-profile-b.service loaded active running\n"
                     ),
                     stderr="",
                 )
             if "show" in cmd_str and "MainPID" in cmd_str:
-                if "hermes-gateway.service" in " ".join(args):
+                if "routster-gateway.service" in " ".join(args):
                     return MagicMock(returncode=0, stdout="111\n", stderr="")
-                elif "hermes-gateway-profile-b.service" in " ".join(args):
+                elif "routster-gateway-profile-b.service" in " ".join(args):
                     return MagicMock(returncode=0, stdout="222\n", stderr="")
             return MagicMock(returncode=0, stdout="", stderr="")
 
         with (
             patch("hermes_cli.gateway.is_macos", return_value=False),
             patch("hermes_cli.gateway.supports_systemd_services", return_value=True),
-            patch("hermes_cli.gateway.get_service_name", return_value="hermes-gateway"),
+            patch("hermes_cli.gateway.get_service_name", return_value="routster-gateway"),
             patch("subprocess.run", side_effect=_run_side_effect),
         ):
             pids = gateway_mod._get_service_pids(all_profiles=True)

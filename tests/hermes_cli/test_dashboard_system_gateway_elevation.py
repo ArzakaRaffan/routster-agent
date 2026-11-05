@@ -24,10 +24,10 @@ def unprivileged(monkeypatch):
 @pytest.fixture
 def system_scope_install(monkeypatch, tmp_path):
     """Only the SYSTEM unit is installed, the shape that needs root."""
-    system_unit = tmp_path / "etc" / "hermes-gateway.service"
+    system_unit = tmp_path / "etc" / "routster-gateway.service"
     system_unit.parent.mkdir(parents=True)
     system_unit.write_text("[Service]\n", encoding="utf-8")
-    user_unit = tmp_path / "user" / "hermes-gateway.service"
+    user_unit = tmp_path / "user" / "routster-gateway.service"
     monkeypatch.setattr(
         "hermes_cli.gateway.get_systemd_unit_path",
         lambda system=False: system_unit if system else user_unit,

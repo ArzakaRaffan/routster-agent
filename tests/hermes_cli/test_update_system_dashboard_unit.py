@@ -27,7 +27,7 @@ from hermes_cli import update_inventory, update_receipt
 from hermes_cli.update_inventory import RuntimeRecord, UpdatePlan
 
 DASH_PID = 961386
-UNIT = "hermes-dashboard.service"
+UNIT = "routster-dashboard.service"
 CGROUP = f"/system.slice/{UNIT}"
 
 
@@ -68,7 +68,7 @@ def test_dashboard_pass_skips_a_unit_the_fleet_loop_already_declined(monkeypatch
     monkeypatch.setattr(dashboard_procs, "_kill_pids_posix", lambda pids, killed, failed: kills.extend(pids))
 
     result = dashboard_procs._kill_stale_dashboard_processes(
-        restart_managed=True, already_restarted_units={"hermes-gateway", "hermes-dashboard"})
+        restart_managed=True, already_restarted_units={"routster-gateway", "routster-dashboard"})
 
     assert not [c for c in calls if "restart" in c], "the declined unit was retried"
     assert not result.get("unrecovered")
@@ -82,7 +82,7 @@ def test_dashboard_pass_still_restarts_the_unit_when_the_fleet_loop_never_saw_it
     """Negative control: without the fleet loop's verdict the managed restart still runs."""
     calls: list = []
     _systemd_owned_dashboard(monkeypatch, calls)
-    dashboard_procs._kill_stale_dashboard_processes(restart_managed=True, already_restarted_units={"hermes-gateway"})
+    dashboard_procs._kill_stale_dashboard_processes(restart_managed=True, already_restarted_units={"routster-gateway"})
     assert ["systemctl", "restart", UNIT] in calls
 
 
@@ -126,7 +126,7 @@ def test_stale_unit_dashboard_hint_names_its_unit_and_scope(monkeypatch, capsys)
     update_cmd._warn_stale_serve_runtimes(rows)
     out = capsys.readouterr().out
     assert f"`sudo systemctl restart {UNIT}`" in out
-    assert "Ask their owner" not in out and "hermes-serve.service" not in out
+    assert "Ask their owner" not in out and "routster-serve.service" not in out
 
 
 def _verify(monkeypatch, restart, *, fleet_state="current", plan=None, dashboards_down=frozenset(), survivors=()):
@@ -150,7 +150,7 @@ def _verify(monkeypatch, restart, *, fleet_state="current", plan=None, dashboard
 
 def _restart(**over):
     fields = dict(incomplete=True, phase_errors=[], pre_restart_gateway_pids=[1234],
-                  restarted_services=["hermes-gateway"], failed_or_stale_units=["hermes-dashboard"],
+                  restarted_services=["routster-gateway"], failed_or_stale_units=["routster-dashboard"],
                   relaunched_profiles=[], externally_supervised_profiles=[], killed_pids=set())
     fields.update(over)
     return update_cmd_fleet._GatewayRestartOutcome(**fields)
@@ -159,10 +159,10 @@ def _restart(**over):
 def test_field_case_forwards_the_declined_unit_and_blames_only_the_dashboard(monkeypatch, capsys):
     """The reported run end to end through verification: gateway current, dashboard declined."""
     refreshed, receipt = _verify(monkeypatch, _restart())
-    assert refreshed == [{"already_restarted_units": {"hermes-gateway", "hermes-dashboard"}}]
+    assert refreshed == [{"already_restarted_units": {"routster-gateway", "routster-dashboard"}}]
     (followup,) = receipt["followups"]
     assert followup["step"] == "gateway_restart"  # Desktop hand-offs parse the step id
-    assert "hermes-dashboard were not restarted onto the new code" in followup["reason"]
+    assert "routster-dashboard were not restarted onto the new code" in followup["reason"]
     assert "routster gateway restart" not in followup["reason"]
     assert "gateways may still run" not in capsys.readouterr().out
     # The obligation stays armed: a stale dashboard unit is still owed (contract unchanged).
@@ -176,19 +176,19 @@ def test_gateway_debt_still_names_gateway_restart(monkeypatch, case):
     if case == "stale-gateway":
         state = "stale"
     elif case == "failed-gateway-unit":
-        restart.failed_or_stale_units.append("hermes-gateway-work")
+        restart.failed_or_stale_units.append("routster-gateway-work")
     else:
         restart.phase_errors.append("boom")
     _refreshed, receipt = _verify(monkeypatch, restart, fleet_state=state)
     reason = receipt["followups"][0]["reason"]
-    assert "routster gateway restart" in reason and "hermes-dashboard" in reason
+    assert "routster gateway restart" in reason and "routster-dashboard" in reason
 
 
 def test_is_serve_unit_matches_the_fleet_loop_gate():
-    assert fleet_verify._is_serve_unit("hermes-dashboard")
-    assert fleet_verify._is_serve_unit("hermes-serve-work.service")
-    assert fleet_verify._is_serve_unit("hermes-dashboard-Work.Two")  # the loop admits any suffix
-    for name in ("hermes-gateway", "hermes-gateway-work", "hermes-dashboardd", "ai.hermes.gateway",
+    assert fleet_verify._is_serve_unit("routster-dashboard")
+    assert fleet_verify._is_serve_unit("routster-serve-work.service")
+    assert fleet_verify._is_serve_unit("routster-dashboard-Work.Two")  # the loop admits any suffix
+    for name in ("routster-gateway", "routster-gateway-work", "hermes-dashboardd", "ai.routster.gateway",
                  "systemd-user (listing failed)"):
         assert not fleet_verify._is_serve_unit(name)
 
@@ -291,7 +291,7 @@ def test_unaccounted_unit_dashboard_hint_names_its_unit(capsys):
         killed_pids=set(), failed_units=[], stale_serve_pids={DASH_PID})
     assert update_inventory.report_unaccounted_runtimes(outcomes) is True
     out = capsys.readouterr().out
-    assert f"sudo systemctl restart {UNIT}" in out and "hermes-serve.service" not in out
+    assert f"sudo systemctl restart {UNIT}" in out and "routster-serve.service" not in out
 
 
 def test_next_run_carries_a_unit_row_forward_from_the_previous_receipt(monkeypatch):
@@ -314,16 +314,16 @@ def _producer_reason(*, gateway_owed=False, units=(), down=(), stale=()):
 
 
 @pytest.mark.parametrize("reasons, hinted", [
-    ([_producer_reason(units=["hermes-dashboard"])], False),
+    ([_producer_reason(units=["routster-dashboard"])], False),
     ([_producer_reason(down=[4242])], False),
-    ([_producer_reason(stale=[4242], units=["hermes-serve-work.service"])], False),
+    ([_producer_reason(stale=[4242], units=["routster-serve-work.service"])], False),
     ([_producer_reason(gateway_owed=True)], True),
-    ([_producer_reason(gateway_owed=True, units=["hermes-dashboard"])], True),
+    ([_producer_reason(gateway_owed=True, units=["routster-dashboard"])], True),
     ([_producer_reason()], True),  # nothing classified: the historical gateway wording
     # update_finish owes gateway_restart with the raw exception when the restart phase itself crashes.
     (["RuntimeError: systemctl list-units timed out"], True),
     # A serve-only line next to a raw-exception line: a gateway may still be owed.
-    ([_producer_reason(units=["hermes-dashboard"]), "RuntimeError: boom"], True),
+    ([_producer_reason(units=["routster-dashboard"]), "RuntimeError: boom"], True),
 ])
 def test_desktop_handoffs_add_the_gateway_hint_only_when_gateways_are_blamed(capsys, reasons, hinted):
     """#141071: both Desktop hand-offs keyed the "Run hermes gateway restart" hint on the step id alone.

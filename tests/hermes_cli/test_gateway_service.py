@@ -119,7 +119,7 @@ class TestSystemdServiceRefresh:
         ``generate_systemd_unit`` to return synthetic content that doesn't
         carry those markers.
         """
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         unit_path.write_text("old unit\n", encoding="utf-8")
 
         monkeypatch.setattr(
@@ -159,7 +159,7 @@ class TestSystemdServiceRefresh:
 
 class TestRequireServiceInstalled:
     def test_exits_with_install_hint_when_unit_missing(self, tmp_path, monkeypatch, capsys):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
 
         with pytest.raises(SystemExit) as exc_info:
@@ -171,7 +171,7 @@ class TestRequireServiceInstalled:
         assert "routster gateway install" in out
 
     def test_passes_when_unit_exists(self, tmp_path, monkeypatch):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         unit_path.write_text("[Unit]\n", encoding="utf-8")
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
 
@@ -198,8 +198,8 @@ class TestServiceIdentityForForeignHome:
         foreign.mkdir()
         monkeypatch.setenv("HERMES_HOME", str(foreign))
 
-        default_unit = machine_home / ".config" / "systemd" / "user" / "hermes-gateway.service"
-        assert gateway_cli.get_service_name() != "hermes-gateway"
+        default_unit = machine_home / ".config" / "systemd" / "user" / "routster-gateway.service"
+        assert gateway_cli.get_service_name() != "routster-gateway"
         assert gateway_cli.get_systemd_unit_path() != default_unit
         assert gateway_cli.get_systemd_unit_path().parent == default_unit.parent
 
@@ -208,10 +208,10 @@ class TestServiceIdentityForForeignHome:
         (default_home / "profiles" / "alpha").mkdir(parents=True)
 
         monkeypatch.setenv("HERMES_HOME", str(default_home))
-        assert gateway_cli.get_service_name() == "hermes-gateway"
+        assert gateway_cli.get_service_name() == "routster-gateway"
 
         monkeypatch.setenv("HERMES_HOME", str(default_home / "profiles" / "alpha"))
-        assert gateway_cli.get_service_name() == "hermes-gateway-alpha"
+        assert gateway_cli.get_service_name() == "routster-gateway-alpha"
 
     def test_sudo_user_default_home_keeps_bare_service_name(self, machine_home, tmp_path, monkeypatch):
         sudo_home = tmp_path / "alice"
@@ -223,18 +223,18 @@ class TestServiceIdentityForForeignHome:
 
         # Before unit sync, sudo resolves the root process's native home.
         monkeypatch.delenv("HERMES_HOME", raising=False)
-        assert gateway_cli.get_service_name() == "hermes-gateway"
+        assert gateway_cli.get_service_name() == "routster-gateway"
 
         # After unit sync, HERMES_HOME points at the invoking user's native home.
         monkeypatch.setenv("HERMES_HOME", str(sudo_default))
-        assert gateway_cli.get_service_name() == "hermes-gateway"
+        assert gateway_cli.get_service_name() == "routster-gateway"
 
 
 class TestUninstallRefusesForeignUnit:
     """systemd_uninstall must not stop/disable/unlink a unit pinned to another HERMES_HOME."""
 
     def test_unit_for_other_home_is_left_alone(self, tmp_path, monkeypatch, capsys):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         unit_path.write_text('[Service]\nEnvironment="HERMES_HOME=/somewhere/else"\n', encoding="utf-8")
         monkeypatch.setenv("HERMES_HOME", str(tmp_path / "mine"))
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
@@ -334,7 +334,7 @@ class TestGeneratedSystemdUnits:
         """#14613: glibc reads LD_LIBRARY_PATH only at process start, so the unit file is the
         only place it can reach CUDA-backed tools; quotes/backslashes must survive systemd quoting."""
         # The absent-env branch falls back to the installed unit: keep the host's real one out.
-        monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: tmp_path / "hermes-gateway.service")
+        monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: tmp_path / "routster-gateway.service")
         monkeypatch.setenv("LD_LIBRARY_PATH", '/opt/cu"da/lib64:/opt/back\\slash/lib')
 
         unit = gateway_cli.generate_systemd_unit(system=False)
@@ -456,7 +456,7 @@ class TestGatewayStopCleanup:
         reached when the host really isn't macOS/Windows (the old
         ``is_macos → False`` stub is gone).
         """
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         unit_path.write_text("unit\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: True)
@@ -503,7 +503,7 @@ class TestLaunchdServiceRecovery:
         """#43842: when the refresh runs inside the gateway's own process tree,
         a direct bootout would kill this CLI before bootstrap. The reload must
         be delegated to a detached helper instead."""
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.routster.gateway.plist"
         plist_path.write_text("<plist>old content</plist>", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
@@ -578,7 +578,7 @@ class TestLaunchdServiceRecovery:
         2026-08-05: the in-process retry loop was killed mid-bootstrap and
         nothing re-registered the label. So always prefer the detached helper.
         """
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.routster.gateway.plist"
         plist_path.write_text("<plist>old content</plist>", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
@@ -629,7 +629,7 @@ class TestLaunchdServiceRecovery:
         issued while it drains fails EIO ("already loaded"), which is how the
         retry budget got burned on 2026-08-05 (4 attempts, all rc=5).
         """
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.routster.gateway.plist"
         plist_path.write_text("<plist>old content</plist>", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
@@ -681,7 +681,7 @@ class TestLaunchdServiceRecovery:
         reloaded. The in-process path waits out the old gateway's drain first so
         its retry budget isn't spent on guaranteed-EIO bootstraps.
         """
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.routster.gateway.plist"
         plist_path.write_text("<plist>old content</plist>", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
@@ -717,7 +717,7 @@ class TestLaunchdServiceRecovery:
                 # the success check correctly refuses to stop retrying.
                 return SimpleNamespace(
                     returncode=0,
-                    stdout='{\n\t"PID" = 5150;\n\t"Label" = "ai.hermes.gateway";\n};',
+                    stdout='{\n\t"PID" = 5150;\n\t"Label" = "ai.routster.gateway";\n};',
                     stderr="",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
@@ -754,7 +754,7 @@ class TestLaunchdServiceRecovery:
 
     def test_launchd_status_reports_fallback_when_unsupported_and_pid_running(self, tmp_path, monkeypatch, capsys):
         """When the unsupported marker exists and a fallback PID is running."""
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.routster.gateway.plist"
         plist_path.write_text(gateway_cli.generate_launchd_plist(), encoding="utf-8")
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
 
@@ -762,7 +762,7 @@ class TestLaunchdServiceRecovery:
             if isinstance(cmd, list) and cmd[:2] == ["launchctl", "list"]:
                 return SimpleNamespace(
                     returncode=0,
-                    stdout='{\n    "Label" = "ai.hermes.gateway";\n    "OnDemand" = true;\n}',
+                    stdout='{\n    "Label" = "ai.routster.gateway";\n    "OnDemand" = true;\n}',
                     stderr="",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
@@ -853,7 +853,7 @@ class TestLaunchdUnsupportedFallbackPolicy:
         exc = subprocess.CalledProcessError(
             5, ["launchctl", "bootstrap"], stderr="Bootstrap failed: 5: Input/output error"
         )
-        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.hermes.gateway")
+        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.routster.gateway")
         monkeypatch.setattr(
             gateway_cli, "_launchctl_label_supervising_process", lambda label: True
         )
@@ -868,7 +868,7 @@ class TestLaunchdUnsupportedFallbackPolicy:
     def test_eio_without_a_supervised_process_still_falls_back(self, monkeypatch):
         """The detached fallback for a domain that really cannot manage the job is unchanged."""
         exc = subprocess.CalledProcessError(125, ["launchctl", "kickstart"])
-        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.hermes.gateway")
+        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.routster.gateway")
         monkeypatch.setattr(
             gateway_cli, "_launchctl_label_supervising_process", lambda label: False
         )
@@ -1156,7 +1156,7 @@ class TestGatewaySystemServiceRouting:
         """
         calls = []
 
-        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.hermes.gateway")
+        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.routster.gateway")
         monkeypatch.setattr(gateway_cli, "_launchd_domain", lambda: "gui/501")
         monkeypatch.setattr("gateway.status.get_running_pid", lambda *a, **k: 654)
         monkeypatch.setattr(gateway_cli, "_request_gateway_self_restart", lambda pid: False)
@@ -1205,7 +1205,7 @@ class TestGatewaySystemServiceRouting:
         # ``-k`` after a successful graceful exit would kill the replacement.
         assert not any(call[0] == "kickstart" for call in calls)
         # The success message must follow an observed replacement PID.
-        assert ("observe", "ai.hermes.gateway", 654, "gui/501") in calls
+        assert ("observe", "ai.routster.gateway", 654, "gui/501") in calls
         out = capsys.readouterr().out
         assert "up to 27s" in out
         assert "up to 0s" not in out
@@ -1223,7 +1223,7 @@ class TestGatewaySystemServiceRouting:
         """
         calls = []
 
-        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.hermes.gateway")
+        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.routster.gateway")
         monkeypatch.setattr(gateway_cli, "_launchd_domain", lambda: "gui/501")
         monkeypatch.setattr("gateway.status.get_running_pid", lambda *a, **k: 654)
         monkeypatch.setattr(gateway_cli, "_request_gateway_self_restart", lambda pid: False)
@@ -1266,7 +1266,7 @@ class TestGatewaySystemServiceRouting:
         on a real macOS host only ``launchd_restart`` is stubbed (it would touch
         the user's real launchd domain).
         """
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.routster.gateway.plist"
         plist_path.write_text("plist\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
@@ -1274,7 +1274,7 @@ class TestGatewaySystemServiceRouting:
             gateway_cli,
             "launchd_restart",
             lambda: (_ for _ in ()).throw(
-                gateway_cli.subprocess.CalledProcessError(5, ["launchctl", "kickstart", "-k", "gui/501/ai.hermes.gateway"])
+                gateway_cli.subprocess.CalledProcessError(5, ["launchctl", "kickstart", "-k", "gui/501/ai.routster.gateway"])
             ),
         )
 
@@ -1459,7 +1459,7 @@ class TestSystemUnitHermesHome:
     def test_installed_unit_keeps_ld_library_path_when_the_shell_lacks_it(self, monkeypatch, tmp_path):
         """The unit is regenerated and compared on every start/restart/status; a later shell without
         the export (ssh, cron, sudo) must see the installed unit as current, not "repair" the line away."""
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
         monkeypatch.setenv("LD_LIBRARY_PATH", "/opt/cuda/lib64:/opt/pct%dir/lib")
         unit_path.write_text(gateway_cli.generate_systemd_unit(system=False), encoding="utf-8")
@@ -1532,7 +1532,7 @@ class TestSystemUnitRefreshSyncsHermesHome:
             "agent:\n  restart_drain_timeout: 180\n", encoding="utf-8"
         )
 
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         monkeypatch.setattr(Path, "home", staticmethod(lambda: root_home))
         monkeypatch.setattr(
             gateway_cli,
@@ -1848,7 +1848,7 @@ class TestProfileArg:
 
         plist_path = gateway_cli.get_launchd_plist_path()
 
-        assert plist_path == machine_home / "Library" / "LaunchAgents" / "ai.hermes.gateway-orcha.plist"
+        assert plist_path == machine_home / "Library" / "LaunchAgents" / "ai.routster.gateway-orcha.plist"
 
     def test_launchd_plist_path_falls_back_to_home_when_uid_lookup_fails(self, tmp_path, monkeypatch):
         """Sandboxed macOS shells can expose a UID that pwd cannot resolve (#57292)."""
@@ -1869,7 +1869,7 @@ class TestProfileArg:
 
         plist_path = gateway_cli.get_launchd_plist_path()
 
-        assert plist_path == machine_home / "Library" / "LaunchAgents" / "ai.hermes.gateway-mybot.plist"
+        assert plist_path == machine_home / "Library" / "LaunchAgents" / "ai.routster.gateway-mybot.plist"
 
     def test_launchd_plist_path_prefers_hermes_real_home_when_uid_lookup_fails(self, tmp_path, monkeypatch):
         """HERMES_REAL_HOME is the explicit operator override for unresolvable UIDs (#57292)."""
@@ -1892,7 +1892,7 @@ class TestProfileArg:
 
         plist_path = gateway_cli.get_launchd_plist_path()
 
-        assert plist_path == real_home / "Library" / "LaunchAgents" / "ai.hermes.gateway-mybot.plist"
+        assert plist_path == real_home / "Library" / "LaunchAgents" / "ai.routster.gateway-mybot.plist"
 
     def test_launchd_plist_path_fallback_never_returns_profile_home(self, tmp_path, monkeypatch):
         """When pwd fails and HOME IS the profile home, the fallback must skip it (#57292)."""
@@ -2002,7 +2002,7 @@ class TestDockerAwareGateway:
         from hermes_cli.gateway_command_errors import SystemctlUnavailableError
 
         with pytest.raises(SystemctlUnavailableError):
-            gateway_cli._run_systemctl(["start", "hermes-gateway"])
+            gateway_cli._run_systemctl(["start", "routster-gateway"])
 
 
     def test_install_in_container_prints_docker_guidance(self, monkeypatch, capsys):
@@ -2203,9 +2203,9 @@ class TestRemoveLegacyHermesUnits:
         must survive a migration call, even if we somehow include them in the
         search dir."""
         user_dir, _, _ = self._setup(tmp_path, monkeypatch, as_root=True)
-        profile_unit = user_dir / "hermes-gateway-coder.service"
+        profile_unit = user_dir / "routster-gateway-coder.service"
         profile_unit.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
-        default_unit = user_dir / "hermes-gateway.service"
+        default_unit = user_dir / "routster-gateway.service"
         default_unit.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
         removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=False)
@@ -2267,7 +2267,7 @@ class TestSystemdInstallOffersLegacyRemoval:
         monkeypatch.setattr(gateway_cli, "prompt_yes_no", lambda *a, **k: True)
 
         # Mock the rest of the install flow
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         monkeypatch.setattr(
             gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
         )
@@ -2304,7 +2304,7 @@ class TestSystemdInstallOffersLegacyRemoval:
         monkeypatch.setattr(gateway_cli, "print_legacy_unit_warning", lambda: None)
         monkeypatch.setattr(gateway_cli, "prompt_yes_no", lambda *a, **k: False)
 
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         monkeypatch.setattr(
             gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
         )
@@ -2348,7 +2348,7 @@ class TestSystemdInstallOffersLegacyRemoval:
         monkeypatch.setattr(gateway_cli, "remove_legacy_hermes_units", fake_remove)
         monkeypatch.setattr(gateway_cli, "prompt_yes_no", counting_prompt)
 
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "routster-gateway.service"
         monkeypatch.setattr(
             gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
         )
@@ -2418,13 +2418,13 @@ class TestSystemScopeWizardPreCheck:
         sys_dir.mkdir()
         usr_dir.mkdir()
         if system_present:
-            (sys_dir / "hermes-gateway.service").write_text("[Unit]\n")
+            (sys_dir / "routster-gateway.service").write_text("[Unit]\n")
         if user_present:
-            (usr_dir / "hermes-gateway.service").write_text("[Unit]\n")
+            (usr_dir / "routster-gateway.service").write_text("[Unit]\n")
         monkeypatch.setattr(
             gateway_cli,
             "get_systemd_unit_path",
-            lambda system=False: (sys_dir if system else usr_dir) / "hermes-gateway.service",
+            lambda system=False: (sys_dir if system else usr_dir) / "routster-gateway.service",
         )
 
     def test_non_root_with_only_system_unit_returns_true(self, tmp_path, monkeypatch):
@@ -2453,11 +2453,11 @@ class TestGatewayCommandCatchesSystemScopeError:
         usr_dir = tmp_path / "usr"
         sys_dir.mkdir()
         usr_dir.mkdir()
-        (sys_dir / "hermes-gateway.service").write_text("[Unit]\n")
+        (sys_dir / "routster-gateway.service").write_text("[Unit]\n")
         monkeypatch.setattr(
             gateway_cli,
             "get_systemd_unit_path",
-            lambda system=False: (sys_dir if system else usr_dir) / "hermes-gateway.service",
+            lambda system=False: (sys_dir if system else usr_dir) / "routster-gateway.service",
         )
         monkeypatch.setattr(gateway_cli.os, "geteuid", lambda: 1000)
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: True)
@@ -2571,9 +2571,9 @@ class TestLaunchctlBootstrapEioRetry:
     version" and needlessly degraded the gateway to a detached process.
     """
 
-    PLIST = "/tmp/ai.hermes.gateway.plist"
+    PLIST = "/tmp/ai.routster.gateway.plist"
     DOMAIN = "gui/501"
-    LABEL = "ai.hermes.gateway"
+    LABEL = "ai.routster.gateway"
 
     def test_eio_triggers_bootout_then_retry(self, monkeypatch):
         calls = []
@@ -2639,9 +2639,9 @@ class TestLaunchdUnloadedJobStderrStaysOffTerminal:
         log = tmp_path / "calls.log"
         monkeypatch.setenv("PATH", f"{bin_dir}{os.pathsep}{os.environ['PATH']}")
         monkeypatch.setenv("FAKE_LAUNCHCTL_LOG", str(log))
-        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.hermes.gateway")
+        monkeypatch.setattr(gateway_cli, "get_launchd_label", lambda: "ai.routster.gateway")
         monkeypatch.setattr(gateway_cli, "_launchd_domain", lambda: "gui/501")
-        monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: tmp_path / "ai.hermes.gateway.plist")
+        monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: tmp_path / "ai.routster.gateway.plist")
         monkeypatch.setattr(gateway_cli, "_clear_launchd_unsupported_marker", lambda: None)
         monkeypatch.setattr(gateway_cli, "_mark_planned_stop", lambda *a, **k: None)
         monkeypatch.setattr(gateway_cli, "_wait_for_gateway_exit", lambda *a, **k: True)
@@ -2686,13 +2686,13 @@ class TestRetryLaunchctlBootstrapUntilRegistered:
     """
 
     DOMAIN = "gui/501"
-    PLIST = "/tmp/ai.hermes.gateway.plist"
-    LABEL = "ai.hermes.gateway"
+    PLIST = "/tmp/ai.routster.gateway.plist"
+    LABEL = "ai.routster.gateway"
 
     # `launchctl list <label>` output for a job launchd is actively running.
     # Success requires a PID here, not just exit 0 — exit 0 alone also covers a
     # registered-but-not-running definition (macOS 26+ `state = not running`).
-    RUNNING_LIST_OUTPUT = '{\n\t"PID" = 4242;\n\t"Label" = "ai.hermes.gateway";\n};'
+    RUNNING_LIST_OUTPUT = '{\n\t"PID" = 4242;\n\t"Label" = "ai.routster.gateway";\n};'
 
     def test_returns_true_once_label_is_registered(self, monkeypatch):
         """Success requires launchctl list to confirm a supervised process, not
@@ -2764,7 +2764,7 @@ class TestRetryLaunchctlBootstrapUntilRegistered:
                 # Registered (exit 0) but no PID line — never running.
                 return SimpleNamespace(
                     returncode=0,
-                    stdout='{\n\t"Label" = "ai.hermes.gateway";\n};',
+                    stdout='{\n\t"Label" = "ai.routster.gateway";\n};',
                     stderr="",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
@@ -2877,7 +2877,7 @@ class TestUnitAnchoredServiceIdentity:
         monkeypatch.setattr(Path, "home", lambda: tmp_path / "alice")
         monkeypatch.setattr(os, "geteuid", lambda: 1000)
         monkeypatch.setenv("HERMES_HOME", str(profile_home))
-        assert gateway_cli.get_service_name() == "hermes-gateway-kimi"
+        assert gateway_cli.get_service_name() == "routster-gateway-kimi"
 
     @pytest.mark.platforms("linux")
     def test_bare_unit_pinning_a_named_profile_home_keeps_the_bare_name(self, tmp_path, monkeypatch):

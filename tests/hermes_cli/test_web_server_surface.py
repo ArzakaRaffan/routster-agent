@@ -65,7 +65,7 @@ def _web_access_statuses(client: TestClient) -> list[int]:
             for method, path, body in WEB_ACCESS]
 
 
-@pytest.mark.parametrize("serves_spa", [True, False], ids=["hermes-dashboard", "hermes-serve"])
+@pytest.mark.parametrize("serves_spa", [True, False], ids=["routster-dashboard", "routster-serve"])
 def test_the_standalone_dashboard_and_serve_have_neither_web_access_nor_browser_file_routes(
         monkeypatch, serves_spa):
     from hermes_constants import get_hermes_home

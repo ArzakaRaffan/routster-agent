@@ -30,7 +30,7 @@ def _gw():
 def get_launchd_label() -> str:
     """Return the launchd service label, scoped per profile."""
     suffix = _gw()._profile_suffix()
-    return f"ai.hermes.gateway-{suffix}" if suffix else "ai.hermes.gateway"
+    return f"ai.routster.gateway-{suffix}" if suffix else "ai.routster.gateway"
 
 
 def _probe_launchd_domain_for_label(label: str) -> str:

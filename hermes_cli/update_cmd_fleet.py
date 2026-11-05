@@ -33,7 +33,7 @@ _FRESH_RESTART_SUPERVISORS = frozenset({"systemd", "launchd", "service", "s6"})
 
 _SYSTEMD_SCOPES = (("user", ["systemctl", "--user"]), ("system", ["systemctl"]))
 _LIST_GATEWAY_UNITS = [
-    "list-units", "hermes-gateway*", "hermes-serve*", "hermes-dashboard*",
+    "list-units", "routster-gateway*", "routster-serve*", "routster-dashboard*",
     "--plain", "--no-legend", "--no-pager",
 ]
 
@@ -738,13 +738,13 @@ def _scoped_manual_gateway_pids(pids, *, keep=(), quiet: bool = False) -> list[i
 def _is_serve_or_dashboard_unit(unit: str) -> bool:
     """``hermes-serve*``/``hermes-dashboard*`` (``.service``) by the same exact-or-hyphenated shape."""
     return (
-        unit == "hermes-serve.service"
-        or unit.startswith("hermes-serve-")
+        unit == "routster-serve.service"
+        or unit.startswith("routster-serve-")
         # #125297: ``hermes-dashboard*`` units are systemd-supervised dashboard backends — the
         # same fleet this pass restarts. Leaving them out meant a successful update reported
         # the dashboard ``deferred`` (still on pre-update code) while nothing ever restarted it.
-        or unit == "hermes-dashboard.service"
-        or unit.startswith("hermes-dashboard-")
+        or unit == "routster-dashboard.service"
+        or unit.startswith("routster-dashboard-")
     )
 
 
@@ -754,8 +754,8 @@ def _is_hermes_gateway_unit(unit: str) -> bool:
     return (
         # list-units is already pattern-filtered, but keep the name gate so a stray non-gateway/serve line
         # cannot enter the restart path. See #83595.
-        unit == "hermes-gateway.service"
-        or unit.startswith("hermes-gateway-")
+        unit == "routster-gateway.service"
+        or unit.startswith("routster-gateway-")
         or _is_serve_or_dashboard_unit(unit)
     )
 
@@ -792,7 +792,7 @@ def _service_unit_supports_graceful_sigusr1_restart(svc_name: str) -> bool:
 
     See #83438.
     """
-    return svc_name == "hermes-gateway" or svc_name.startswith("hermes-gateway-")
+    return svc_name == "routster-gateway" or svc_name.startswith("routster-gateway-")
 
 
 def _warn_incomplete_gateway_fleet_restart(failed_units: list) -> None:
@@ -818,10 +818,10 @@ def _warn_incomplete_gateway_fleet_restart(failed_units: list) -> None:
     print("  Skipped units may still be running pre-update code (mixed")
     print("  sys.modules). Restart them manually, then verify:")
     print("    routster gateway status")
-    if any(not name.startswith("ai.hermes.") for name in ordered):
+    if any(not name.startswith("ai.routster.") for name in ordered):
         print("    systemctl --user restart <unit>   # user-scope")
         print("    sudo systemctl restart <unit>     # system-scope")
-    if any(name.startswith("ai.hermes.") for name in ordered):
+    if any(name.startswith("ai.routster.") for name in ordered):
         print("    launchctl kickstart -k gui/$UID/<label>   # macOS (or user/$UID)")
 
 
@@ -1025,7 +1025,7 @@ _DESKTOP_SERVE_SKIP_REASON = (
 # survivors reported by _surviving_pre_update_serve_runtimes.
 _SERVE_SKIP_REASON = (
     "no per-profile relaunch command reaches a serve/dashboard runtime; recovered by the fresh"
-    " systemd unit pass when a hermes-serve*/hermes-dashboard* unit owns it, else left running for explicit"
+    " systemd unit pass when a routster-serve*/routster-dashboard* unit owns it, else left running for explicit"
     " operator restart"
 )
 # A launchd-owned backend (#116503): the fresh child has no per-label kickstart for serve/dashboard

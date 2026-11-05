@@ -75,7 +75,7 @@ def test_pm_handoff_reports_update_and_gateway_results(
 @pytest.mark.platforms('windows')
 @pytest.mark.parametrize(('output', 'code'), [
     ('✓ Update complete! (v1.0.0)', 0),
-    ('✓ Update complete! (v1.0.0)|  ✗ hermes-gateway failed to come back after restart.', 124),
+    ('✓ Update complete! (v1.0.0)|  ✗ routster-gateway failed to come back after restart.', 124),
     ('✓ Update complete! (v1.0.0)|Update incomplete — some units were not restarted', 124),
     ('Cloning into the checkout...', 124),
 ])

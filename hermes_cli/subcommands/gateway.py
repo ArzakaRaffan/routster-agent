@@ -195,7 +195,7 @@ def build_gateway_parser(
         "migrate-legacy", help="Remove legacy hermes.service units from pre-rename installs",
         description="Stop, disable, and remove legacy Routster gateway unit files "
             "(e.g. hermes.service) left over from older installs. Profile "
-            "units (hermes-gateway-<profile>.service) and unrelated "
+            "units (routster-gateway-<profile>.service) and unrelated "
             "third-party services are never touched.")
     _flag(gateway_migrate_legacy, "--dry-run", dest="dry_run",
         help="List what would be removed without doing it")

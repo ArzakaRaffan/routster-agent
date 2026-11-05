@@ -39,20 +39,20 @@ def test_bare_user_unit_pinning_this_custom_home_is_adopted_by_lifecycle_command
     monkeypatch.setattr(gateway, "is_linux", lambda: True)
     monkeypatch.setattr(gateway.os, "geteuid", lambda: 1000)
     monkeypatch.setattr(gateway, "supports_systemd_services", lambda: True)
-    legacy_unit = unit_dir / "hermes-gateway.service"
+    legacy_unit = unit_dir / "routster-gateway.service"
 
     # A bare unit that pins ANOTHER home is someone else's service: this home keeps its own name.
     legacy_unit.write_text(
         f'[Service]\nEnvironment="HERMES_HOME={tmp_path / "other"}"\nExecStart=/usr/bin/hermes gateway run\n',
         encoding="utf-8",
     )
-    assert gateway.get_service_name() != "hermes-gateway"
+    assert gateway.get_service_name() != "routster-gateway"
     assert not gateway._systemd_unit_installed()
 
     legacy_unit.write_text(
         f'[Service]\nEnvironment="HERMES_HOME={custom_root}"\nRestart=always\nExecStart=/usr/bin/hermes gateway run\n',
         encoding="utf-8",
     )
-    assert gateway.get_service_name() == "hermes-gateway"
+    assert gateway.get_service_name() == "routster-gateway"
     assert gateway.get_systemd_unit_path(system=False) == legacy_unit
     assert gateway._systemd_unit_installed()

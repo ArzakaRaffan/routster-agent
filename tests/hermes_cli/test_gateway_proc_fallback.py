@@ -178,7 +178,7 @@ class TestGetServicePidsAllProfiles:
             patch("hermes_cli.gateway.supports_systemd_services", return_value=False),
             patch(
                 "hermes_cli.gateway.get_launchd_label",
-                return_value="ai.hermes.gateway.myprofile",
+                return_value="ai.routster.gateway.myprofile",
             ),
             patch(
                 "hermes_cli.gateway._locate_launchd_gateway_service",
@@ -191,7 +191,7 @@ class TestGetServicePidsAllProfiles:
         assert pids == {123}
         # Default scope: exactly the current profile's label, no fleet
         # enumeration and no bare `launchctl list` scan.
-        assert located == ["ai.hermes.gateway.myprofile"]
+        assert located == ["ai.routster.gateway.myprofile"]
         launchctl_calls = [
             c[0][0]
             for c in mock_run.call_args_list
@@ -207,8 +207,8 @@ class TestGetServicePidsAllProfiles:
         (#74075 belt-and-suspenders)."""
         located = []
         label_pids = {
-            "ai.hermes.gateway": 123,
-            "ai.hermes.gateway-profile-b": 456,
+            "ai.routster.gateway": 123,
+            "ai.routster.gateway-profile-b": 456,
         }
 
         def _fake_locate(label):
@@ -220,11 +220,11 @@ class TestGetServicePidsAllProfiles:
             patch("hermes_cli.gateway.supports_systemd_services", return_value=False),
             patch(
                 "hermes_cli.gateway.get_launchd_label",
-                return_value="ai.hermes.gateway",
+                return_value="ai.routster.gateway",
             ),
             patch(
                 "hermes_cli.gateway.launchd_gateway_labels_for_install",
-                return_value=["ai.hermes.gateway", "ai.hermes.gateway-profile-b"],
+                return_value=["ai.routster.gateway", "ai.routster.gateway-profile-b"],
             ),
             patch(
                 "hermes_cli.gateway._locate_launchd_gateway_service",
@@ -246,8 +246,8 @@ class TestGetServicePidsAllProfiles:
         assert pids == {123, 456, 999}
         assert 789 not in pids
         assert sorted(located) == [
-            "ai.hermes.gateway",
-            "ai.hermes.gateway-profile-b",
+            "ai.routster.gateway",
+            "ai.routster.gateway-profile-b",
         ]
         launchctl_calls = [
             c[0][0]
@@ -270,7 +270,7 @@ class TestGetServicePidsAllProfiles:
                 if "list-units" in cmd_str:
                     return MagicMock(
                         returncode=0,
-                        stdout="hermes-gateway-jarvis.service loaded active running\n",
+                        stdout="routster-gateway-jarvis.service loaded active running\n",
                         stderr="",
                     )
                 if "show" in cmd_str and "MainPID" in cmd_str:

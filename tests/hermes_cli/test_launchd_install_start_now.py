@@ -14,7 +14,7 @@ import hermes_cli.gateway as gateway_cli
 from hermes_cli import gateway_service_owner
 from hermes_cli.subcommands.gateway import build_gateway_parser
 
-LABEL = "ai.hermes.gateway"
+LABEL = "ai.routster.gateway"
 DOMAIN = "gui/501"
 
 

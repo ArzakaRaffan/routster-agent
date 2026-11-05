@@ -632,7 +632,7 @@ def _kill_stale_dashboard_processes(
     """
     from hermes_cli import main_dashboard as _dash
 
-    _dash_unit = str(getattr(_dash, "_DASHBOARD_SYSTEMD_UNIT", "hermes-dashboard.service")).removesuffix(".service")
+    _dash_unit = str(getattr(_dash, "_DASHBOARD_SYSTEMD_UNIT", "routster-dashboard.service")).removesuffix(".service")
     # The update's fleet loop already handled the dashboard unit (restarted it, or declined for lack
     # of root and printed the manual command): a second attempt here restarts a healthy unit twice,
     # or retries without --no-ask-password and dumps a polkit/tty error under the same advice (#141021).

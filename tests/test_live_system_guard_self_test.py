@@ -124,31 +124,31 @@ def test_os_killpg_blocks_foreign_pgid():
 
 def test_subprocess_run_systemctl_restart_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.run(["systemctl", "--user", "restart", "hermes-gateway"], check=False)
+        subprocess.run(["systemctl", "--user", "restart", "routster-gateway"], check=False)
 
 
 def test_subprocess_run_full_path_systemctl_blocked():
     """``/usr/bin/systemctl`` (full path) must be blocked too."""
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.run(["/usr/bin/systemctl", "--user", "stop", "hermes-gateway"], check=False)
+        subprocess.run(["/usr/bin/systemctl", "--user", "stop", "routster-gateway"], check=False)
 
 
 def test_subprocess_run_sudo_systemctl_blocked():
     """``sudo systemctl ...`` defeated the old head==systemctl check."""
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.run(["sudo", "systemctl", "restart", "hermes-gateway"], check=False)
+        subprocess.run(["sudo", "systemctl", "restart", "routster-gateway"], check=False)
 
 
 def test_subprocess_run_env_systemctl_blocked():
     """``env systemctl ...`` similarly defeated the old head check."""
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.run(["env", "systemctl", "--user", "restart", "hermes-gateway"], check=False)
+        subprocess.run(["env", "systemctl", "--user", "restart", "routster-gateway"], check=False)
 
 
 def test_subprocess_run_bash_c_systemctl_blocked():
     """``bash -c "systemctl ..."`` must also be caught."""
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.run(["bash", "-c", "systemctl --user restart hermes-gateway"], check=False)
+        subprocess.run(["bash", "-c", "systemctl --user restart routster-gateway"], check=False)
 
 
 
@@ -156,13 +156,13 @@ def test_subprocess_run_bash_c_systemctl_blocked():
 @pytest.mark.parametrize(
     "cmd",
     [
-        ["systemctl", "--user", "restart", "hermes-dashboard.service"],
-        ["systemctl", "--user", "restart", "hermes-dashboard-work.service"],
-        ["systemctl", "--user", "stop", "hermes-serve"],
-        ["/usr/bin/systemctl", "--user", "--no-ask-password", "restart", "hermes-serve-work.service"],
-        ["bash", "-c", "systemctl --user restart hermes-dashboard.service"],
-        "systemctl --user restart hermes-dashboard-work.service",
-        'bash -c "systemctl --user restart hermes-serve.service"',
+        ["systemctl", "--user", "restart", "routster-dashboard.service"],
+        ["systemctl", "--user", "restart", "routster-dashboard-work.service"],
+        ["systemctl", "--user", "stop", "routster-serve"],
+        ["/usr/bin/systemctl", "--user", "--no-ask-password", "restart", "routster-serve-work.service"],
+        ["bash", "-c", "systemctl --user restart routster-dashboard.service"],
+        "systemctl --user restart routster-dashboard-work.service",
+        'bash -c "systemctl --user restart routster-serve.service"',
     ],
 )
 def test_subprocess_run_systemctl_mutating_any_hermes_unit_blocked(cmd):
@@ -175,9 +175,9 @@ def test_subprocess_run_systemctl_mutating_any_hermes_unit_blocked(cmd):
 @pytest.mark.parametrize(
     "cmd",
     [
-        ["systemctl", "--user", "show", "hermes-dashboard.service", "--property=MainPID"],
-        ["systemctl", "--user", "status", "hermes-dashboard"],
-        ["systemctl", "--user", "is-active", "hermes-serve.service"],
+        ["systemctl", "--user", "show", "routster-dashboard.service", "--property=MainPID"],
+        ["systemctl", "--user", "status", "routster-dashboard"],
+        ["systemctl", "--user", "is-active", "routster-serve.service"],
         ["systemctl", "--user", "restart", "nginx.service"],
         ["systemctl", "--user", "restart", "myhermes-dashboard.service"],
     ],
@@ -193,9 +193,9 @@ def test_subprocess_run_systemctl_read_only_or_foreign_unit_passes_guard(cmd):
     "cmd",
     [
         ["bash", "-c", r"systemctl st\op hermes.service"],
-        ["bash", "-c", r"systemctl --user rest\art hermes-dashboard"],
-        r"systemctl --user re\start hermes-serve.service",
-        ["bash", "-c", "sh -c 'systemctl --user restart hermes-dashboard'"],
+        ["bash", "-c", r"systemctl --user rest\art routster-dashboard"],
+        r"systemctl --user re\start routster-serve.service",
+        ["bash", "-c", "sh -c 'systemctl --user restart routster-dashboard'"],
     ],
 )
 def test_subprocess_run_shell_escaped_or_nested_verb_blocked(cmd):
@@ -211,14 +211,14 @@ def test_a_test_owned_unit_can_be_cleaned_up_but_no_other(request):
     with pytest.raises(FileNotFoundError):
         subprocess.run(["systemctl", "--user", "stop", owned], env={"PATH": "/nonexistent"}, check=False)
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.run(["systemctl", "--user", "stop", owned, "hermes-dashboard.service"], check=False)
+        subprocess.run(["systemctl", "--user", "stop", owned, "routster-dashboard.service"], check=False)
     with pytest.raises(RuntimeError, match="live-system guard"):
         subprocess.run(["systemctl", "--user", "stop", "hermes-worker-kanban-other-run-1.scope"], check=False)
 
 
 def test_subprocess_run_setsid_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.run(["setsid", "systemctl", "kill", "hermes-gateway"], check=False)
+        subprocess.run(["setsid", "systemctl", "kill", "routster-gateway"], check=False)
 
 
 def test_host_gateway_start_blocked_but_container_exec_allowed():
@@ -235,7 +235,7 @@ def test_host_gateway_start_blocked_but_container_exec_allowed():
 def test_subprocess_run_string_shell_true_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
         subprocess.run(
-            "systemctl --user restart hermes-gateway",
+            "systemctl --user restart routster-gateway",
             shell=True,
             check=False,
         )
@@ -243,32 +243,32 @@ def test_subprocess_run_string_shell_true_blocked():
 
 def test_subprocess_popen_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.Popen(["systemctl", "--user", "stop", "hermes-gateway"])
+        subprocess.Popen(["systemctl", "--user", "stop", "routster-gateway"])
 
 
 def test_subprocess_call_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.call(["systemctl", "--user", "restart", "hermes-gateway"])
+        subprocess.call(["systemctl", "--user", "restart", "routster-gateway"])
 
 
 def test_subprocess_check_call_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.check_call(["systemctl", "--user", "restart", "hermes-gateway"])
+        subprocess.check_call(["systemctl", "--user", "restart", "routster-gateway"])
 
 
 def test_subprocess_check_output_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.check_output(["systemctl", "--user", "restart", "hermes-gateway"])
+        subprocess.check_output(["systemctl", "--user", "restart", "routster-gateway"])
 
 
 def test_subprocess_getoutput_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.getoutput("systemctl --user restart hermes-gateway")
+        subprocess.getoutput("systemctl --user restart routster-gateway")
 
 
 def test_subprocess_getstatusoutput_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        subprocess.getstatusoutput("systemctl --user restart hermes-gateway")
+        subprocess.getstatusoutput("systemctl --user restart routster-gateway")
 
 
 # ──────────────────── os.system / os.popen ────────────────────
@@ -276,12 +276,12 @@ def test_subprocess_getstatusoutput_systemctl_blocked():
 
 def test_os_system_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        os.system("systemctl --user restart hermes-gateway")
+        os.system("systemctl --user restart routster-gateway")
 
 
 def test_os_popen_systemctl_blocked():
     with pytest.raises(RuntimeError, match="live-system guard"):
-        os.popen("systemctl --user restart hermes-gateway")
+        os.popen("systemctl --user restart routster-gateway")
 
 
 # ──────────────────── pty.spawn ────────────────────────────────
@@ -291,7 +291,7 @@ def test_os_popen_systemctl_blocked():
 def test_pty_spawn_systemctl_blocked():
     import pty
     with pytest.raises(RuntimeError, match="live-system guard"):
-        pty.spawn(["systemctl", "--user", "restart", "hermes-gateway"])
+        pty.spawn(["systemctl", "--user", "restart", "routster-gateway"])
 
 
 # ──────────────────── asyncio.create_subprocess_* ──────────────
@@ -302,7 +302,7 @@ def test_asyncio_create_subprocess_exec_systemctl_blocked():
 
     async def _attempt():
         await asyncio.create_subprocess_exec(
-            "systemctl", "--user", "restart", "hermes-gateway"
+            "systemctl", "--user", "restart", "routster-gateway"
         )
 
     with pytest.raises(RuntimeError, match="live-system guard"):
@@ -314,7 +314,7 @@ def test_asyncio_create_subprocess_shell_systemctl_blocked():
 
     async def _attempt():
         await asyncio.create_subprocess_shell(
-            "systemctl --user restart hermes-gateway"
+            "systemctl --user restart routster-gateway"
         )
 
     with pytest.raises(RuntimeError, match="live-system guard"):

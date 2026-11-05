@@ -34,5 +34,5 @@ def test_malformed_installed_plist_has_a_bounded_refusal():
     from hermes_cli.gateway_runtime_service import _verify_binding, RuntimeStartError
     with pytest.raises(RuntimeStartError, match='service_identity_unverified'):
         _verify_binding(plistlib.loads, b'<?xml version="1.0"?><plist><dict>')
-    definition = {'Label': 'ai.hermes.gateway'}
+    definition = {'Label': 'ai.routster.gateway'}
     assert _verify_binding(plistlib.loads, plistlib.dumps(definition)) == definition

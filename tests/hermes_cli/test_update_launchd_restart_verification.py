@@ -27,7 +27,7 @@ import pytest
 import hermes_cli.gateway as gateway_cli
 from hermes_cli import update_cmd
 
-LABEL = "ai.hermes.gateway"
+LABEL = "ai.routster.gateway"
 
 # Captured at import so a test can re-install the real verifier over a fixture's stub.
 _REAL_WAIT_FOR_SUPERVISION = gateway_cli.wait_for_launchd_gateway_supervision
