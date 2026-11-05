@@ -20,8 +20,6 @@ import shlex
 from contextlib import suppress
 from pathlib import Path
 
-from hermes_constants import HOME_DIRNAME
-
 
 def _resolved(path) -> Path | None:
     try:
@@ -134,7 +132,7 @@ def systemd_unit_hermes_home(scope_cmd: list, svc_name: str) -> str | None:
         if sep and key == "HERMES_HOME" and value.strip():
             return value.strip()
     if "--user" in scope_cmd:
-        return str(Path.home() / HOME_DIRNAME)
+        return str(Path.home() / ".hermes")  # Routster units pin HERMES_HOME; an unpinned one is Hermes's
     return None
 
 

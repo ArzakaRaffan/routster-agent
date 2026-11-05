@@ -50,6 +50,11 @@ import itertools
 # A literal ``~``/``$VAR`` in HERMES_HOME (fish, or any quoted value) must become absolute
 # before the first reader — otherwise it resolves against cwd and scaffolds <cwd>/~/.hermes.
 _startup_fast.normalize_hermes_home_env()
+# Routster fork: pin the home on every process Routster starts, so a process (or unit) without
+# HERMES_HOME is provably a Hermes install's and `routster update` never adopts or restarts it.
+if not os.environ.get("HERMES_HOME", "").strip():
+    from hermes_constants import get_default_hermes_root
+    os.environ["HERMES_HOME"] = str(get_default_hermes_root())
 
 # Startup-liveness watchdog: for gateway runs, arm BEFORE the heavy import
 # graph below — an import-time deadlock (native-extension init, contended

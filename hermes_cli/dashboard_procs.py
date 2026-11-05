@@ -10,8 +10,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-from hermes_constants import HOME_DIRNAME, WINDOWS_HOME_DIRNAME
-
 from hermes_cli._startup_fast import is_desktop_ssh_backend_argv
 
 _PS_RUN_KWARGS = dict(capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -210,9 +208,9 @@ def _hermes_home_for_pid(pid: int, *, require_launch_identity: bool = False) -> 
     if sys.platform == "win32":
         local_appdata = env.get("LOCALAPPDATA", "").strip()
         base = Path(local_appdata) if local_appdata else Path(env.get("USERPROFILE") or Path.home()) / "AppData" / "Local"
-        default_home = base / WINDOWS_HOME_DIRNAME
+        default_home = base / "hermes"  # Routster pins HERMES_HOME; an unpinned process is Hermes's
     else:
-        default_home = Path(env.get("HOME") or _pid_passwd_home(pid) or Path.home()) / HOME_DIRNAME
+        default_home = Path(env.get("HOME") or _pid_passwd_home(pid) or Path.home()) / ".hermes"
     root = profile_root_for_env_home(env_home, default_home)
     fixed_identity = any(env.get(k) for k in ("HERMES_SUPERVISED_CHILD", "HERMES_S6_SUPERVISED_CHILD",
                                                "HERMES_GATEWAY_EXTERNAL_SUPERVISOR",

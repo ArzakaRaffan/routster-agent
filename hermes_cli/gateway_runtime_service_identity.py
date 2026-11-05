@@ -203,7 +203,7 @@ def verify_systemd(props: dict[str, str], manager_env: str, home: Path, *, syste
             env.pop(key, None)
     configured = env.get("HERMES_HOME", "").strip()
     if not configured:
-        configured = str(_absolute(env.get("HOME") or pwd.getpwuid(uid).pw_dir) / HOME_DIRNAME)
+        configured = str(_absolute(env.get("HOME") or pwd.getpwuid(uid).pw_dir) / ".hermes")  # Routster units pin HERMES_HOME
     verify_home(home, configured)
     match = re.fullmatch(r"\{ path=(.*?) ; argv\[\]=(.*?) ; ignore_errors=(?:yes|no) ;(?:.*?)\}", props["ExecStart"])
     if not match or any(char in match[2] for char in ("$", "\\", "{", "}")):

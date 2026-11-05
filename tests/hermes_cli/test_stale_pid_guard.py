@@ -232,13 +232,13 @@ class TestHermesHomeForPid:
         service_home = tmp_path / "hermes-service"
         self._posix_scrubbed_unit(monkeypatch, tmp_path, str(service_home))
 
-        assert Path(dashboard_procs._hermes_home_for_pid(1)) == service_home / ".routster"
+        assert Path(dashboard_procs._hermes_home_for_pid(1)) == service_home / ".hermes"
 
     def test_unreadable_passwd_entry_keeps_the_existing_fallback(self, monkeypatch, tmp_path):
         """No owner, no entry: the previous behaviour stands rather than resolving to nothing."""
         self._posix_scrubbed_unit(monkeypatch, tmp_path, None)
 
-        assert Path(dashboard_procs._hermes_home_for_pid(1)) == tmp_path / "inspecting-user" / ".routster"
+        assert Path(dashboard_procs._hermes_home_for_pid(1)) == tmp_path / "inspecting-user" / ".hermes"
 
     def test_root_shaped_hermes_home_follows_the_flag_and_the_sticky_active_profile(self, monkeypatch, tmp_path):
         """Mirror ``_apply_profile_override``: an exported root ``HERMES_HOME`` is the root, not the
