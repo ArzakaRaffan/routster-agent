@@ -334,7 +334,9 @@ def _get_lock_dir() -> Path:
     # lock dir CWD-relative, so two serves started from different directories shared no singleton.
     state_home_env = os.getenv("XDG_STATE_HOME") or ""
     state_home = Path(state_home_env) if os.path.isabs(state_home_env) else Path.home() / ".local" / "state"
-    return state_home / "hermes" / _LOCKS_DIRNAME
+    # Routster fork: its own rendezvous dir, so a Hermes gateway on the same user is never adopted.
+    from hermes_constants import WINDOWS_HOME_DIRNAME
+    return state_home / WINDOWS_HOME_DIRNAME / _LOCKS_DIRNAME
 
 
 def _utc_now_iso() -> str:
