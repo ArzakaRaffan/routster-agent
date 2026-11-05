@@ -179,7 +179,7 @@ def test_stop_only_targets_the_invoking_hermes_home(monkeypatch):
 
     with mock.patch.object(
         dashboard_procs, "_scan_dashboard_processes",
-        return_value=[(12345, "hermes serve"), (12346, "hermes serve"), (12347, "hermes serve")],
+        return_value=[(12345, "routster serve"), (12346, "routster serve"), (12347, "routster serve")],
     ), mock.patch.object(dashboard_procs, "_caller_ancestor_pids", return_value=set()), mock.patch.object(
         dashboard_procs, "_hermes_home_for_pid",
         side_effect=lambda pid: {

@@ -22,7 +22,7 @@ from tui_gateway.user_messages import agent_init_failed_message
 def test_auth_lock_timeout_contention_gets_the_wait_copy(exc_text):
     message = agent_init_failed_message(TimeoutError(exc_text))
     assert "/model" not in message
-    assert "hermes setup" not in message
+    assert "routster setup" not in message
     assert "lock" in message and "dashboard" in message  # actionable: what holds it, what to do
 
 
@@ -30,9 +30,9 @@ def test_generic_timeout_keeps_the_model_setup_hints():
     # A TimeoutError that is NOT an auth lock (e.g. a network connect timeout) must not
     # be misread as lock contention.
     message = agent_init_failed_message(TimeoutError("connect timed out"))
-    assert "/model" in message and "hermes setup" in message
+    assert "/model" in message and "routster setup" in message
 
 
 def test_other_init_failures_keep_the_model_setup_hints():
     message = agent_init_failed_message(RuntimeError("provider bootstrap failed"))
-    assert "/model" in message and "hermes setup" in message
+    assert "/model" in message and "routster setup" in message

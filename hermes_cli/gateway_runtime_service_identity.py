@@ -115,7 +115,7 @@ def verify_gateway_argv(argv: list[str], home: Path, *, wrapped: bool = False) -
         if entry is None or entry[0] != "hermes_cli.main":
             _unverified()
         args = entry[1]
-    elif executable in {"hermes", "hermes.exe"} and (not own_launcher_only or _own_store_launcher(argv[0])):
+    elif executable in {"hermes", "hermes.exe", "routster", "routster.exe"} and (not own_launcher_only or _own_store_launcher(argv[0])):
         args = argv[1:]
     else:
         _unverified()

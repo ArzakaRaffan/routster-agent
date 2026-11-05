@@ -265,7 +265,7 @@ def test_enabled_portable_plugin_server_is_not_reported_as_an_unknown_toolset(en
     startup warning calling it an unknown toolset is a false alarm the user sees on every launch."""
     warned = [line for line in env_echo_results["output"].splitlines() if "Unknown toolsets" in line]
     with known_gate(KNOWN, request.node.name, raises=KnownSymptom):
-        symptom(not warned, f"`hermes chat` warned about the enabled plugin's MCP server: {warned}")
+        symptom(not warned, f"`routster chat` warned about the enabled plugin's MCP server: {warned}")
 
 
 # 4. #121078 same manifest name in two user plugin dirs ------------------------------------------
@@ -312,14 +312,14 @@ def test_same_name_backup_dir_does_not_shadow_the_live_plugin(name_collision: di
     assert rows, name_collision["listing"]
     with known_gate(KNOWN, request.node.name, raises=KnownSymptom):
         symptom("2.0.0" in rows[0],
-                f"`hermes plugins list` shows the backup copy instead of plugins/foo (v2.0.0): {rows}")
+                f"`routster plugins list` shows the backup copy instead of plugins/foo (v2.0.0): {rows}")
         symptom(any("RO:CANARY-LIVE:dup" in r for r in name_collision["results"]),
                 f"a real turn ran the backup dir's MCP server, not plugins/foo's: {name_collision['results']}")
 
 
 def test_same_name_plugin_collision_is_reported(name_collision: dict[str, Any], request: pytest.FixtureRequest) -> None:
     live, backup = str(name_collision["live"]), str(name_collision["backup"])
-    surfaces = {"hermes plugins list": name_collision["listing"], "logs/*.log": name_collision["logs"]}
+    surfaces = {"routster plugins list": name_collision["listing"], "logs/*.log": name_collision["logs"]}
     named_both = [where for where, text in surfaces.items() if live in text and backup in text]
     with known_gate(KNOWN, request.node.name, raises=KnownSymptom):
         symptom(named_both, f"two user plugin dirs declare the same name 'foo' ({live} and {backup}) but no "

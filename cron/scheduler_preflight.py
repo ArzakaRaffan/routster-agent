@@ -117,8 +117,8 @@ def _preflight_check_provider_key(job: dict, cfg: dict) -> Optional[str]:
             return None
         return (
             f"provider credential missing: {exc} {_credential_store_scope_label()}. "
-            "Set the provider API key in .env (or `hermes setup`) for that home, or pin a "
-            "working provider via `hermes cron edit "
+            "Set the provider API key in .env (or `routster setup`) for that home, or pin a "
+            "working provider via `routster cron edit "
             f"{job.get('id')} --provider <p>`."
         )
     except Exception:
@@ -304,7 +304,7 @@ def _preflight_check_delivery(job: dict) -> Optional[str]:
             return (
                 f"delivery platform '{platform_name}' has no gateway "
                 "credentials configured (not connected). Configure it via "
-                "`hermes setup` or change the job's `deliver` target."
+                "`routster setup` or change the job's `deliver` target."
             )
     return None
 

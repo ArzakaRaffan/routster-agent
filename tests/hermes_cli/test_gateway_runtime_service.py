@@ -231,14 +231,14 @@ def _installed_vbs(home, configured):
     """The current installed launcher grammar; no script is executed."""
     script = home / 'gateway.vbs'
     script.write_text("\n".join([
-        "' Hermes Agent Gateway", "Option Explicit", "Dim sh, env, existing_pp",
+        "' Routster Agent Gateway", "Option Explicit", "Dim sh, env, existing_pp",
         'Set sh = CreateObject("WScript.Shell")', 'Set env = sh.Environment("PROCESS")',
         f'env.Item("HERMES_HOME") = "{configured}"',
         'env.Item("HERMES_SUPERVISED_CHILD") = "1"',
-        'env.Item("VIRTUAL_ENV") = "C:\\Hermes"',
+        'env.Item("VIRTUAL_ENV") = "C:\\Routster"',
         'existing_pp = env.Item("PYTHONPATH")', 'If Len(existing_pp) > 0 Then',
-        '  env.Item("PYTHONPATH") = "C:\\Hermes;" & existing_pp', 'Else',
-        '  env.Item("PYTHONPATH") = "C:\\Hermes"', 'End If',
+        '  env.Item("PYTHONPATH") = "C:\\Routster;" & existing_pp', 'Else',
+        '  env.Item("PYTHONPATH") = "C:\\Routster"', 'End If',
         f'sh.CurrentDirectory = "{home}"',
         f'sh.Run "{sys.executable} -m hermes_cli.main gateway run", 0, False',
     ]) + "\n", encoding='utf-8')

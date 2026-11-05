@@ -6,7 +6,7 @@ import { getTurnState, resetTurnState } from '../app/turnStore.js'
 beforeEach(() => resetTurnState())
 
 // The client never retries gateway_bootstrap.py's terminal verdict, so the user sees it once: it
-// must carry the next step and must not claim Hermes is still starting.
+// must carry the next step and must not claim Routster is still starting.
 it('shows a terminal bootstrap verdict and its remedy, never "still waiting"', () => {
   const statuses: string[] = []
 

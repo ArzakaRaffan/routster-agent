@@ -97,13 +97,13 @@ export const ko: Translations = {
     activeProvider: "활성 메모리 제공자",
     noProvider: "없음 — 내장 메모리만",
     builtinLayer: "내장 레이어",
-    builtinNote: "MEMORY.md와 USER.md는 외부 제공자와 별개인 Hermes 자체 메모리입니다. 기본적으로 둘 다 세션에 로드되며, 설정 토글 (memory.memory_enabled / memory.user_profile_enabled)로 각각 끌 수 있습니다. 외부 제공자는 여기에 더해질 뿐, 이를 대체하지 않습니다.",
+    builtinNote: "MEMORY.md와 USER.md는 외부 제공자와 별개인 Routster 자체 메모리입니다. 기본적으로 둘 다 세션에 로드되며, 설정 토글 (memory.memory_enabled / memory.user_profile_enabled)로 각각 끌 수 있습니다. 외부 제공자는 여기에 더해질 뿐, 이를 대체하지 않습니다.",
   },
 
   status: {
     actionFailed: "작업 실패",
     actionFinished: "완료됨",
-    actionFinishedOwed: "업데이트되었지만 아직 남은 작업이 있습니다 (완료하려면 `hermes update`를 다시 실행하세요)",
+    actionFinishedOwed: "업데이트되었지만 아직 남은 작업이 있습니다 (완료하려면 `routster update`를 다시 실행하세요)",
     actions: "작업",
     agent: "에이전트",
     activeSessions: "활성 세션",
@@ -129,8 +129,8 @@ export const ko: Translations = {
     starting: "시작 중",
     startedInBackground: "백그라운드에서 시작됨 — 진행 상황은 로그를 확인하세요",
     stopped: "중지됨",
-    updateHermes: "Hermes 업데이트",
-    updatingHermes: "Hermes 업데이트 중…",
+    updateHermes: "Routster 업데이트",
+    updatingHermes: "Routster 업데이트 중…",
     waitingForOutput: "출력 대기 중…",
   },
 
@@ -341,7 +341,7 @@ export const ko: Translations = {
       "저장됨 — 변경 사항을 적용하려면 게이트웨이를 다시 시작하세요.",
     forceReinstall: "강제 재설치 (기존 폴더를 먼저 삭제)",
     headline:
-      "Hermes 플러그인을 검색, 설치, 활성화 및 업데이트합니다 (`hermes plugins` 동등).",
+      "Routster 플러그인을 검색, 설치, 활성화 및 업데이트합니다 (`routster plugins` 동등).",
     identifierLabel: "Git URL 또는 owner/repo",
     inactive: "비활성",
     installBtn: "설치",
@@ -520,11 +520,11 @@ export const ko: Translations = {
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "Hermes Achievements",
+      title: "Routster Achievements",
       subtitle:
-        "실제 세션 기록에서 획득하는 Hermes 컬렉터블 배지입니다. 알려져 있지만 아직 달성되지 않은 업적은 Discovered로 표시되며, Secret 업적은 일치하는 동작이 처음 나타날 때까지 숨겨집니다.",
+        "실제 세션 기록에서 획득하는 Routster 컬렉터블 배지입니다. 알려져 있지만 아직 달성되지 않은 업적은 Discovered로 표시되며, Secret 업적은 일치하는 동작이 처음 나타날 때까지 숨겨집니다.",
       scan_subtitle:
-        "Hermes 세션 기록을 스캔하고 있습니다. 기록이 많으면 첫 스캔에 5~10초가 걸릴 수 있습니다.",
+        "Routster 세션 기록을 스캔하고 있습니다. 기록이 많으면 첫 스캔에 5~10초가 걸릴 수 있습니다.",
     },
     actions: {
       rescan: "다시 스캔",
@@ -620,7 +620,7 @@ export const ko: Translations = {
         "X에 공유를 누르면 새 탭에서 미리 작성된 게시물이 열립니다. 1200×630 배지를 첨부하려면 먼저 이미지 복사를 누르세요 — X 작성기에서 바로 붙여넣을 수 있습니다. PNG 다운로드는 파일을 저장하여 어디서나 사용할 수 있게 합니다.",
       clipboard_unsupported:
         "이 브라우저에서는 클립보드 이미지 복사를 지원하지 않습니다 — 대신 다운로드를 이용하세요.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Hermes Agent ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Routster Agent ☤",
     },
   },
   kanban: {

@@ -653,11 +653,11 @@ class TestDeleteProfile:
         # Typed partial success: the filesystem delete completed, the identity did not, and the
         # payload carries what a surfacing caller needs to report it and retry.
         assert ei.value.profile == "gone"
-        assert ei.value.retry_command == "hermes profile purge-identity gone"
+        assert ei.value.retry_command == "routster profile purge-identity gone"
         assert not ei.value.path.exists()
         assert isinstance(ei.value, RuntimeError)  # the CLI handler catches RuntimeError
 
-        assert "hermes profile purge-identity gone" in capsys.readouterr().err
+        assert "routster profile purge-identity gone" in capsys.readouterr().err
         check = SessionDB(tmp_path / ".hermes" / "state.db")
         try:
             # The CLI left the identity alone rather than racing the live owner.
@@ -1039,7 +1039,7 @@ class TestAliasCollision:
         wrapper_dir = profile_env / ".local" / "bin"
         wrapper_dir.mkdir(parents=True, exist_ok=True)
         bat_path = wrapper_dir / "mybot.bat"
-        bat_path.write_text("@echo off\r\nhermes -p mybot %*\r\n", encoding="utf-8")
+        bat_path.write_text("@echo off\r\nroutster -p mybot %*\r\n", encoding="utf-8")
         with patch("subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
                 returncode=0, stdout=str(bat_path),
@@ -1335,7 +1335,7 @@ class TestRenameProfile:
              patch("hermes_cli.profiles._notify_multiplexer"), \
              patch("gateway.control_socket.migrate_gateway_profile_identity", return_value=None):
             rename_profile("oldname", "newname")
-        assert "hermes profile migrate-identity oldname newname" in capsys.readouterr().err
+        assert "routster profile migrate-identity oldname newname" in capsys.readouterr().err
 
         # Gateway restarted/stopped → the retry command repairs both stores.
         with patch("hermes_cli.profiles._live_default_multiplexer", return_value=False):
@@ -1659,7 +1659,7 @@ class TestEdgeCases:
         # runs the gateway with no profile flag).
         with patch("gateway.status.get_running_pid", return_value=None), patch(
             "gateway.status._read_process_cmdline",
-            return_value="hermes gateway run --replace",
+            return_value="routster gateway run --replace",
         ):
             assert _check_gateway_running(default_home) is True
 

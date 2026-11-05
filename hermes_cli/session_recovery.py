@@ -335,11 +335,11 @@ def _snapshot_and_inspect(
         snapshot_source, copied = _copy_source_bundle(source, Path(temp_dir.name))
         if _source_fingerprint(source) != before:
             raise SessionRecoverySafetyError(
-                "The source database bundle changed while it was being copied. Stop every Hermes process using this "
-                "profile and retry. This includes the interactive `hermes` CLI session this command may have been "
+                "The source database bundle changed while it was being copied. Stop every Routster process using this "
+                "profile and retry. This includes the interactive `routster` CLI session this command may have been "
                 "launched from: a running parent CLI writes session bookkeeping (compression ticks, context "
-                "tracking) to state.db in the background and counts as a Hermes process even after the gateway is "
-                "stopped. Run the recovery from a fresh shell with no `hermes` session open, or point --source at an "
+                "tracking) to state.db in the background and counts as a Routster process even after the gateway is "
+                "stopped. Run the recovery from a fresh shell with no `routster` session open, or point --source at an "
                 "immutable snapshot copy of the database."
             )
         conn = _connect(snapshot_source)

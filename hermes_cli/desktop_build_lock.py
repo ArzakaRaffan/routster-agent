@@ -82,7 +82,7 @@ class DesktopBuildLock:
             if not wait:
                 return False
             if not announced:
-                print("→ Waiting for a running Hermes update to release this checkout...")
+                print("→ Waiting for a running Routster update to release this checkout...")
                 announced = True
             time.sleep(1.0)
         self._checkout = lock

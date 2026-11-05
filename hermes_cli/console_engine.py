@@ -93,7 +93,7 @@ def _strip_console_status_footer(text: str) -> str:
     if len(lines) < 2:
         return text.rstrip()
     last, prev = (_strip_ansi(lines[i]).strip() for i in (-1, -2))
-    if not (prev.startswith("Run 'hermes doctor'") and last.startswith("Run 'hermes setup'")):
+    if not (prev.startswith("Run 'routster doctor'") and last.startswith("Run 'routster setup'")):
         return text.rstrip()
     lines = lines[:-2]
     _drop_trailing_blank(lines)
@@ -345,8 +345,8 @@ def _register_command_family(
             return _dispatch(surface, root, fixed, args, namespace_update)
 
         engine.register(
-            full_path, usage, summaries.get(full_path) or f"Run `hermes {usage}`.", handler,
-            mutating=mutating, confirmation=f"Run `hermes {usage}`?")
+            full_path, usage, summaries.get(full_path) or f"Run `routster {usage}`.", handler,
+            mutating=mutating, confirmation=f"Run `routster {usage}`?")
 
 
 _BLOCKED_TOP = frozenset(
@@ -395,7 +395,7 @@ class HermesConsoleEngine:
             if _contains_shell_syntax(raw_line, tokens):
                 raise ConsoleCommandError(
                     "Hermes Console does not run shell syntax. Use one supported "
-                    "Hermes command at a time.")
+                    "Routster command at a time.")
             builtin = self._execute_builtin(tokens)
             if builtin is not None:
                 if raw_line not in {"history", "clear"}:
@@ -478,7 +478,7 @@ class HermesConsoleEngine:
         if first.startswith("-"):
             return f"{first} is not available in Hermes Console."
         if first in _BLOCKED_TOP:
-            return f"`hermes {first}` is not available in Hermes Console."
+            return f"`routster {first}` is not available in Hermes Console."
         return _BLOCKED_PAIRS.get(tuple(tokens[:2]), "")
 
     def _cap_output(self, output: str) -> str:
@@ -765,7 +765,7 @@ def _cron_pause(_engine: HermesConsoleEngine, args: list[str]) -> str:
     from cron.jobs import pause_job
     return _cron_job_action(
         args, "cron pause <job>", "Paused",
-        lambda ref: pause_job(ref, reason="paused from hermes console"))
+        lambda ref: pause_job(ref, reason="paused from routster console"))
 
 
 def _cron_resume(_engine: HermesConsoleEngine, args: list[str]) -> str:
@@ -791,10 +791,10 @@ def _cron_run(_engine: HermesConsoleEngine, args: list[str]) -> str:
 
 # (path, usage, summary, handler, confirmation prompt) — a non-empty prompt marks it mutating.
 _BUILTIN_COMMANDS = (
-    (("status",), "status", "Show Hermes component status.", _status, ""),
-    (("version",), "version", "Show Hermes version information.", _version, ""),
+    (("status",), "status", "Show Routster component status.", _status, ""),
+    (("version",), "version", "Show Routster version information.", _version, ""),
     (("doctor",), "doctor", "Run diagnostics without auto-fix.", _doctor, ""),
-    (("logs",), "logs [name] [-n N]", "Show recent Hermes logs.", _logs, ""),
+    (("logs",), "logs [name] [-n N]", "Show recent Routster logs.", _logs, ""),
     (("sessions", "list"), "sessions list [--limit N]", "List recent sessions.", _sessions_list,
      ""),
     (("sessions", "stats"), "sessions stats", "Show session store statistics.", _sessions_stats,
@@ -805,7 +805,7 @@ _BUILTIN_COMMANDS = (
     (("cron", "status"), "cron status", "Show cron scheduler status.", _cron_status, ""),
     (("profile",), "profile", "Show active profile status.", _profile_status, ""),
     (("config", "set"), "config set <key> <value>", "Set a configuration value.", _config_set,
-     "Update Hermes configuration?"),
+     "Update Routster configuration?"),
     (("cron", "pause"), "cron pause <job>", "Pause a scheduled job.", _cron_pause,
      "Pause this cron job?"),
     (("cron", "resume"), "cron resume <job>", "Resume a paused cron job.", _cron_resume,
@@ -813,7 +813,7 @@ _BUILTIN_COMMANDS = (
     (("cron", "run"), "cron run <job>", "Run a job on the next scheduler tick.", _cron_run,
      "Trigger this cron job?"),
     (("config", "migrate"), "config migrate", "Update config with new options.", _config_migrate,
-     "Update Hermes configuration with missing defaults?"),
+     "Update Routster configuration with missing defaults?"),
     (("sessions", "export"), "sessions export <output> [--source SOURCE] [--session-id ID]",
      "Export sessions to JSONL.", _sessions_export, "Export session data?"),
     (("sessions", "rename"), "sessions rename <session> <title>", "Rename a session.",

@@ -48,11 +48,49 @@ Most Routster behaviour lives in a file upstream never edits:
 | `hermes_cli/update_cmd_git.py`, `hermes_cli/update_cmd_zip.py` | "official" repo = ArzakaRaffan/routster-agent (no Hermes upstream prompt or push for users; ZIP fallback and repair hints point at the fork) |
 | `hermes_cli/_launchers.py`, `hermes_cli/_install_repair.py` | `routster` launcher next to `hermes` / `hermes-acp` |
 | `scripts/install.sh`, `scripts/install.ps1`, `scripts/install.cmd` | default repo = the fork, home `~/.routster`, Routster banner and wording, setup runs `routster setup`, gateway service stage disabled |
-| `hermes_constants.py` (`HOME_DIRNAME`) + the stray `~/.hermes` fallbacks (`agent/file_safety.py`, `agent/nous_rate_guard.py`, `agent/transports/codex_app_server.py`, `hermes_cli/{dashboard_procs,env_loader,gateway,gateway_runtime_service_identity,main,main_dashboard,stdio,update_fleet_scope,update_lock}.py`, `hermes_state_holders.py`, `ui-tui/src/**` home fallbacks, `scripts/_activation.sh`, `scripts/run_tests.sh`, `setup-hermes.sh`, `activate.ps1`) | data folder is `~/.routster` (Windows `%LOCALAPPDATA%
-outster`), never a Hermes home; the checkout inside it keeps the `hermes-agent` folder name (backup/uninstall/doctor key on it) |
+| `hermes_constants.py` (`HOME_DIRNAME`) + the stray `~/.hermes` fallbacks (`agent/file_safety.py`, `agent/nous_rate_guard.py`, `agent/transports/codex_app_server.py`, `hermes_cli/{dashboard_procs,env_loader,gateway,gateway_runtime_service_identity,main,main_dashboard,stdio,update_fleet_scope,update_lock}.py`, `hermes_state_holders.py`, `ui-tui/src/**` home fallbacks, `scripts/_activation.sh`, `scripts/run_tests.sh`, `setup-hermes.sh`, `activate.ps1`) | data folder is `~/.routster` (Windows `%LOCALAPPDATA%\routster`), never a Hermes home; the checkout inside it keeps the `hermes-agent` folder name (backup/uninstall/doctor key on it) |
 | `hermes_cli/_launchers.py::expose_cli` | only `routster` is published to `~/.local/bin`; `hermes` stays free for a real Hermes install |
 | `hermes_cli/setup.py`, `hermes_cli/setup_quick.py` | `routster setup` = Routster key + model, nothing else (no mode menu, agent import, terminal prompt or Nous metrics offer); `--reconfigure` = full wizard, `--quick` = missing items |
 | `hermes_cli/main.py::cmd_chat` | no shared-metrics (Nous telemetry) offer before chat |
+
+## Branding: `scripts/routster_rebrand.py`
+
+User-visible text is rewritten by a script, not by hand, so upstream merges stay mechanical:
+after `git merge upstream/main`, take upstream's side of any conflicted *string* and run
+
+```bash
+python scripts/routster_rebrand.py          # idempotent; --check exits 1 if anything is left
+```
+
+It rewrites string literals (never comments, docstrings, raw strings, bytes or identifiers) in the
+Python tree, every `locales/*.yaml` line and every skill `.md` (a `hermes …` line in a skill is a
+command the agent runs). `hermes <subcommand>` → `routster <subcommand>` (the subcommand list is
+the live parser's; add new upstream commands to `_SUBCOMMANDS`), `Hermes Agent` → `Routster Agent`,
+`Hermes` → `Routster`. Kept on purpose: `X-Hermes-*` headers, `Hermes-Agent/…` user agents, the
+desktop app (`Hermes.app`, "Hermes Desktop"), Nous models (`Hermes 3/4`), anything crediting Nous
+Research, and literals that are exactly `hermes`/`Hermes`. `ui-tui/src` and `web/src` were rewritten
+once with the same line rule (`rewrite_lines`); rerun it on them by hand after a TUI/web merge.
+
+## Living next to a real Hermes install
+
+A machine can run Hermes (`~/.hermes`, `hermes` on PATH) and Routster side by side:
+
+- `hermes_cli/main.py` pins `HERMES_HOME` at entry, so every Routster process and unit carries it.
+  A process or user unit *without* it is Hermes's: `dashboard_procs._hermes_home_for_pid`,
+  `update_fleet_scope.systemd_unit_hermes_home` and `gateway_runtime_service_identity.verify_systemd`
+  default to `~/.hermes`, so `routster update` never restarts Hermes services.
+- `gateway/status.py::_get_lock_dir` is `~/.local/state/routster/locks`: a shared rendezvous made
+  `routster` attach to the Hermes gateway (`Gateway inaccessible: profile_mismatch`).
+- Self-relaunch, kanban workers, profile wrapper scripts, the TUI's external commands, the agent
+  terminal's PATH bin dir and `pm.environments.cli_command_name` resolve `routster`, never
+  `which("hermes")` (that is the other install).
+- `tools/approval_detection.py`, `tools/skills_guard.py`, `tools/threat_patterns.py` and
+  `tools/plugin_guard_context.py` match `.routster` paths and `routster update/gateway`/`pkill
+  routster` next to the Hermes spellings (`tests/tools/test_routster_approval_names.py`).
+- The default persona says "You are Routster Agent." (`agent/prompt_builder.py`,
+  `hermes_cli/default_soul.py`, `SOUL.md`, `docker/SOUL.md`); an auto-seeded Hermes-named `SOUL.md`
+  upgrades in place, an edited one is never touched.
+- `routster update` prints no curator notices and no "select a provider" tip.
 
 ## Routster gateway contract (what the profile relies on)
 
@@ -83,13 +121,12 @@ outster`), never a Hermes home; the checkout inside it keeps the `hermes-agent` 
 - Dashboard / TUI TypeScript changes are not type-checked locally (repo wants Node 26; `npm ci`
   not run). The edits are strings, palette values, four nav items and three icon imports.
 - Hidden ≠ deleted: messaging gateway, kanban, cron, desktop app and Nous code still ship (the
-  dashboard, TUI and upstream merges depend on them). Many hints still say `hermes <cmd>`; the
-  `hermes` command keeps working, so they are cosmetic.
+  dashboard, TUI and upstream merges depend on them).
+- Docstrings, comments and `website/` docs still say Hermes (never shown in the product).
 - `routster debug share` still uploads to paste.rs/dpaste and points at Nous support.
 - One-line install reads `scripts/install.sh` from `main`. It installs into `~/.routster`, so an
   existing Hermes checkout in `~/.hermes` (origin NousResearch, tracks Hermes stable tags) is never
   reused. Not yet run end-to-end on a clean machine.
-- Windows: `%LOCALAPPDATA%
-outsterin` still holds a `hermes` launcher and goes on the User PATH.
+- Windows: `%LOCALAPPDATA%\routster\bin` still holds a `hermes` launcher and goes on the User PATH.
 - `routster` with no model configured and only `ROUTSTER_API_KEY` in the environment fails with
   upstream's `storage_unavailable`; `routster login` (Enter keeps the env key) fixes it.

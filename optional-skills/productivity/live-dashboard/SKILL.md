@@ -12,7 +12,7 @@ metadata:
     related_skills: [product-price-monitor, competitor-news-monitor, email-inbox-triage, google-workspace]
     blueprint:
       schedule: "0 8 * * *"
-      prompt: "Load the live-dashboard skill and run the refresh tick for every dashboard.json under the Hermes home directory's dashboards/ folder. Mark failed reads stale without overwriting last-known-good values, regenerate each index.html from its state file, and deliver a short summary ONLY on material change or new needs-attention items — otherwise respond with [SILENT]."
+      prompt: "Load the live-dashboard skill and run the refresh tick for every dashboard.json under the Routster home directory's dashboards/ folder. Mark failed reads stale without overwriting last-known-good values, regenerate each index.html from its state file, and deliver a short summary ONLY on material change or new needs-attention items — otherwise respond with [SILENT]."
 ---
 
 # Live Dashboard
@@ -49,7 +49,7 @@ For each source, do one bounded foreground read now: email/calendar via the conn
 
 ### 3. Build the dashboard artifact
 
-Write two files under the Hermes home directory's `dashboards/<slug>/` (the same directory that holds `config.yaml`; never assume a fixed location):
+Write two files under the Routster home directory's `dashboards/<slug>/` (the same directory that holds `config.yaml`; never assume a fixed location):
 
 - `dashboard.json` — the contract plus current state: purpose, entities, per-field values, per-field source + retrieval timestamp, a `needs_attention` list, and a change log (append-only, most recent first).
 - `index.html` — a single self-contained HTML page (inline CSS, no external requests) rendering the state: a header with purpose and last-updated time, a "Needs attention" section on top, the entity table, and the recent-changes list. Regenerate it from `dashboard.json` on every refresh; never hand-edit HTML state.
@@ -99,7 +99,7 @@ Done when the user has either seen the rendered page or been told exactly where 
 - Rendering state into HTML only — `dashboard.json` is the source of truth; HTML is a projection.
 - Alerting on every refresh instead of on material change.
 - Tracking the wrong grain (per-thread when the user thinks per-application).
-- Hardcoding the Hermes home path — resolve it from the running install (the directory holding `config.yaml`) and write absolute paths into cron prompts.
+- Hardcoding the Routster home path — resolve it from the running install (the directory holding `config.yaml`) and write absolute paths into cron prompts.
 - Calling `desktop_preview` outside a desktop session — it is only in the toolset for GUI sessions; fall back to the path.
 
 ## Verification

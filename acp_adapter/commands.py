@@ -66,7 +66,7 @@ class SlashCommandsMixin:
             "Queue a prompt to run after the current turn finishes",
             "prompt to run next",
         ),
-        "version": ("Show Hermes version", "Show Hermes version", None),
+        "version": ("Show Routster version", "Show Routster version", None),
     }
 
 

@@ -161,7 +161,7 @@ export const coreCommands: SlashCommand[] = [
   },
 
   {
-    help: 'update Hermes Agent to the latest version (exits TUI)',
+    help: 'update Routster Agent to the latest version (exits TUI)',
     name: 'update',
     run: (_arg, ctx) => {
       if (DASHBOARD_TUI_MODE) {
@@ -171,7 +171,7 @@ export const coreCommands: SlashCommand[] = [
       }
 
       ctx.transcript.sys(t('slashCmd.core.update.exiting'))
-      // Exit code 42 signals the Python wrapper to exec `hermes update`.
+      // Exit code 42 signals the Python wrapper to exec `routster update`.
       // Use dieWithCode for proper cleanup (gateway kill + Ink unmount).
       setTimeout(() => ctx.session.dieWithCode(42), 100)
     }
@@ -380,7 +380,7 @@ export const coreCommands: SlashCommand[] = [
 
       // T10: the owner's config.get `full` is the redacted presentation projection (display,
       // approvals, voice keybinding) — never provider/MCP/terminal config, which can hold secrets.
-      // The client renders it; the classic CLI's full dump stays `hermes config`.
+      // The client renders it; the classic CLI's full dump stays `routster config`.
       ctx.gateway
         .rpc<ConfigFullResponse>('config.get', { key: 'full', ...(ctx.sid ? { session_id: ctx.sid } : {}) })
         .then(

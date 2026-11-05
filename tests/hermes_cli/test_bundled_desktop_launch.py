@@ -78,8 +78,8 @@ def _linux_bundle(tmp_path: Path) -> Path:
 def _windows_bundle(tmp_path: Path) -> Path:
     app = tmp_path / "Hermes"
     repo = _payload(app)
-    _exe(app / "Hermes.exe")
-    _exe(app / "Uninstall Hermes.exe")
+    _exe(app / "Routster.exe")
+    _exe(app / "Uninstall Routster.exe")
     return repo
 
 
@@ -99,7 +99,7 @@ def _host_bundle(tmp_path: Path) -> tuple[Path, Path]:
     """
     if sys.platform == "win32":
         repo = _windows_bundle(tmp_path)
-        return repo, tmp_path / "Hermes" / "Hermes.exe"
+        return repo, tmp_path / "Hermes" / "Routster.exe"
     if sys.platform == "darwin":
         return _macos_bundle(tmp_path), tmp_path / "Hermes.app/Contents/MacOS/Hermes"
     repo = _linux_bundle(tmp_path)
@@ -118,7 +118,7 @@ class TestResolveBundleLayout:
     def test_windows_launcher_is_never_the_uninstaller(self, tmp_path):
         repo = _windows_bundle(tmp_path)
         layout = resolve_bundle_layout(repo, platform="win32")
-        assert layout.launcher == tmp_path / "Hermes" / "Hermes.exe"
+        assert layout.launcher == tmp_path / "Hermes" / "Routster.exe"
 
     def test_macos_app_root_climbs_out_of_contents_resources(self, tmp_path):
         repo = _macos_bundle(tmp_path)

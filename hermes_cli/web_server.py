@@ -58,7 +58,7 @@ except ImportError:
     except Exception:
         raise SystemExit(
             "Web UI requires fastapi and uvicorn.\n"
-            "Run hermes pm repair, then restart Hermes."
+            "Run routster pm repair, then restart Routster."
         )
 
 WEB_DIST = Path(os.environ["HERMES_WEB_DIST"]) if "HERMES_WEB_DIST" in os.environ else Path(__file__).parent / "web_dist"
@@ -205,7 +205,7 @@ def _get_pty_active_session_files(app: FastAPI) -> dict[str, Path]:
     return _app_state_default(app, "pty_active_session_files", dict)
 
 
-app = FastAPI(title="Hermes Agent", version=get_version_info().base_version, lifespan=app_lifespan)
+app = FastAPI(title="Routster Agent", version=get_version_info().base_version, lifespan=app_lifespan)
 
 from hermes_cli.dashboard_auth.body_limit import AuthBodyLimitMiddleware
 
@@ -918,7 +918,7 @@ def _no_auth_provider_message(host: str) -> str:
         "    (hash with: python -c \"from "
         "plugins.dashboard_auth.basic import hash_password; "
         "print(hash_password('your-password'))\")\n"
-        "  • OAuth: run `hermes dashboard register` (Nous Portal) or "
+        "  • OAuth: run `routster dashboard register` (Nous Portal) or "
         "install a DashboardAuthProvider plugin.\n"
         "  • Deployment token: provision HERMES_DASHBOARD_SESSION_TOKEN "
         "(a literal token, or 'file:<path>' naming a secret-manager-decrypted "
@@ -946,7 +946,7 @@ def _no_auth_provider_message(host: str) -> str:
                 "plugins.disabled but dashboard.basic_auth is "
                 "configured.\n"
                 "Remove 'basic' from plugins.disabled (or run "
-                "`hermes plugins enable basic`), then restart the "
+                "`routster plugins enable basic`), then restart the "
                 "dashboard.\n\n"
             ) + fix_hint
     except Exception:
@@ -1295,11 +1295,11 @@ def _on_server_started(
     if headless:
         # Auth-gated JSON-RPC/WS only — announce the bind, not a URL. flush:
         # a piped stdout otherwise surfaces this minutes after the sentinel.
-        print(f"  Hermes backend listening on {host}:{actual_port}", flush=True)
+        print(f"  Routster backend listening on {host}:{actual_port}", flush=True)
     else:
         from hermes_cli.url_utils import format_url_host
 
-        print(f"  Hermes Web UI → http://{format_url_host(host)}:{actual_port}")
+        print(f"  Routster Web UI → http://{format_url_host(host)}:{actual_port}")
     _maybe_open_browser(host, actual_port, open_browser, initial_profile)
 
     if start_mcp_discovery_after_bind:

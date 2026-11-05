@@ -74,7 +74,7 @@ def packaged_gui_app_paths() -> list[Path]:
     # The legacy entry is a hidden alias of the app-id entry since #124492 — remove it with the real one.
     return [desktop_entry_path(),
             data_base / "applications" / LEGACY_DESKTOP_ENTRY_NAME,
-            data_base / "applications" / "Hermes.desktop"] + [
+            data_base / "applications" / "Routster.desktop"] + [
         icons / size / "apps" / "hermes.png"
         for size in ("scalable", "24x24", "32x32", "48x48", "256x256", "512x512", "1024x1024")]
 

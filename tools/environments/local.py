@@ -558,8 +558,8 @@ def _find_bash() -> str:
     if bash:
         return bash
     raise RuntimeError(
-        "No shell found. Hermes needs bash (Git for Windows on Windows). "
-        "Run `hermes pm install` or reinstall the bundle."
+        "No shell found. Routster needs bash (Git for Windows on Windows). "
+        "Run `routster pm install` or reinstall the bundle."
     )
 
 
@@ -661,14 +661,14 @@ def _resolve_hermes_bin_dir() -> str | None:
     if payload_dir is not None and payload_dir.is_dir():
         _HERMES_BIN_DIR, _HERMES_BIN_DIR_IS_PAYLOAD = str(payload_dir), True
         return _HERMES_BIN_DIR
-    which = shutil.which("hermes")
+    which = shutil.which("routster")  # Routster fork: `hermes` on PATH may be a separate Hermes install
     argv0 = sys.argv[0] if sys.argv else ""
     base = os.path.basename(argv0).lower()
     exe_dir = os.path.dirname(sys.executable) if sys.executable else ""
-    shim = "hermes.exe" if _IS_WINDOWS else "hermes"
+    shim = "routster.exe" if _IS_WINDOWS else "routster"
     if which:
         candidate = os.path.dirname(which)
-    elif (os.path.isabs(argv0) and (base == "hermes" or base.startswith("hermes."))
+    elif (os.path.isabs(argv0) and (base == "routster" or base.startswith("routster."))
             and os.path.isfile(argv0)):
         candidate = os.path.dirname(argv0)
     else:

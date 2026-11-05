@@ -1073,7 +1073,7 @@ def _relocate_basetemp_outside_operator_home(config) -> None:
     # and, for runs that were killed before that, swept once it is 24h idle.
     safe = Path(tempfile.mkdtemp(prefix="b-", dir=_pytest_disk_temp_root(native)))
     assert not safe.resolve().is_relative_to(native), (
-        f"pytest basetemp {safe} still resolves inside the operator's Hermes home {native}; "
+        f"pytest basetemp {safe} still resolves inside the operator's Routster home {native}; "
         "refusing to run the suite against the live install (pass --basetemp outside it)"
     )
     factory._given_basetemp = safe
@@ -1225,7 +1225,7 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers",
         f"{_REQUIRES_WAL_MARK}: test needs the runtime to actually enable "
-        "SQLite WAL mode; skipped on builds where Hermes falls back to "
+        "SQLite WAL mode; skipped on builds where Routster falls back to "
         "journal_mode=DELETE for the WAL-reset bug.",
     )
     config.addinivalue_line(
@@ -1358,7 +1358,7 @@ def pytest_collection_modifyitems(config, items):
         return
 
     reason = (
-        f"SQLite {sqlite3.sqlite_version} has the WAL-reset bug — Hermes uses "
+        f"SQLite {sqlite3.sqlite_version} has the WAL-reset bug — Routster uses "
         "journal_mode=DELETE here, so no -wal sidecar exists to assert on"
     )
     skip_marker = pytest.mark.skip(reason=reason)

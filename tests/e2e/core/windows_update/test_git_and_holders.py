@@ -104,7 +104,7 @@ def test_update_fetches_into_the_installers_partial_clone(journey: Journey) -> N
     fetch_bug = next((ln.strip() for ln in run.stdout.splitlines() if "BUG:" in ln or "fatal:" in ln),
                      failure_line(run))
     assert run.returncode == 0 and m.installed_head() == m.next, fail_with(
-        m, f"hermes update over the installer's partial clone failed: rc={run.returncode}, checkout at "
+        m, f"routster update over the installer's partial clone failed: rc={run.returncode}, checkout at "
            f"{m.installed_head()} (NEXT {m.next}); {fetch_bug or 'no git error printed'}", run)
 
 
@@ -117,7 +117,7 @@ def test_list_venv_holders_reports_live_holders(journey: Journey) -> None:
                        "gated on #123050: --list-venv-holders reads the retired hermes_cli.main stub "
                        "and always prints []"):
         assert run.returncode == VENV_HOLDERS_EXIT and set(pids) <= set(reported), fail_with(
-            m, f"`hermes update --list-venv-holders` did not report the live venv holders {pids} "
+            m, f"`routster update --list-venv-holders` did not report the live venv holders {pids} "
                f"(rc={run.returncode}, reported pids {reported})", run)
 
 

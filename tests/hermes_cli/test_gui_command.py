@@ -103,7 +103,7 @@ def _make_packaged_executable(root: Path, monkeypatch) -> Path:
     if sys.platform == "darwin":
         exe = desktop_dir / "release" / "mac-arm64" / "Hermes.app" / "Contents" / "MacOS" / "Hermes"
     elif sys.platform == "win32":
-        exe = desktop_dir / "release" / "win-unpacked" / "Hermes.exe"
+        exe = desktop_dir / "release" / "win-unpacked" / "Routster.exe"
     else:
         exe = desktop_dir / "release" / "linux-unpacked" / "hermes"
     exe.parent.mkdir(parents=True, exist_ok=True)
@@ -127,7 +127,7 @@ def _packaged_exe_rel() -> Path:
     if sys.platform == "darwin":
         return Path("mac-arm64") / "Hermes.app" / "Contents" / "MacOS" / "Hermes"
     if sys.platform == "win32":
-        return Path("win-unpacked") / "Hermes.exe"
+        return Path("win-unpacked") / "Routster.exe"
     return Path("linux-unpacked") / "hermes"
 
 
@@ -389,7 +389,7 @@ def _make_signable_app(desktop_dir: Path) -> Path:
     (app / "Contents" / "MacOS").mkdir(parents=True)
     (app / "Contents" / "MacOS" / "Hermes").write_text("", encoding="utf-8")
 
-    helper = app / "Contents" / "Frameworks" / "Hermes Helper.app"
+    helper = app / "Contents" / "Frameworks" / "Routster Helper.app"
     _write_info_plist(helper, "com.nousresearch.hermes.helper")
 
     framework = app / "Contents" / "Frameworks" / "Electron Framework.framework"

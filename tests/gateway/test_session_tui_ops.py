@@ -355,10 +355,10 @@ def test_cli_only_commands_refuse_with_what_to_use_instead(tmp_path):
         async def probe():
             async with websocket(home, desc) as ws:
                 sid = (await rpc(ws, 'session.create', request_id='refuse', source='tui', toolsets=[]))['result']['session_id']
-                for command, hint in [('export', 'hermes profile export'), ('import x.tar.gz', 'hermes profile import'),
-                                      ('snapshot', 'hermes backup'), ('snap list', 'hermes backup'),
-                                      ('handoff telegram', 'hermes --cli'), ('hatch a cat', 'hermes --cli'),
-                                      ('worktree new', 'hermes -w'), ('palette', 'Type /')]:
+                for command, hint in [('export', 'routster profile export'), ('import x.tar.gz', 'routster profile import'),
+                                      ('snapshot', 'routster backup'), ('snap list', 'routster backup'),
+                                      ('handoff telegram', 'routster --cli'), ('hatch a cat', 'routster --cli'),
+                                      ('worktree new', 'routster -w'), ('palette', 'Type /')]:
                     refused = (await rpc(ws, 'slash.exec', command=command, session_id=sid))['error']
                     assert refused['message'] == 'unsupported_command', (command, refused)
                     assert hint in refused['data'].get('detail', ''), (command, refused)

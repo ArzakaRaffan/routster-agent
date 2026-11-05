@@ -210,7 +210,7 @@ def cli_command_name(project_root: Path) -> str:
     (``hermes-canary``) so it never shadows another install's ``hermes``.
     """
     command = _payload_hermes_command(Path(project_root).resolve())
-    return command.name.removesuffix(".exe") if command else "hermes"
+    return command.name.removesuffix(".exe") if command else "routster"  # Routster fork
 
 
 def base_venv(project_root: Path) -> Path:

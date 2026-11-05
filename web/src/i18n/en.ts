@@ -111,7 +111,7 @@ export const en: Translations = {
     diskElevatedBanner:
       "Your agent's disk is filling up. Consider clearing old sessions or expanding its storage.",
     multiplexStandaloneBanner:
-      "Your gateway serves only one profile. Not served: {profiles}. Why: {reason}. Fix: hermes gateway migrate --multiplex",
+      "Your gateway serves only one profile. Not served: {profiles}. Why: {reason}. Fix: routster gateway migrate --multiplex",
     dismiss: "Dismiss",
     sharedMetricsTitle: "Help improve Routster?",
     sharedMetricsBody:
@@ -135,7 +135,7 @@ export const en: Translations = {
   status: {
     actionFailed: "Action failed",
     actionFinished: "Finished",
-    actionFinishedOwed: "Updated, but still owed (re-run `hermes update` to finish)",
+    actionFinishedOwed: "Updated, but still owed (re-run `routster update` to finish)",
     actions: "Actions",
     agent: "Agent",
     activeSessions: "Active Sessions",
@@ -167,7 +167,7 @@ export const en: Translations = {
     stopped: "Stopped",
     updateHermes: "Update Routster",
     updateHermesConfirmMessage:
-      "This runs hermes update and restarts the gateway when it finishes. Active sessions keep their prompt cache until then.",
+      "This runs routster update and restarts the gateway when it finishes. Active sessions keep their prompt cache until then.",
     updateHermesConfirmNow: "Update now",
     updateHermesConfirmTitle: "Update Routster?",
     updatingHermes: "Updating Routster…",
@@ -492,7 +492,7 @@ export const en: Translations = {
     all: "All",
     categories: "Categories",
     filters: "Filters",
-    noSkills: "No skills installed yet. Browse the skills hub or create one here; from a terminal you can also run `hermes skills search <topic>`.",
+    noSkills: "No skills installed yet. Browse the skills hub or create one here; from a terminal you can also run `routster skills search <topic>`.",
     noSkillsMatch: "No skills match your search or filter.",
     skillCount: "{count} skill{s}",
     resultCount: "{count} result{s}",

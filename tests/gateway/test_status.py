@@ -396,7 +396,7 @@ class TestGatewayRuntimeStatus:
         monkeypatch.setattr(status, "_get_process_start_time", lambda pid: None)
         # PID 139 is now the live DEFAULT gateway (bare, no -p coder).
         monkeypatch.setattr(
-            status, "_read_process_cmdline", lambda pid: "hermes gateway run --replace"
+            status, "_read_process_cmdline", lambda pid: "routster gateway run --replace"
         )
 
         assert (
@@ -419,9 +419,9 @@ class TestGatewayRuntimeStatus:
         monkeypatch.setattr(status, "_pid_exists", lambda pid: True)
         monkeypatch.setattr(status, "_get_process_start_time", lambda pid: 1000)
         for cmdline in (
-            "hermes -p coder gateway run --replace",
+            "routster -p coder gateway run --replace",
             "/opt/hermes/.venv/bin/hermes --profile coder gateway run --replace",
-            "hermes_home=/opt/data/profiles/coder hermes gateway run --replace",
+            "hermes_home=/opt/data/profiles/coder routster gateway run --replace",
         ):
             monkeypatch.setattr(status, "_read_process_cmdline", lambda pid, c=cmdline: c)
             assert (
@@ -436,11 +436,11 @@ class TestGatewayRuntimeStatus:
         (#100817), while a foreign ``-p coder`` keeps being rejected."""
         default_home = Path("/opt/hermes-data")
         for cmdline in (
-            "hermes --profile default gateway run --replace --external-supervisor",
+            "routster --profile default gateway run --replace --external-supervisor",
             "/opt/hermes/.venv/bin/hermes -p default gateway run",
         ):
             assert status._command_line_belongs_to_profile(cmdline, default_home) is True, cmdline
-        assert status._command_line_belongs_to_profile("hermes -p coder gateway run", default_home) is False
+        assert status._command_line_belongs_to_profile("routster -p coder gateway run", default_home) is False
 
     def test_command_line_belongs_to_profile_normalizes_separators(self):
         """A Windows argv renders HERMES_HOME with backslashes while the
@@ -457,15 +457,15 @@ class TestGatewayRuntimeStatus:
         (#115031). An exact or absent assignment still matches."""
         home = Path("/fixture/profiles/ops")
         for cmdline in (
-            "HERMES_HOME=/fixture/profiles/ops2 hermes gateway run",
-            "HERMES_HOME=/fixture/profiles/ops-backup hermes gateway run",
-            "HERMES_HOME=/fixture/profiles/ops/2 hermes gateway run",
+            "HERMES_HOME=/fixture/profiles/ops2 routster gateway run",
+            "HERMES_HOME=/fixture/profiles/ops-backup routster gateway run",
+            "HERMES_HOME=/fixture/profiles/ops/2 routster gateway run",
         ):
             assert not status._command_line_belongs_to_profile(cmdline, home), cmdline
         default_home = Path("/opt/hermes-data")
-        assert not status._command_line_belongs_to_profile("HERMES_HOME=/opt/hermes-data2 hermes gateway run", default_home)
-        assert status._command_line_belongs_to_profile("HERMES_HOME=/opt/hermes-data hermes gateway run", default_home)
-        assert status._command_line_belongs_to_profile("hermes gateway run", default_home)
+        assert not status._command_line_belongs_to_profile("HERMES_HOME=/opt/hermes-data2 routster gateway run", default_home)
+        assert status._command_line_belongs_to_profile("HERMES_HOME=/opt/hermes-data routster gateway run", default_home)
+        assert status._command_line_belongs_to_profile("routster gateway run", default_home)
 
     def test_command_line_belongs_to_profile_matches_own_home_spellings_only(self):
         """Token-bounded value AND name: quoted values (ps/wmic re-quoting) and a trailing separator
@@ -473,19 +473,19 @@ class TestGatewayRuntimeStatus:
         embeds the name inside another token and is not an assignment."""
         home = Path("/opt/data/profiles/coder with space")
         assert status._command_line_belongs_to_profile(
-            'hermes_home="/opt/data/profiles/coder with space" hermes gateway run', home)
+            'hermes_home="/opt/data/profiles/coder with space" routster gateway run', home)
         # /proc and psutil hand argv back space-joined, so an unquoted value with a space is cut at
         # the space by the token parser; the whole-home literal match must still claim it.
         assert status._command_line_belongs_to_profile(
-            "HERMES_HOME=/opt/data/profiles/coder with space hermes gateway run", home)
+            "HERMES_HOME=/opt/data/profiles/coder with space routster gateway run", home)
         assert status._command_line_belongs_to_profile(
             r"HERMES_HOME=C:\Users\John Doe\.hermes hermes gateway run", Path(r"C:\Users\John Doe\.hermes"))
         assert not status._command_line_belongs_to_profile(
-            "HERMES_HOME=/opt/data/profiles/coder with spaces hermes gateway run", home)
+            "HERMES_HOME=/opt/data/profiles/coder with spaces routster gateway run", home)
         home = Path("/fixture/profiles/ops")
-        assert status._command_line_belongs_to_profile("HERMES_HOME=/fixture/profiles/ops/ hermes gateway run", home)
-        assert status._command_line_belongs_to_profile("HERMES_HOME=/opt/hermes-data/ hermes gateway run", Path("/opt/hermes-data"))
-        assert not status._command_line_belongs_to_profile("FOO=hermes_home=/fixture/profiles/ops hermes gateway run", home)
+        assert status._command_line_belongs_to_profile("HERMES_HOME=/fixture/profiles/ops/ routster gateway run", home)
+        assert status._command_line_belongs_to_profile("HERMES_HOME=/opt/hermes-data/ routster gateway run", Path("/opt/hermes-data"))
+        assert not status._command_line_belongs_to_profile("FOO=hermes_home=/fixture/profiles/ops routster gateway run", home)
 
 
     def test_write_runtime_status_explicit_none_clears_stale_fields(self, tmp_path, monkeypatch):
@@ -1812,7 +1812,7 @@ def test_pid_record_names_the_entry_point_under_an_inline_launcher(tmp_path, mon
     (#124029, #123151)."""
     import types
 
-    entry = types.SimpleNamespace(__file__="/opt/Hermes Agent/hermes-agent/hermes_cli/main.py")
+    entry = types.SimpleNamespace(__file__="/opt/Routster Agent/hermes-agent/hermes_cli/main.py")
     monkeypatch.setitem(status.sys.modules, "hermes_cli.main", entry)
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     monkeypatch.setattr(status.sys, "argv", ["-c", "gateway", "run"])

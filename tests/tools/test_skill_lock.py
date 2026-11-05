@@ -50,7 +50,7 @@ def test_file_tools_refuse_a_locked_skill_and_its_record(locked_home):
     ("bash -c 'cp /etc/hosts {L}/SKILL.md'", True),
     ("python3 -c \"open('{L}/SKILL.md','w').write('x')\"", True),
     ("echo {{}} > {H}/skills/.usage.json", True),
-    ("hermes curator unlock locked-skill", True),
+    ("routster curator unlock locked-skill", True),
     ("echo checking\nsed -i s/body/x/ {L}/SKILL.md", True),
     ("sudo -u root rm -rf {L}", True),
     ("cd {L} && (cd /) ; echo x > SKILL.md", True),

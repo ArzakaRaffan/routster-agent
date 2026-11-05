@@ -340,7 +340,7 @@ async def launch_page(request: Request):
     fragment (never sent to the server), keeps the credential it receives in this tab's
     sessionStorage and enters the Webapp at an address that carries neither."""
     _require_private_webapp(request)
-    return _handoff_page(request, "Opening Hermes", "Opening Hermes Webapp…", _LAUNCH_SCRIPT)
+    return _handoff_page(request, "Opening Routster", "Opening Hermes Webapp…", _LAUNCH_SCRIPT)
 
 
 # No credential appears in this public page or in its URL. The fragment
@@ -402,4 +402,4 @@ if (!/^[a-f0-9-]{36}$/.test(id)) {
 @router.get("/webapp/window")
 async def child_window_page(request: Request):
     _require_private_webapp(request)
-    return _handoff_page(request, "Opening Hermes", "Authorizing this Hermes window…", _WINDOW_SCRIPT)
+    return _handoff_page(request, "Opening Routster", "Authorizing this Routster window…", _WINDOW_SCRIPT)

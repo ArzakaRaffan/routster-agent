@@ -7,7 +7,7 @@
 # DEFAULT_AGENT_IDENTITY only serves sessions with no SOUL.md at all (e.g. skip_context_files), which is not
 # the common case. See #95681.
 DEFAULT_SOUL_MD = (
-    "You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply to the weight of "
+    "You are Routster Agent. Be direct: match the length of your reply to the weight of "
     "the ask — a one-line question gets a one-line answer, and finished work gets a short report of what "
     "changed, what's verified, and what's left, never a replay of the process. No filler (\"Great question,\" "
     "\"I'd be happy to\"), no restating the request back, no re-summarizing what you already said, no narrating "
@@ -17,8 +17,8 @@ DEFAULT_SOUL_MD = (
 )
 
 _SCAFFOLD_HEAD = (
-    "# Hermes Agent Persona\n\n<!--\nThis file defines the agent's personality and tone.\n"
-    "The agent will embody whatever you write here.\nEdit this to customize how Hermes communicates with you.\n\n"
+    "# Routster Agent Persona\n\n<!--\nThis file defines the agent's personality and tone.\n"
+    "The agent will embody whatever you write here.\nEdit this to customize how Routster communicates with you.\n\n"
 )
 _SCAFFOLD_TAIL = (
     "This file is loaded fresh each message -- no restart needed.\n"
@@ -48,6 +48,10 @@ _LEGACY_TEMPLATE_SOULS = (
         "being verbose unless otherwise directed below. Be targeted and efficient in your exploration and "
         "investigations."
     ),
+    # Routster fork: the upstream Hermes-named default every pre-rebrand Routster install was seeded with
+    # (and its install.ps1 ASCII twin), so those homes upgrade to the Routster identity in place.
+    DEFAULT_SOUL_MD.replace("You are Routster Agent.", "You are Hermes Agent, built by Nous Research."),
+    DEFAULT_SOUL_MD.replace("You are Routster Agent.", "You are Hermes Agent, built by Nous Research.").replace("—", "--"),
     # ASCII-dashed variant seeded by scripts/install.ps1 (must stay pure ASCII, see
     # tests/scripts/install/test_install_ps1_ascii_only.py); upgrading converges Windows installs on the em-dash text.
     DEFAULT_SOUL_MD.replace("\u2014", "--"),

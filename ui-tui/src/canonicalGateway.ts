@@ -110,12 +110,12 @@ export function localCreationOptions(env = process.env): Record<string, unknown>
 
   if (env.HERMES_TUI_TOOLSETS) { options.toolsets = env.HERMES_TUI_TOOLSETS.split(',') }
 
-  // `hermes --tui -s a,b`: the owner renders these into the session's frozen prompt.
+  // `routster --tui -s a,b`: the owner renders these into the session's frozen prompt.
   const skills = [...new Set((env.HERMES_TUI_SKILLS ?? '').split(/[,\n]/).map(name => name.trim()).filter(Boolean))]
 
   if (skills.length) { options.skills = skills }
 
-  // The launcher's shell environment (allowlisted by `hermes --tui`): this session's HERMES_* behaviour
+  // The launcher's shell environment (allowlisted by `routster --tui`): this session's HERMES_* behaviour
   // values and tool PATH/venv on the shared gateway, as main's own process had them.
   const clientEnv = parseClientEnv(env.HERMES_TUI_CLIENT_ENV)
 
@@ -129,7 +129,7 @@ export function localCreationOptions(env = process.env): Record<string, unknown>
     options.max_turns = Number.isInteger(turns) ? turns : env.HERMES_TUI_MAX_TURNS.trim()
   }
 
-  // `hermes --tui --yolo` / `--ignore-rules` export HERMES_YOLO_MODE / HERMES_IGNORE_RULES (the in-process
+  // `routster --tui --yolo` / `--ignore-rules` export HERMES_YOLO_MODE / HERMES_IGNORE_RULES (the in-process
   // TUI read them); over the canonical gateway they must ride session.create as frozen launch flags or the
   // session prompts anyway / still loads rules, SOUL, memory and skills.auto_load.
   const truthy = (value?: string) => ['1', 'true', 'yes', 'on'].includes((value ?? '').trim().toLowerCase())
@@ -167,7 +167,7 @@ function parseClientEnv(raw?: string): Record<string, string> | undefined {
 
 const TOOL_PROGRESS_MODES = new Set(['off', 'new', 'all', 'verbose'])
 
-/** `hermes --tui -v` / `-Q` export HERMES_TUI_TOOL_PROGRESS (verbose / off). The owner carries it as the
+/** `routster --tui -v` / `-Q` export HERMES_TUI_TOOL_PROGRESS (verbose / off). The owner carries it as the
  * session-scoped tool-progress mode (`config.set key=verbose`, the same control `/verbose` writes), so a
  * fresh session is pinned right after creation. An unreadable value refuses the launch, never drops it. */
 export function launchToolProgress(env = process.env): string | undefined {

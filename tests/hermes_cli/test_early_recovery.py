@@ -30,7 +30,7 @@ def test_bootstrap_and_pm_cli_work_without_site_packages(tmp_path, prefix):
         check=False,
     )
     assert result.returncode == 0, result.stderr
-    assert "hermes pm repair" in result.stdout
+    assert "routster pm repair" in result.stdout
 
 
 @pytest.mark.parametrize("marker_name", [".update-incomplete", ".lazy-refresh-incomplete"])
@@ -67,7 +67,7 @@ def test_failed_repair_keeps_marker_and_stops_at_retry_limit(tmp_path, monkeypat
     assert len(calls) == before
     output = capsys.readouterr()
     assert output.out == ""
-    assert "hermes pm repair" in output.err
+    assert "routster pm repair" in output.err
 
 
 def test_recovery_obeys_live_owner_and_single_flight(tmp_path, monkeypatch):
@@ -295,15 +295,15 @@ def test_an_unparsed_zip_journal_keeps_itself_and_every_backup(tmp_path, monkeyp
 def test_dropping_a_staged_tree_never_changes_a_hardlinked_live_files_mode(tmp_path):
     live = tmp_path / "release"
     live.mkdir()
-    (live / "Hermes.exe").write_bytes(b"app")
+    (live / "Routster.exe").write_bytes(b"app")
     staging = tmp_path / "apps.hermes-update-staging" / "release"
     staging.mkdir(parents=True)
-    os.link(live / "Hermes.exe", staging / "Hermes.exe")
-    (live / "Hermes.exe").chmod(0o555)
+    os.link(live / "Routster.exe", staging / "Routster.exe")
+    (live / "Routster.exe").chmod(0o555)
     staging.chmod(0o555)  # a read-only dir refuses rmtree: the retry path runs
     erz._drop_path(staging.parent)
     assert not staging.parent.exists()
-    assert (live / "Hermes.exe").stat().st_mode & 0o777 == 0o555
+    assert (live / "Routster.exe").stat().st_mode & 0o777 == 0o555
 
 
 @pytest.mark.parametrize("body", ['{"attempts": Infinity}', '{"attempts": -Infinity}', '{"attempts": NaN}',

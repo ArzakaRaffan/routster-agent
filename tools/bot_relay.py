@@ -495,7 +495,7 @@ def _hermes_cli() -> str:
     if published.is_file():
         return str(published)
     sibling = Path(sys.executable or "").parent / name
-    return str(sibling) if sibling.is_file() else shutil.which("hermes") or "hermes"
+    return str(sibling) if sibling.is_file() else shutil.which("routster") or "routster"
 
 
 class DeliveryAuthor:

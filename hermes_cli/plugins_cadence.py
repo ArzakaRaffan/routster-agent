@@ -231,15 +231,15 @@ def _run_check_locked(
     if updates:
         names = ", ".join(r.name for r in updates)
         log.info(
-            "plugin updates available: %s — run `hermes plugins check-updates` "
-            "and `hermes plugins update <name>`",
+            "plugin updates available: %s — run `routster plugins check-updates` "
+            "and `routster plugins update <name>`",
             names,
         )
     if needs_fixing:
         names = ", ".join(r.name for r in needs_fixing)
         log.warning(
             "plugin update_url mismatches need attention: %s — run "
-            "`hermes plugins trust-update-url <name>` after review",
+            "`routster plugins trust-update-url <name>` after review",
             names,
         )
 

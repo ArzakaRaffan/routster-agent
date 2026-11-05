@@ -41,7 +41,7 @@ export const backendRestarting = (): string => t('userMessages.backend.restartin
 
 export const backendRestartingActivity = (): string => t('userMessages.backend.restartingActivity')
 
-// Attached (dashboard / embedded) mode: only the socket dropped; Hermes and any
+// Attached (dashboard / embedded) mode: only the socket dropped; Routster and any
 // reply in progress are still alive on the backend and come back on reconnect.
 export const connectionLost = (): string => t('userMessages.backend.connectionLost')
 
@@ -106,7 +106,7 @@ export const stderrProblemActivity = (line: string): string => {
 const VERSION_SKEW_RE = /Extra inputs are not permitted|^unknown method:/
 // Both server routes' answer for a method they do not serve (tui_gateway/contracts/registry.py
 // unknown_method_message). A JSON-RPC client sends no version, so this is not proof of skew.
-const UNAVAILABLE_METHOD_RE = /^unknown method: (\S+) — not available on this Hermes backend$/
+const UNAVAILABLE_METHOD_RE = /^unknown method: (\S+) — not available on this Routster backend$/
 
 /** The Ink bundle and the Python backend disagree on the wire: stale dist or an older attached backend. */
 export const isVersionSkewError = (err: unknown): boolean => {

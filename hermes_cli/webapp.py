@@ -48,7 +48,7 @@ def mark_webapp_stale(project_root: Path) -> bool:
     dist = webapp_dist_dir(project_root)
     if packaged_webapp_dist() is not None or not (dist / "index.html").is_file():
         return False
-    (dist / STALE_MARKER).write_text("hermes update could not rebuild this bundle\n", encoding="utf-8")
+    (dist / STALE_MARKER).write_text("routster update could not rebuild this bundle\n", encoding="utf-8")
     return True
 
 

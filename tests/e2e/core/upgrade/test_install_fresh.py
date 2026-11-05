@@ -137,7 +137,7 @@ def test_fresh_install_serves_head_and_runs_a_turn(installed, provider):
     assert db["integrity"] == [("ok",)] and len(db["sessions"]) == 1 and db["n_messages"] >= 2, db
     # A new login shell finds the command through the rc files the installer edited.
     assert all(n >= 1 for n in _path_lines(sb).values()), f"PATH not wired into the shell rc: {_path_lines(sb)}"
-    assert _login_shell_hermes(sb) == sb.hermes, "a new shell does not resolve `hermes` to the installed launcher"
+    assert _login_shell_hermes(sb) == sb.hermes, "a new shell does not resolve `routster` to the installed launcher"
 
 
 def test_rerunning_the_installer_is_idempotent(installed, provider):

@@ -1172,7 +1172,7 @@ class TestLaunchctlGatewayLifecycle:
             "launchctl kick'start' -k gui/501/ai.hermes.gateway",
             'launchctl boot"out" gui/501/ai.hermes.gateway',
             'launchctl bootout gui/501/ai.hermes."gateway"',
-            'hermes gateway re"start"',
+            'routster gateway re"start"',
             'systemctl re"start" hermes-gateway',
         ):
             dangerous, _, _ = detect_dangerous_command(cmd)

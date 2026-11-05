@@ -29,7 +29,7 @@ const resolvePython = () => {
 
 export interface LocalGatewayGrant { url: string; protocols: string[]; profile_id: string; instance_id: string }
 
-/** gateway_bootstrap.py's verdict for an interpreter that cannot load Hermes or its dependencies. */
+/** gateway_bootstrap.py's verdict for an interpreter that cannot load Routster or its dependencies. */
 // execFile's error text is `Command failed: …` followed by the child's stderr, hence the line match.
 export const isTerminalBootstrapFailure = (message: string) => /^gateway unavailable: /m.test(message)
 

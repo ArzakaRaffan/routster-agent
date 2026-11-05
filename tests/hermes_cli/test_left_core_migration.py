@@ -263,7 +263,7 @@ def test_an_agent_start_install_of_a_platform_keeps_the_restart_hint(tmp_path, m
     assert lcm.recover_at_startup(gateway_start=gateway_start) == ["homeassistant"]
     kept = lcm._claim_notices(home)
     assert kept[0].startswith("✓ Home Assistant moved out of core")
-    assert any("hermes gateway restart" in message for message in kept) is not gateway_start
+    assert any("routster gateway restart" in message for message in kept) is not gateway_start
 
 
 
@@ -395,8 +395,8 @@ def test_old_spotify_commands_point_at_the_plugin(tmp_path, monkeypatch):
     """`hermes auth spotify` / `hermes spotify` name the new command and how to get it for this home."""
     home = _home(tmp_path)
     monkeypatch.setenv("HERMES_HOME", str(home))
-    hint = lcm.moved_command_hint("hermes auth", "spotify", "status")
-    assert "`hermes auth status spotify` is now `hermes spotify status`" in hint
+    hint = lcm.moved_command_hint("routster auth", "spotify", "status")
+    assert "`routster auth status spotify` is now `routster spotify status`" in hint
     assert "plugins install spotify" in hint
     assert "plugins install spotify" in lcm.moved_command_hint("hermes", "spotify")
     (home / "plugins" / "spotify").mkdir(parents=True)  # installed but disabled
@@ -412,17 +412,17 @@ def test_old_mcp_serve_spelling_names_the_plugin_command(tmp_path, monkeypatch, 
     from hermes_cli import main as main_mod
     home = _home(tmp_path)
     monkeypatch.setenv("HERMES_HOME", str(home))
-    monkeypatch.setattr(sys, "argv", ["hermes", "mcp", "serve", "--tools"])
+    monkeypatch.setattr(sys, "argv", ["routster", "mcp", "serve", "--tools"])
     parser, _ = main_mod._build_cli_parser()
     with pytest.raises(SystemExit) as exc:
         parser.parse_args(["mcp", "serve", "--tools"])
     out, err = capsys.readouterr()
     assert exc.value.code == 2 and out == ""
-    assert "`hermes mcp serve` is now `hermes mcp-serve`" in err
+    assert "`routster mcp serve` is now `routster mcp-serve`" in err
     assert "plugins install mcp-serve" in err
     (home / "plugins" / "mcp-serve").mkdir(parents=True)
-    hint = lcm.moved_command_hint("hermes mcp", "serve")
-    assert "is now `hermes mcp-serve`" in hint and "install" not in hint
+    hint = lcm.moved_command_hint("routster mcp", "serve")
+    assert "is now `routster mcp-serve`" in hint and "install" not in hint
 
 
 def test_mcp_serve_is_never_installed_automatically(tmp_path):
@@ -466,7 +466,7 @@ def test_old_langfuse_plugin_key_keeps_naming_the_catalog_plugin(tmp_path, monke
     for name in ("observability/langfuse", "langfuse"):
         message = _unknown_plugin_message(name)
         assert "moved out of core into the 'langfuse' plugin" in message
-        assert "hermes plugins install langfuse" in message
+        assert "routster plugins install langfuse" in message
     assert "moved out of core" not in _unknown_plugin_message("nonexistent")
 
     plugin_dir = home / "plugins" / "langfuse"

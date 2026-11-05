@@ -43,7 +43,7 @@ export function parseRichMarkup(markup: string): Line[] {
   return lines
 }
 
-// Routster fork: wordmark + a "many in, one route, many out" hero replace the Hermes art.
+// Routster fork: wordmark + a "many in, one route, many out" hero replace the Routster art.
 const LOGO_ART = [
   '██████╗  ██████╗ ██╗   ██╗████████╗███████╗████████╗███████╗██████╗ ',
   '██╔══██╗██╔═══██╗██║   ██║╚══██╔══╝██╔════╝╚══██╔══╝██╔════╝██╔══██╗',

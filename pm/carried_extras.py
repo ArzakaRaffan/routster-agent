@@ -63,11 +63,11 @@ def refuse_transient(failing: dict[str, tuple[str, bool]], failure: BaseExceptio
 
     transient = {extra: detail for extra, (detail, verdict) in failing.items() if not verdict}
     if transient:
-        raise InstallError("venv", f"the extras {sorted(transient)} Hermes carried over from the old venv could "
+        raise InstallError("venv", f"the extras {sorted(transient)} Routster carried over from the old venv could "
                                    f"not be prepared: {'; '.join(transient.values())[:600]}",
-                           "fix the download or tooling problem, then rerun `hermes update`: it tries them "
+                           "fix the download or tooling problem, then rerun `routster update`: it tries them "
                            "again; or leave them out for good with "
-                           + " ".join(f"`hermes pm install --without {extra}`" for extra in sorted(transient))) from failure
+                           + " ".join(f"`routster pm install --without {extra}`" for extra in sorted(transient))) from failure
 
 
 _NO_BUILD = "it no longer builds on this machine"
@@ -84,7 +84,7 @@ def record_left_out(package, failing: dict[str, tuple[str, bool]]) -> None:
 
     record_declined_extras(add=failing, reasons=dict.fromkeys(failing, _NO_BUILD), project_root=package.project_root())
     for extra, (detail, _verdict) in failing.items():
-        message = (f"Left the optional {extra!r} extra out of this update: Hermes carried it over from the old "
+        message = (f"Left the optional {extra!r} extra out of this update: Routster carried it over from the old "
                    f"venv, and {_NO_BUILD} (the build output is above). Everything else is installed. Once that "
                    f"is fixed, run "
                    f"`{install_hint(extra)}` to add it back.")

@@ -27,11 +27,11 @@ _FORCED_STOP_SECONDS = 5.0
 
 # One line each, short enough for the TUI's activity row after its "gateway incompatible: " prefix.
 REFUSAL_DETAIL = {
-    "owner_newer": "a newer Hermes's gateway owns this profile; update Hermes or run: hermes gateway stop",
-    "foreign_install": "another Hermes install's gateway owns this profile; stop it there: hermes gateway stop",
-    "owner_unverified": "an older Hermes gateway owns this profile and was not verified; run: hermes gateway stop",
-    "owner_did_not_exit": "an older Hermes gateway owns this profile and did not stop; run: hermes gateway stop",
-    "owner_unreachable": "an older Hermes gateway owns this profile; run: hermes gateway stop",
+    "owner_newer": "a newer Routster's gateway owns this profile; update Routster or run: routster gateway stop",
+    "foreign_install": "another Routster install's gateway owns this profile; stop it there: routster gateway stop",
+    "owner_unverified": "an older Routster gateway owns this profile and was not verified; run: routster gateway stop",
+    "owner_did_not_exit": "an older Routster gateway owns this profile and did not stop; run: routster gateway stop",
+    "owner_unreachable": "an older Routster gateway owns this profile; run: routster gateway stop",
 }
 
 

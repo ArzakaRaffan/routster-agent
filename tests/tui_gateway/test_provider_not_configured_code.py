@@ -47,7 +47,7 @@ def _run_build(session):
 
 def test_provider_not_configured_is_named_in_the_error_event(monkeypatch, emitted):
     session = _fail_build(monkeypatch, ProviderNotConfiguredError(
-        "No LLM provider configured. Run `hermes model` to select a provider, or run `hermes setup` "
+        "No LLM provider configured. Run `routster model` to select a provider, or run `routster setup` "
         "for first-time configuration."))
 
     _run_build(session)

@@ -31,7 +31,7 @@ def test_relaunched_desktop_does_not_hold_its_app_folder(tmp_path: Path) -> None
         directory.mkdir(parents=True)
     # A console exe with no arguments waits on its own console: a stand-in Desktop
     # that stays alive until the test kills it.
-    relaunch = app_dir / 'Hermes.exe'
+    relaunch = app_dir / 'Routster.exe'
     shutil.copy2(Path(os.environ.get('SystemRoot', r'C:\Windows')) / 'System32' / 'cmd.exe', relaunch)
 
     result = subprocess.run(

@@ -53,7 +53,7 @@ def _packaged_exe(root: Path) -> Path:
     if sys.platform == "darwin":
         exe = desktop_dir / "release" / "mac-arm64" / "Hermes.app" / "Contents" / "MacOS" / "Hermes"
     elif sys.platform == "win32":
-        exe = desktop_dir / "release" / "win-unpacked" / "Hermes.exe"
+        exe = desktop_dir / "release" / "win-unpacked" / "Routster.exe"
     else:
         exe = desktop_dir / "release" / "linux-unpacked" / "hermes"
         exe.parent.mkdir(parents=True, exist_ok=True)

@@ -376,7 +376,7 @@ def test_plugin_error_containing_conflict_text_is_not_misclassified(
             is relay_runtime._RelayPluginConfigurationState.FAILED
         )
         assert "Hermes Relay plugin initialization failed" in caplog.text
-        assert "already active outside Hermes native ownership" not in caplog.text
+        assert "already active outside Routster native ownership" not in caplog.text
     finally:
         host.shutdown()
 
@@ -597,7 +597,7 @@ def test_two_profile_hosts_initialize_once_and_clear_after_final_shutdown(
     assert (
         caplog.text.count(
             "The Relay plugin host is active process-wide and applies to all "
-            "profiles hosted by this Hermes process."
+            "profiles hosted by this Routster process."
         )
         == 1
     )
@@ -1007,7 +1007,7 @@ manifest_ref = "relay-plugin.toml"
             is relay_runtime._RelayPluginConfigurationState.FAILED
         )
         assert relay.events == []
-        assert "Hermes [[dynamic_plugins]] records are unsupported" in caplog.text
+        assert "Routster [[dynamic_plugins]] records are unsupported" in caplog.text
         assert "use Relay [[plugins.dynamic]] records" in caplog.text
     finally:
         host.shutdown()

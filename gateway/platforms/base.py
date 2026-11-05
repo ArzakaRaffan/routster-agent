@@ -461,7 +461,7 @@ GATEWAY_SECRET_CAPTURE_UNSUPPORTED_MESSAGE = (
 # Kept under 200 chars: Telegram's answerCallbackQuery truncates longer text.
 UNAUTHORIZED_ACTION_NOTICE = (
     "This bot is private and you're not on its allowed list. If you own it, run "
-    "`hermes pairing approve {platform} <request-id>` on the host (`hermes pairing list` shows the id).")
+    "`routster pairing approve {platform} <request-id>` on the host (`routster pairing list` shows the id).")
 
 
 def unauthorized_action_notice(platform: Any) -> str:
@@ -2160,7 +2160,7 @@ class BasePlatformAdapter(ABC):
             self._set_fatal_error(
                 "lock_dir_unusable",
                 f"{resource_desc} lock cannot be taken: the gateway lock directory {exc.filename} is not "
-                f"usable by this user (likely created by an elevated Hermes). To repair, "
+                f"usable by this user (likely created by an elevated Routster). To repair, "
                 f"{unusable_dir_remedy(exc.filename)}; the gateway retries on its own.",
                 retryable=True)
             return False
@@ -2186,7 +2186,7 @@ class BasePlatformAdapter(ABC):
         owner_profile = scoped_lock_owner_label(existing)
         pid_part = f" (PID {owner_pid})" if owner_pid else ""
         holder = f" by the '{owner_profile}' profile gateway{pid_part}" if owner_profile else pid_part
-        remedy = (f" Stop that gateway first (hermes --profile {owner_profile} gateway stop)."
+        remedy = (f" Stop that gateway first (routster --profile {owner_profile} gateway stop)."
                   if owner_profile else " Stop the other gateway first.")
         message = f"{resource_desc} already in use{holder}.{remedy}"
         logger.error('[%s] %s', self.name, message)

@@ -394,7 +394,7 @@ def test_relay_ack_is_queued_with_the_envelope_id(tmp_path, monkeypatch):
     _capture_spawn(monkeypatch)
     home = _managed_home(tmp_path)
     bot_relay.write_remote_roster(home, [
-        {"profile": "default", "handle": "hermes", "connection_id": "cloud-1", "connection_label": "Hermes Cloud"},
+        {"profile": "default", "handle": "hermes", "connection_id": "cloud-1", "connection_label": "Routster Cloud"},
     ])
     result = json.loads(bot_mode_dm.message_agent_tool(target="hermes", message="ping", agent=_FakeAgent(home)))
 
@@ -455,7 +455,7 @@ def test_friendly_names_and_desktop_slugs_resolve_to_folder_ids(tmp_path, monkey
 
 
 @pytest.mark.parametrize(("target", "local_name", "relayed"), [
-    ("hermes@mini", "Hermes Mini", True),
+    ("hermes@mini", "Routster Mini", True),
     ("@hermes@mini", "HermesMini", True),
     ("Ops@Home", "Ops@Home", False),  # an '@' friendly name no connection answers to stays local (#100671)
 ])

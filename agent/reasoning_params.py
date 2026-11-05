@@ -211,8 +211,8 @@ class ReasoningParamsMixin:
             # Log the class, never the config value or exception traceback.
             logging.getLogger("run_agent").warning(
                 "Agent configuration for model.reasoning_echo could not be loaded (%s); "
-                "using the default reasoning echo setting. Check the active Hermes Python "
-                "environment and dependencies; run 'hermes config check' after "
+                "using the default reasoning echo setting. Check the active Routster Python "
+                "environment and dependencies; run 'routster config check' after "
                 "configuration imports work again.",
                 type(exc).__name__,
             )

@@ -76,7 +76,7 @@ def test_every_hermes_model_provider_is_configurable_in_desktop():
         if slug not in _EXEMPT and slug not in gui
     ]
     assert not missing, (
-        "providers shown in `hermes model` but not configurable in the desktop "
+        "providers shown in `routster model` but not configurable in the desktop "
         f"Providers tabs: {missing}"
     )
     # Routster Agent: providers the fork stops offering (FORK_UNOFFERED_PROVIDERS) keep their desktop

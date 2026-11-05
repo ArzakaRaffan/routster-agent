@@ -417,7 +417,7 @@ def _delivery_lock(argv: list[str], *, stdin_file: bool):
     # (service contexts lack PATH) and carries .exe on Windows; split on both separators.
     # Split on both separators so the shape matches regardless of which platform built the argv. See #93590.
     cli = (argv[0] if argv else "").rsplit("\\", 1)[-1].rsplit("/", 1)[-1]
-    if stdin_file or len(argv) < 3 or cli not in ("hermes", "hermes.exe") or argv[1] != "-p":
+    if stdin_file or len(argv) < 3 or cli not in ("hermes", "hermes.exe", "routster", "routster.exe") or argv[1] != "-p":
         return contextlib.nullcontext()
     from tools.bot_mode_probe import _hermes_root
     from tools.bot_relay import acquire_turn_lock
@@ -599,7 +599,7 @@ def _wait_live_dm(home: str, delivery_id: str, *, dm_file: str | os.PathLike | N
 
 def _local_delivery_home(argv: list[str]) -> Path | None:
     cli = (argv[0] if argv else "").rsplit("\\", 1)[-1].rsplit("/", 1)[-1]
-    if len(argv) < 3 or cli not in ("hermes", "hermes.exe") or argv[1] != "-p":
+    if len(argv) < 3 or cli not in ("hermes", "hermes.exe", "routster", "routster.exe") or argv[1] != "-p":
         return None
     from tools.bot_mode_probe import _hermes_root, _roster
 
@@ -932,6 +932,6 @@ if __name__ == "__main__":  # pragma: no cover - exercised as a background proce
             parsed = _runner_argv(sys.argv[1:])
             if not booted and parsed and os.path.exists(_live_intent_file(parsed[2])):
                 print(_live_outcome_unknown(parsed[2], "the delivery runner could not activate "
-                                                       "Hermes dependencies (see stderr)"))
+                                                       "Routster dependencies (see stderr)"))
             raise
     raise SystemExit(_delivery_main(sys.argv[1:]))

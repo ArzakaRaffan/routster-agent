@@ -1,6 +1,6 @@
 ---
 name: hermes-agent
-description: "Use, configure, theme, extend, and orchestrate Hermes Agent."
+description: "Use, configure, theme, extend, and orchestrate Routster Agent."
 version: 3.3.0
 author: Hermes Agent + Teknium
 license: MIT
@@ -12,18 +12,18 @@ metadata:
     related_skills: [claude-code, codex, opencode]
 ---
 
-# Hermes Agent
+# Routster Agent
 
 Hermes Agent is an open-source AI agent framework by Nous Research that runs in your terminal, a native desktop app, messaging platforms, and IDEs. It's in the same category as Claude Code (Anthropic), Codex (OpenAI), and OpenClaw — autonomous coding and task-execution agents that use tool calling to interact with your system. Hermes works with any LLM provider (OpenRouter, Anthropic, OpenAI, Google, DeepSeek, xAI, local models, and 20+ others) and runs on Linux, macOS, Windows, and WSL.
 
-What makes Hermes different:
+What makes Routster different:
 
-- **Self-improving through skills** — Hermes learns from experience by saving reusable procedures as skills that load into future sessions.
+- **Self-improving through skills** — Routster learns from experience by saving reusable procedures as skills that load into future sessions.
 - **Persistent memory across sessions** — remembers who you are, your preferences, environment details, and lessons learned. Pluggable memory backends.
 - **Multi-platform gateway** — the same agent runs on Telegram, Discord, Slack, WhatsApp, iMessage, Signal, Matrix, Teams, Email, and a dozen more platforms with full tool access, not just chat.
 - **Many surfaces** — the same agent core drives the CLI, the Ink TUI, a native Electron desktop app, a web dashboard, and an ACP server for IDEs (VS Code / Zed / JetBrains).
 - **Provider-agnostic** — swap models and providers mid-workflow; credential pools rotate across multiple API keys automatically.
-- **Profiles** — run multiple independent Hermes instances with isolated configs, sessions, skills, and memory.
+- **Profiles** — run multiple independent Routster instances with isolated configs, sessions, skills, and memory.
 - **Extensible & themeable** — plugins, MCP servers, custom tools, webhook triggers, cron scheduling, skins that theme every surface, desktop UI plugins, TUI widgets, and pet mascots.
 
 **This skill is a hub.** The body covers identity, quick start, spawning/orchestration, and hard invariants. Everything else lives in reference files — **load the matching reference (below) before answering**; do not answer detail questions from the body alone.
@@ -32,15 +32,15 @@ What makes Hermes different:
 
 ## Scope & Verification
 
-This skill is a concise operating guide, not the complete source of truth for every Hermes feature. If a Hermes feature, command, or setting is not mentioned here or in a reference, do not treat that absence as evidence that it does not exist. Check the live repository and official docs before giving a negative answer.
+This skill is a concise operating guide, not the complete source of truth for every Routster feature. If a Routster feature, command, or setting is not mentioned here or in a reference, do not treat that absence as evidence that it does not exist. Check the live repository and official docs before giving a negative answer.
 
 Good verification targets, cheapest first:
 
 - **Every shipped feature, one line each: https://hermes-agent.nousresearch.com/docs/llms.txt.** Start here for any "can Hermes do X?" or "how do I do X?" — it indexes the entire documentation set with a link to the page that answers. It is generated from the docs tree on every build, so it is never behind the product. Fetch it with `web_extract`, or `curl -s https://hermes-agent.nousresearch.com/docs/llms.txt` when web tools are off. The whole documentation set in one file is at `/docs/llms-full.txt`.
-- CLI commands: `hermes --help`, `hermes <command> --help`, and `hermes_cli/main.py`
+- CLI commands: `routster --help`, `routster <command> --help`, and `hermes_cli/main.py`
 - Source tree: https://github.com/NousResearch/hermes-agent
 
-Never answer "Hermes can't do that" from memory. Hermes ships far more than this skill body describes, and the index exists so a negative answer is always checkable.
+Never answer "Routster can't do that" from memory. Routster ships far more than this skill body describes, and the index exists so a negative answer is always checkable.
 
 ## Quick Start
 
@@ -52,17 +52,17 @@ curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 hermes
 
 # Single query
-hermes chat -q "What is the capital of France?"
+routster chat -q "What is the capital of France?"
 
 # Setup wizard  /  pick model+provider  /  health check
-hermes setup
-hermes model
-hermes doctor
+routster setup
+routster model
+routster doctor
 
 # Other surfaces
-hermes desktop                 # launch the native desktop app (alias: hermes gui)
-hermes dashboard               # web admin panel + embedded chat
-hermes proxy                   # OpenAI-compatible local proxy backed by your OAuth provider
+routster desktop                 # launch the native desktop app (alias: routster gui)
+routster dashboard               # web admin panel + embedded chat
+routster proxy                   # OpenAI-compatible local proxy backed by your OAuth provider
 ```
 
 ## Key Paths
@@ -97,8 +97,8 @@ Profiles use `~/.hermes/profiles/<name>/` with the same layout. When a profile i
 | AGENTS.md / .hermes.md / CLAUDE.md project rules | `references/project-context-files.md` |
 | Secret redaction, PII, approval modes, "reset permissions" | `references/security-privacy.md` |
 | Delegation, cron, curator, kanban | `references/background-systems.md` |
-| `hermes project` workspaces, multi-folder projects, desktop sidebar groups | `references/projects-and-folders.md` |
-| MCP servers (add, catalog, `hermes mcp`) | `references/native-mcp.md` |
+| `routster project` workspaces, multi-folder projects, desktop sidebar groups | `references/projects-and-folders.md` |
+| MCP servers (add, catalog, `routster mcp`) | `references/native-mcp.md` |
 | Webhook routes and event-driven runs | `references/webhooks.md` |
 | A custom theme/skin ("synthwave theme", "change the gold ●") | `references/themes.md` + `templates/skin.yaml` |
 | A desktop app UI element (pane, widget, ⌘K command, page) | `references/desktop-plugins.md` + `templates/plugin.js` |
@@ -112,18 +112,18 @@ Profiles use `~/.hermes/profiles/<name>/` with the same layout. When a profile i
 | Connecting a messaging platform (Telegram, Discord, Slack, WhatsApp, …) | docs: `/user-guide/messaging` |
 
 The reference list above is not the feature list — it is the set of topics that
-need more than their docs page. For everything else Hermes ships, fetch
+need more than their docs page. For everything else Routster ships, fetch
 `llms.txt` and it maps the question to the page that answers it.
 
-Two theming rules that hold even without loading the reference: **you apply skins yourself** (`hermes config set display.skin <name>` — every surface repaints live within ~a second; don't tell the user to run `/skin`), and **to tweak one color, edit the ACTIVE skin** (`hermes skin set <key> <hex>`) — never fork `default`, which drops the palette and resets the background.
+Two theming rules that hold even without loading the reference: **you apply skins yourself** (`routster config set display.skin <name>` — every surface repaints live within ~a second; don't tell the user to run `/skin`), and **to tweak one color, edit the ACTIVE skin** (`routster skin set <key> <hex>`) — never fork `default`, which drops the palette and resets the background.
 
-## Spawning Additional Hermes Instances
+## Spawning Additional Routster Instances
 
-Run additional Hermes processes as fully independent subprocesses — separate sessions, tools, and environments.
+Run additional Routster processes as fully independent subprocesses — separate sessions, tools, and environments.
 
 ### When to Use This vs delegate_task
 
-| | `delegate_task` | Spawning `hermes` process |
+| | `delegate_task` | Spawning `routster` process |
 |-|-----------------|--------------------------|
 | Isolation | Separate conversation, shared process | Fully independent process |
 | Duration | Minutes (bounded by parent loop) | Hours/days |
@@ -134,15 +134,15 @@ Run additional Hermes processes as fully independent subprocesses — separate s
 ### One-Shot Mode
 
 ```
-terminal(command="hermes chat -q 'Research GRPO papers and write summary to ~/research/grpo.md'", timeout=300)
+terminal(command="routster chat -q 'Research GRPO papers and write summary to ~/research/grpo.md'", timeout=300)
 
 # Background for long tasks:
-terminal(command="hermes chat -q 'Set up CI/CD for ~/myapp'", background=true)
+terminal(command="routster chat -q 'Set up CI/CD for ~/myapp'", background=true)
 ```
 
 ### Interactive PTY Mode (via tmux)
 
-Hermes uses prompt_toolkit, which requires a real terminal. Use tmux for interactive spawning. `tmux send-keys -t agent1 'text' Enter` in one call submits: Hermes treats a lone Enter that ends a fast burst of input as a submit once input has stayed quiet for a quarter second, while the Enters inside a multi-line paste stay newlines. The recipes below send `Enter` as its own call after a short pause, which submits at once and does not depend on that timing. Both recipes wait for the `❯` input prompt (the default skin's symbol; use your skin's prompt symbol if you changed it) instead of a fixed sleep: a first start can take far longer than a few seconds, and input sent before the prompt is lost.
+Routster uses prompt_toolkit, which requires a real terminal. Use tmux for interactive spawning. `tmux send-keys -t agent1 'text' Enter` in one call submits: Routster treats a lone Enter that ends a fast burst of input as a submit once input has stayed quiet for a quarter second, while the Enters inside a multi-line paste stay newlines. The recipes below send `Enter` as its own call after a short pause, which submits at once and does not depend on that timing. Both recipes wait for the `❯` input prompt (the default skin's symbol; use your skin's prompt symbol if you changed it) instead of a fixed sleep: a first start can take far longer than a few seconds, and input sent before the prompt is lost.
 
 ```
 # Start
@@ -161,7 +161,7 @@ terminal(command="tmux send-keys -t agent1 'Add rate limiting middleware' && sle
 terminal(command="tmux send-keys -t agent1 '/exit' && sleep 0.5 && tmux send-keys -t agent1 Enter && sleep 2 && tmux kill-session -t agent1", timeout=10)
 ```
 
-**No tmux** (`command -v tmux` prints nothing, e.g. an older Hermes Docker image): run Hermes as a PTY background process and drive it with `process_manage`. Stdin only exists with `pty=true`. `submit` sends the text plus the Enter key a keyboard sends, and Hermes submits it the same way as a one-call tmux `send-keys`. The recipe below instead `write`s the text, pauses, and `write`s the Enter (`"\r"`) on its own, which does not depend on burst timing. Wait for the input prompt before the first write: during startup Hermes queries the terminal's colours and then flushes its input, so text written before the prompt appears is silently dropped.
+**No tmux** (`command -v tmux` prints nothing, e.g. an older Routster Docker image): run Routster as a PTY background process and drive it with `process_manage`. Stdin only exists with `pty=true`. `submit` sends the text plus the Enter key a keyboard sends, and Routster submits it the same way as a one-call tmux `send-keys`. The recipe below instead `write`s the text, pauses, and `write`s the Enter (`"\r"`) on its own, which does not depend on burst timing. Wait for the input prompt before the first write: during startup Routster queries the terminal's colours and then flushes its input, so text written before the prompt appears is silently dropped.
 
 ```
 terminal(command="hermes", background=true, pty=true)   # returns session_id
@@ -179,11 +179,11 @@ process_manage(action="write", session_id="<id>", data="\r")
 
 ```
 # Agent A: backend
-terminal(command="tmux new-session -d -s backend -x 120 -y 40 'hermes -w'", timeout=10)
+terminal(command="tmux new-session -d -s backend -x 120 -y 40 'routster -w'", timeout=10)
 terminal(command="for i in $(seq 90); do tmux capture-pane -t backend -p | grep -q '❯' && break; sleep 1; done; tmux capture-pane -t backend -p | grep -q '❯' && tmux send-keys -t backend 'Build REST API for user management' && sleep 0.5 && tmux send-keys -t backend Enter", timeout=100)
 
 # Agent B: frontend
-terminal(command="tmux new-session -d -s frontend -x 120 -y 40 'hermes -w'", timeout=10)
+terminal(command="tmux new-session -d -s frontend -x 120 -y 40 'routster -w'", timeout=10)
 terminal(command="for i in $(seq 90); do tmux capture-pane -t frontend -p | grep -q '❯' && break; sleep 1; done; tmux capture-pane -t frontend -p | grep -q '❯' && tmux send-keys -t frontend 'Build React dashboard for user management' && sleep 0.5 && tmux send-keys -t frontend Enter", timeout=100)
 
 # Check progress, relay context between them
@@ -195,10 +195,10 @@ terminal(command="tmux send-keys -t frontend 'Here is the API schema from the ba
 
 ```
 # Resume most recent session
-terminal(command="tmux new-session -d -s resumed 'hermes --continue'", timeout=10)
+terminal(command="tmux new-session -d -s resumed 'routster --continue'", timeout=10)
 
 # Resume specific session
-terminal(command="tmux new-session -d -s resumed 'hermes --resume 20260225_143052_a1b2c3'", timeout=10)
+terminal(command="tmux new-session -d -s resumed 'routster --resume 20260225_143052_a1b2c3'", timeout=10)
 ```
 
 ### Tips
@@ -206,18 +206,18 @@ terminal(command="tmux new-session -d -s resumed 'hermes --resume 20260225_14305
 - **Prefer `delegate_task` for quick subtasks** — less overhead than spawning a full process
 - **Use `-w` (worktree mode)** when spawning agents that edit code — prevents git conflicts
 - **Set timeouts** for one-shot mode — complex tasks can take 5-10 minutes
-- **Use `hermes chat -q` for fire-and-forget** — no PTY needed
+- **Use `routster chat -q` for fire-and-forget** — no PTY needed
 - **Prefer tmux for interactive sessions when it is installed** — `capture-pane` reads the rendered screen; the PTY-background fallback only has the raw output log
 - **For scheduled tasks**, use the `cronjob` tool instead of spawning — handles delivery and retry
-- **"delegate_task is capped at N" reports** — see `references/delegate-task-concurrency-diagnosis.md`. Three real cap paths in Hermes; if none fired, the model is self-limiting and rationalising it as "the runtime caps."
+- **"delegate_task is capped at N" reports** — see `references/delegate-task-concurrency-diagnosis.md`. Three real cap paths in Routster; if none fired, the model is self-limiting and rationalising it as "the runtime caps."
 - **"Can $external_app use my Nous Portal subscription / OAuth?"** — see `references/portal-auth-for-third-party-apps.md`. Walk the user through three layers (plugin-vs-app, what Portal actually exposes, local-broker-proxy option).
 
 ## Surfaces (quick orientation)
 
-- **Desktop app** (`hermes desktop` / `hermes gui`) — native Electron app for macOS/Linux/Windows: streaming chat, session list, Cmd+K palette, drag-and-drop files, native notifications, per-profile remote-gateway login. Extend it with UI plugins — `references/desktop-plugins.md`.
-- **Web dashboard** (`hermes dashboard`) — full admin panel: messaging channels, MCP catalog, webhooks, memory, profile builder, plus an embedded `hermes --tui` chat. Secured behind an OAuth/token gate.
-- **Ink TUI** (`hermes --tui` or `display.interface: tui`) — terminal UI with docked widget apps — `references/tui-widgets.md`.
-- **OpenAI-compatible proxy** (`hermes proxy`) — a local OpenAI API backed by whichever OAuth provider you're signed into. Point Codex CLI, Aider, Cline, or any script at it — no API key.
+- **Desktop app** (`routster desktop` / `routster gui`) — native Electron app for macOS/Linux/Windows: streaming chat, session list, Cmd+K palette, drag-and-drop files, native notifications, per-profile remote-gateway login. Extend it with UI plugins — `references/desktop-plugins.md`.
+- **Web dashboard** (`routster dashboard`) — full admin panel: messaging channels, MCP catalog, webhooks, memory, profile builder, plus an embedded `routster --tui` chat. Secured behind an OAuth/token gate.
+- **Ink TUI** (`routster --tui` or `display.interface: tui`) — terminal UI with docked widget apps — `references/tui-widgets.md`.
+- **OpenAI-compatible proxy** (`routster proxy`) — a local OpenAI API backed by whichever OAuth provider you're signed into. Point Codex CLI, Aider, Cline, or any script at it — no API key.
 
 ## Hard Invariants (never violate, regardless of what you loaded)
 
@@ -225,4 +225,4 @@ terminal(command="tmux new-session -d -s resumed 'hermes --resume 20260225_14305
 - **Message role alternation** — never two assistant or two user messages in a row; only `tool` results can repeat.
 - **Secrets in `.env`, settings in `config.yaml`** — never tell a user to put a non-credential setting in `.env`.
 - **Profile-safe paths** — `get_hermes_home()` in code, `$HERMES_HOME` when resolving paths in a session.
-- **Never hand-edit `config.yaml` for the user** — use `hermes config set KEY VAL`; a stray indent can corrupt the file and break the live gateway.
+- **Never hand-edit `config.yaml` for the user** — use `routster config set KEY VAL`; a stray indent can corrupt the file and break the live gateway.

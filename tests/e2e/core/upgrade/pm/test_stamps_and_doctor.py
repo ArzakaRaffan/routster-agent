@@ -69,7 +69,7 @@ def updated(tmp_path_factory, provider):
     installed_gen = P.selected_generation(sb)
     target = P.publish_dependency_release(origin, root, 1)
     up = P.update(sb)
-    P.ok(up, "hermes update failed")
+    P.ok(up, "routster update failed")
     assert P.selected_generation(sb) != installed_gen, "harness: update did not select a new generation"
     assert I.git("rev-parse", "HEAD", cwd=sb.checkout) == target
     return {"sb": sb, "target": target, "update": up, "origin": origin, "root": root}
@@ -82,7 +82,7 @@ def _venv_hermes(sb: I.Sandbox) -> str:
 def test_managed_env_hermes_can_check_for_updates(updated):
     sb = updated["sb"]
     exe = _venv_hermes(sb)
-    assert Path(exe).is_file(), f"harness: selected generation ships no hermes console script: {exe}"
+    assert Path(exe).is_file(), f"harness: selected generation ships no routster console script: {exe}"
     # A dead proxy: a read of the GitHub API fails here every run instead of drawing on the
     # runner's shared anonymous quota. The sandbox origin is a local path, so git never uses it.
     dead = "http://127.0.0.1:9"
@@ -90,7 +90,7 @@ def test_managed_env_hermes_can_check_for_updates(updated):
                 env={**sb.env, "HTTPS_PROXY": dead, "https_proxy": dead, "HTTP_PROXY": dead, "http_proxy": dead})
     assert "Update channel: main" in cp.stdout, "harness: the check left the pinned main channel\n" + I.describe(cp)
     assert cp.returncode == 0 and "Not a git repository" not in cp.stdout + cp.stderr, (
-        "`hermes update --check` from the managed environment: " + (cp.stdout + cp.stderr).strip()[-400:]
+        "`routster update --check` from the managed environment: " + (cp.stdout + cp.stderr).strip()[-400:]
         + "\n" + I.describe(cp))
 
 
@@ -113,8 +113,8 @@ def test_doctor_on_a_healthy_pm_install_reports_no_command_installation_problem(
     section = _section(cp.stdout, "Command Installation")
     assert section, "doctor printed no Command Installation section:\n" + I.describe(cp)
     bad = [line for line in section if line.lstrip().startswith(("⚠", "✗"))]
-    assert not bad, f"hermes doctor reports a launcher problem on a healthy PM install: {bad}\n" + I.describe(cp)
-    assert f"Hermes entry point exists ({sb.checkout / 'hermes'})" in cp.stdout, "\n".join(section)
+    assert not bad, f"routster doctor reports a launcher problem on a healthy PM install: {bad}\n" + I.describe(cp)
+    assert f"Routster entry point exists ({sb.checkout / 'hermes'})" in cp.stdout, "\n".join(section)
 
 
 def test_pm_status_receipt_reports_the_successful_update(updated):
@@ -122,7 +122,7 @@ def test_pm_status_receipt_reports_the_successful_update(updated):
     receipt = json.loads(P.ok(sb.cli("pm", "status")).stdout)
     code = receipt.get("exit_code", receipt.get("pm_exit_code"))
     assert code == 0 and receipt.get("outcome") in ("ok", "success"), (
-        f"`hermes pm status` does not report the last (successful) update as a success: {receipt}")
+        f"`routster pm status` does not report the last (successful) update as a success: {receipt}")
 
 
 @pytest.fixture(scope="module")
@@ -144,16 +144,16 @@ def test_doctor_reports_web_extra_drift(drifted):
     flagged = [line for line in cp.stdout.splitlines()
                if re.search(r"(?i)fastapi|dashboard|web extra|\bweb\b.*(missing|not installed)", line)
                and line.lstrip().startswith(("⚠", "✗"))]
-    assert flagged, ("hermes doctor is silent about fastapi missing from the selected environment "
+    assert flagged, ("routster doctor is silent about fastapi missing from the selected environment "
                      f"(rc={cp.returncode})\n" + I.describe(cp))
 
 
 def test_pm_repair_heals_the_drift(drifted):
     sb, rp = drifted["sb"], drifted["repair"]
-    assert rp.returncode == 0, "hermes pm repair failed on a drifted environment:\n" + P.diagnostics(sb, rp)
+    assert rp.returncode == 0, "routster pm repair failed on a drifted environment:\n" + P.diagnostics(sb, rp)
     imports = P.managed_imports(sb, "fastapi", "hermes_cli.web_server")
     assert set(imports.values()) == {"ok"}, (
-        f"`hermes pm repair` exited 0 but the dashboard still cannot import: {imports}\n" + P.diagnostics(sb, rp))
+        f"`routster pm repair` exited 0 but the dashboard still cannot import: {imports}\n" + P.diagnostics(sb, rp))
 
 
 def test_failed_dependency_update_is_an_owed_followup(updated):
@@ -169,7 +169,7 @@ def test_failed_dependency_update_is_an_owed_followup(updated):
     up = P.update(sb)
     receipt = json.loads(P.ok(sb.cli("pm", "status")).stdout)
     assert up.returncode == 0, (
-        "`hermes update` failed although the code committed; a dependency sync after the tree moved "
+        "`routster update` failed although the code committed; a dependency sync after the tree moved "
         "is an owed follow-up (A6)\n" + P.diagnostics(sb, up))
     assert I.git("rev-parse", "HEAD", cwd=sb.checkout) == target, "the code update did not land\n" + P.diagnostics(sb, up)
     assert re.search(r"⚠ Update follow-up 'dependencies' did not finish: .*dependencies not installed yet",

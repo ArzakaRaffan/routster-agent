@@ -303,7 +303,7 @@ def _launcher_root() -> Iterable[Path]:
     from hermes_cli._launchers import _launcher_python
     from hermes_platform.resolver import locate_command
 
-    found = locate_command("hermes").command
+    found = locate_command("routster").command  # Routster fork: only `routster` is ours on PATH
     if not found:
         return ()
     protected = _protected_dirs()

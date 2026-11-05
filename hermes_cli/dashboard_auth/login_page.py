@@ -23,7 +23,7 @@ _LOGIN_HTML_TEMPLATE = """\
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign in — Hermes Agent</title>
+<title>Sign in — Routster Agent</title>
 <style>
   /* Brand fonts shipped by @nous-research/ui — same files the SPA loads. */
   @font-face {{
@@ -290,7 +290,7 @@ _LOGIN_HTML_TEMPLATE = """\
   <div class="brand">Nous<span class="dot"></span>Research</div>
   <div class="card">
     <h1>Sign in</h1>
-    <p class="subtitle">Choose a sign-in method to continue to the Hermes Agent dashboard.</p>
+    <p class="subtitle">Choose a sign-in method to continue to the Routster Agent dashboard.</p>
     <div class="provider-list">
 {provider_buttons}
     </div>
@@ -397,7 +397,7 @@ _TOKEN_MODE_HTML = """\
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token-gated dashboard — Hermes Agent</title>
+<title>Token-gated dashboard — Routster Agent</title>
 <style>
   :root {
     --background-base: #170d02;
@@ -545,7 +545,7 @@ def render_login_html(*, next_path: str = "", prefix: str = "") -> str:
                 .replace("{note}",
                          "Clients authenticate with the deployment&rsquo;s provisioned "
                          "credential (<code>Authorization: Bearer</code>, or "
-                         "<code>?token=</code> on the /api/ws upgrade) &mdash; e.g. Hermes "
+                         "<code>?token=</code> on the /api/ws upgrade) &mdash; e.g. Routster "
                          "Desktop&rsquo;s &ldquo;Session token&rdquo; remote-gateway field. "
                          "There is no browser sign-in flow."))
     buttons = [

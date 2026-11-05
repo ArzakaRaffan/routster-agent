@@ -65,7 +65,7 @@ it('resolves a relative image path in the session folder, never the ui-tui insta
   try {
     resetUiState(); patchUiState({ sid: 'owner', info: { cwd: project } as never })
     expect(readFileSync((await stageImagePath('shot.png caption', gw, captureDestination())).path)).toEqual(png)
-    // No session folder yet: the folder `hermes --tui` was launched from.
+    // No session folder yet: the folder `routster --tui` was launched from.
     resetUiState(); patchUiState({ sid: 'owner' }); vi.stubEnv('HERMES_CWD', project)
     expect(await stageImagePath('./shot.png', gw, captureDestination())).toMatchObject({ mime: 'image/png', name: 'shot.png' })
   } finally { resetUiState(); vi.unstubAllEnvs(); rmSync(home, { recursive: true, force: true }) }

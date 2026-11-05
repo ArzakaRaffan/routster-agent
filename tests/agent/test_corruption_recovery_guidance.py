@@ -89,7 +89,7 @@ def test_format_turn_completion_corrupt_never_names_the_live_db():
     assert "sessions recover" in explanation
     assert 'sqlite3 ~/.hermes/state.db ".recover"' not in explanation
     # The replacement guidance names the safe command.
-    assert "hermes sessions recover --source" in explanation
+    assert "routster sessions recover --source" in explanation
 
 
 
@@ -117,7 +117,7 @@ def test_corrupt_guidance_pins_the_failing_profile(tmp_path, monkeypatch):
 
     explanation = AIAgent._format_turn_completion_explanation("session_persistence_failed", "corrupt")
     commands = [line.strip() for line in explanation.splitlines() if "hermes " in line]
-    assert commands and all("hermes -p research " in line for line in commands), commands
+    assert commands and all("routster -p research " in line for line in commands), commands
     # The conftest pins hermes_state.DEFAULT_DB_PATH, so the store named is whatever the
     # process resolves — the contract is "the same path the runtime would open".
     assert f"--source {_default_db_path()} " in explanation
@@ -133,8 +133,8 @@ def test_corrupt_guidance_pins_the_failing_profile(tmp_path, monkeypatch):
     monkeypatch.setattr(runner, "_send_home_channel_message", _capture_send)
     asyncio.run(runner._send_session_db_warning_notifications())
     notice_commands = [line.strip() for line in sent[0].splitlines() if "hermes " in line]
-    assert notice_commands and all("hermes -p research " in line for line in notice_commands), notice_commands
+    assert notice_commands and all("routster -p research " in line for line in notice_commands), notice_commands
     assert f"--source {_default_db_path()} " in sent[0]
 
     exhausted = _persistent_repair_exhausted_error(home / "state.db")
-    assert "`hermes -p research sessions recover --source" in exhausted
+    assert "`routster -p research sessions recover --source" in exhausted

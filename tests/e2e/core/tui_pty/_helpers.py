@@ -397,7 +397,7 @@ class TmuxTui:
             raise AssertionError(f"{exc}\n{self.dump()}") from None
         state = self.pane_state()
         assert state.startswith("0 "), (
-            f"hermes --tui exited during startup (pane_dead pid status={state!r}, "
+            f"routster --tui exited during startup (pane_dead pid status={state!r}, "
             f"tmux server {'up' if state else 'gone'})\n{self.dump()}")
 
     def wait_ready(self, timeout: float = 120.0) -> None:
@@ -410,7 +410,7 @@ class TmuxTui:
                  what="the startup session (status bar 'ready')")
         except AssertionError as exc:
             raise AssertionError(f"{exc} (status {self.status()!r})\n{self.dump()}") from None
-        assert self.alive(), f"hermes --tui exited during startup\n{self.dump()}"
+        assert self.alive(), f"routster --tui exited during startup\n{self.dump()}"
         self.wait_quiet(1.5, timeout=timeout)
 
     # -- processes -------------------------------------------------------------------------------

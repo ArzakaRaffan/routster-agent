@@ -127,11 +127,11 @@ The ONLY import surface is `@hermes/plugin-sdk` (plus `react` /
   folder handle plus a RELATIVE path (`list`, `stat`, `readText`,
   `readDataUrl`, `writeText(…, { exclusive })`, `rename`, `trash`) and resolve
   `{ ok, … }` / `{ ok: false, error }`; `..`, absolute paths, escaping
-  symlinks and Hermes' own data are refused by the main process. Never call
+  symlinks and Routster's own data are refused by the main process. Never call
   `window.hermesDesktop` file methods from a plugin.
 - `ctx.os` — the curated OS door, attributed to your plugin:
   `ctx.os.notify({ title, body?, silent?, icon?, activate?, onActivate?, actions? })`
-  posts a native OS notification. Fires only while the user is away from Hermes
+  posts a native OS notification. Fires only while the user is away from Routster
   (use `host.notify` for the in-app toast); gated by Settings ▸ Notifications ▸
   "Plugin notifications" and throttled per plugin — reserve it for genuinely
   notable events. `activate` accepts a plugin deep link

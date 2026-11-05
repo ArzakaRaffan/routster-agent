@@ -1040,7 +1040,7 @@ export function createGatewayEventHandler(ctx: GatewayEventHandlerContext): (ev:
       }
 
       // Startup queries are arbitrary launcher/script text (Omarchy prompted
-      // launches, `hermes --tui -q "…"`) — submit LITERALLY, bypassing the
+      // launches, `routster --tui -q "…"`) — submit LITERALLY, bypassing the
       // slash/!/interpolation dispatcher, matching one-shot's semantics.
       if (!isCurrentDestination(destination)) {
         return sys(t('canonical.submit.startupQuerySwitched'))
@@ -1112,8 +1112,8 @@ export function createGatewayEventHandler(ctx: GatewayEventHandlerContext): (ev:
 
     // Opt-in: when `display.tui_auto_resume_recent` is true, look up
     // the most recent human-facing session and resume it instead of
-    // forging a brand-new one.  Mirrors classic CLI's `hermes -c` /
-    // `hermes --tui` muscle memory and addresses the audit's "session
+    // forging a brand-new one.  Mirrors classic CLI's `routster -c` /
+    // `routster --tui` muscle memory and addresses the audit's "session
     // unrecoverable after disconnection" gap.  Default off so existing
     // users aren't surprised.  (Shares the memoized full-config read.)
     getFullConfigOnce()

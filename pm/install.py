@@ -219,7 +219,7 @@ def _refuse_lazy(name: str, what: str) -> InstallError:
     error = InstallError(
         name,
         f"not installed and lazy installs are disabled: {what}",
-        "enable security.allow_lazy_installs or run `hermes pm install`",
+        "enable security.allow_lazy_installs or run `routster pm install`",
     )
     receipt.record_refusal("lazy-install", str(error))
     return error
@@ -274,7 +274,7 @@ def _discard_entry(store: Store, entry_name: str) -> None:
     except OSError:
         LOG.warning("could not remove or set aside %s: %s", entry_name, error)
         return
-    LOG.warning("%s is still in use (%s); set aside for the next install or `hermes pm gc`",
+    LOG.warning("%s is still in use (%s); set aside for the next install or `routster pm gc`",
                 entry_name, error)
 
 
@@ -449,7 +449,7 @@ def _install(
     version = lockfile.version(package.name)
     if version is None:
         raise InstallError(
-            package.name, "not in the lockfile", "add it with `hermes pm lock --bump`"
+            package.name, "not in the lockfile", "add it with `routster pm lock --bump`"
         )
 
     reason = package.missing_reason(target)
@@ -482,7 +482,7 @@ def _install(
             raise InstallError(
                 package.name,
                 f"no artifact for {target} in the lockfile",
-                "run `hermes pm lock --bump` for this package",
+                "run `routster pm lock --bump` for this package",
             )
         with store.scratch() as scratch:
             staged = scratch / "tree"
@@ -771,8 +771,8 @@ def _venv_install_lock(*, patient: bool):
         if not held:
             error = InstallError(
                 "venv",
-                f"another Hermes process is installing dependencies (waited {INSTALL_LOCK_TIMEOUT_SECONDS:.0f}s)",
-                "retry in a moment, or run `hermes pm install` to install explicitly",
+                f"another Routster process is installing dependencies (waited {INSTALL_LOCK_TIMEOUT_SECONDS:.0f}s)",
+                "retry in a moment, or run `routster pm install` to install explicitly",
             )
             receipt.record_refusal("install-busy", str(error))
             raise error
@@ -858,7 +858,7 @@ def _refuse_declined(package, extras: Optional[list[str]], *, explicit: bool) ->
         reasons = declined_reasons(package.project_root())
         why = "; ".join(f"an update left {extra!r} out because {reasons[_extra_key(extra)]}" for extra in dropped
                         if _extra_key(extra) in reasons)
-        raise InstallError("venv", why or f"extras {dropped} were removed with `hermes pm install --without`",
+        raise InstallError("venv", why or f"extras {dropped} were removed with `routster pm install --without`",
                            "run `" + "`, `".join(install_hint(extra) for extra in dropped) + "` to enable them again")
 
 

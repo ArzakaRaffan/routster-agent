@@ -99,7 +99,7 @@ def _reserve_abandoned_loader_slot() -> None:
             return
     raise PluginLoadTimeout(
         f"not loaded: {_MAX_ABANDONED_LOADERS} abandoned plugin loader thread(s) are still running "
-        f"(plugins.load_timeout_seconds); restart Hermes to retry"
+        f"(plugins.load_timeout_seconds); restart Routster to retry"
     )
 
 
@@ -523,15 +523,15 @@ class PluginLoaderMixin:
         if installed_in_selected_environment(missing):
             logger.warning(
                 "Plugin %s's Python dependencies were installed after this process started: %s. "
-                "A running process never switches dependency environments; restart Hermes "
-                "(hermes gateway restart for the gateway) to load them.",
+                "A running process never switches dependency environments; restart Routster "
+                "(routster gateway restart for the gateway) to load them.",
                 key, ", ".join(missing),
             )
         else:
             logger.warning(
                 "Plugin %s declares Python dependencies that are not "
-                "installed: %s. For an enabled plugin, run hermes pm repair, "
-                "then restart Hermes. Discovery does not install dependencies.",
+                "installed: %s. For an enabled plugin, run routster pm repair, "
+                "then restart Routster. Discovery does not install dependencies.",
                 key, ", ".join(missing),
             )
 

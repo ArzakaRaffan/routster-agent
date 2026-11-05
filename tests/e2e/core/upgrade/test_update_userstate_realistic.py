@@ -172,7 +172,7 @@ def world(tmp_path_factory, provider):
 
 def test_update_on_a_realistic_home_exits_clean_at_the_new_commit(world):
     sb, up = world["sb"], world["update"]
-    assert up.returncode == 0, "hermes update failed on a realistic home:\n" + I.describe(up)
+    assert up.returncode == 0, "routster update failed on a realistic home:\n" + I.describe(up)
     assert I.TRACEBACK not in up.stdout + up.stderr, I.describe(up)
     assert I.git("rev-parse", "HEAD", cwd=sb.checkout) == world["target"], "update exited 0 but HEAD is not the target"
     assert not (sb.checkout / ".git" / "index.lock").exists()

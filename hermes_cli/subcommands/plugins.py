@@ -11,7 +11,7 @@ def build_plugins_parser(subparsers, *, cmd_plugins: Callable) -> None:
     """Attach the ``plugins`` subcommand to ``subparsers``."""
     plugins_parser = subparsers.add_parser(
         "plugins", help="Manage and validate plugins",
-        description="Install, update, remove, list, or validate native Hermes plugins "
+        description="Install, update, remove, list, or validate native Routster plugins "
             "and portable Agent Plugins v1 packages. Portable packages install disabled.")
     plugins_subparsers = plugins_parser.add_subparsers(dest="plugins_action")
 
@@ -19,7 +19,7 @@ def build_plugins_parser(subparsers, *, cmd_plugins: Callable) -> None:
         "install", help="Install a plugin from the curated catalog, a Git URL, or owner/repo")
     plugins_install.add_argument(
         "identifier",
-        help="Bare plugin catalog entry name (see `hermes plugins search`), Git URL, or owner/repo "
+        help="Bare plugin catalog entry name (see `routster plugins search`), Git URL, or owner/repo "
             "shorthand (e.g. anpicasso/hermes-plugin-chrome-profiles)")
     plugins_install.add_argument(
         "--force", "-f", action="store_true",
@@ -44,7 +44,7 @@ def build_plugins_parser(subparsers, *, cmd_plugins: Callable) -> None:
         help="Auto-enable the plugin after install (skip confirmation prompt)")
     _install_enable_group.add_argument(
         "--no-enable", action="store_true",
-        help="Install disabled (skip confirmation prompt); enable later with `hermes plugins enable <name>`",
+        help="Install disabled (skip confirmation prompt); enable later with `routster plugins enable <name>`",
     )
 
     plugins_search = plugins_subparsers.add_parser(
@@ -109,7 +109,7 @@ def build_plugins_parser(subparsers, *, cmd_plugins: Callable) -> None:
             "saved-tag update_url feeds (with mismatch protection), git "
             "ls-remote for git installs, and a stateless PyPI probe for "
             "pip entry-point plugins. NEVER mutates anything — apply with "
-            "`hermes plugins update <name>`."
+            "`routster plugins update <name>`."
         ),
     )
     plugins_check.add_argument(

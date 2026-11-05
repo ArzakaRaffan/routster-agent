@@ -72,14 +72,14 @@ def offer_agent_import(hermes_home: Path, from_setup: bool = True) -> str:
     print_header("Coming from another agent?", gap=True)
     context = ("Found on this computer: " + ", ".join(
         f"{s.label} ({str(p).replace(user_home, '~', 1)})" for s, p in found) + ".",
-        "Hermes can bring over its settings, memories, skills and MCP servers.",
+        "Routster can bring over its settings, memories, skills and MCP servers.",
         "You'll see a preview and confirm before anything changes.")
     _info(*context)
     names = " or ".join(s.label for s, _ in found) if len(found) <= 2 else "any of them"
     # The menu clears the screen, so the question carries what it refers to ("any of them").
     if not prompt_yes_no(f"Import your setup from {names}?", default=True,
                          description="\n".join(f"  {w}" for line in context for w in textwrap.wrap(line, 76))):
-        print_info(f"Skipped. Import later with: hermes plugins install {PLUGIN}, then hermes import-agent")
+        print_info(f"Skipped. Import later with: routster plugins install {PLUGIN}, then routster import-agent")
         return ""
     picked = _pick_sources(found)
     if not picked or not _ensure_plugin(hermes_home):
@@ -92,7 +92,7 @@ def _pick_sources(found: list[tuple[ImportSource, Path]]) -> list[ImportSource]:
     from hermes_cli.setup import print_info, prompt_checklist
     if len(found) == 1:
         return [found[0][0]]
-    picked = prompt_checklist("Which agents should Hermes import from?", [s.label for s, _ in found],
+    picked = prompt_checklist("Which agents should Routster import from?", [s.label for s, _ in found],
                               list(range(len(found))))
     if not picked:
         print_info("Nothing selected, so nothing was imported.")
@@ -125,7 +125,7 @@ def _ensure_plugin(hermes_home: Path) -> bool:
             return True
     verb = "enabled" if present else "installed"
     print_warning(f"The '{PLUGIN}' plugin could not be {verb}, so nothing was imported. "
-                  f"Try again later with: hermes plugins {'enable' if present else 'install'} {PLUGIN}")
+                  f"Try again later with: routster plugins {'enable' if present else 'install'} {PLUGIN}")
     return False
 
 
@@ -172,7 +172,7 @@ def _import_child(source: ImportSource, hermes_home: Path, extra_args: tuple[str
         returncode = subprocess.run(argv, env=env, check=False).returncode  # health: allow HX006 -- same child
     if returncode == 2:
         print_warning(f"The {source.label} import did not run. If the error names an invalid choice or "
-                      f"unrecognized arguments, update the plugin first: hermes plugins update {PLUGIN}")
+                      f"unrecognized arguments, update the plugin first: routster plugins update {PLUGIN}")
     elif returncode:
         print_warning(f"The {source.label} import stopped with errors; see the report above.")
     return returncode
@@ -202,7 +202,7 @@ def migrate_from_agents(hermes_home: Path, source_name: str = "", extra_args: tu
             return 0
         print_info(("Found: " + ", ".join(s.label for s, _ in found) + ". " if found else
                     "No other agent setup found on this computer. ")
-                   + "Import one with: " + ", ".join(f"hermes migrate {s.name}" for s in IMPORT_SOURCES))
+                   + "Import one with: " + ", ".join(f"routster migrate {s.name}" for s in IMPORT_SOURCES))
         return 0
     source = next(s for s in IMPORT_SOURCES if s.name == source_name)
     if not _ensure_plugin(hermes_home):

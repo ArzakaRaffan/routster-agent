@@ -1445,7 +1445,7 @@ class TestLockedGuard:
         for op, res in zip(self._MUTATIONS, results):
             assert res["success"] is False, (op, res)
             assert "locked" in res["error"], (op, res)
-            assert "hermes curator unlock locked-skill" in res["error"], (op, res)
+            assert "routster curator unlock locked-skill" in res["error"], (op, res)
         assert after == before
 
     def test_unlocked_sibling_keeps_learning_and_unlock_lifts_refusal(self, tmp_path, monkeypatch):
@@ -1476,7 +1476,7 @@ class TestLockedGuard:
             results = [json.loads(skill_manage(name="locked-skill", **op)) for op in self._MUTATIONS]
             after = self._tree(d)
         for op, res in zip(self._MUTATIONS, results):
-            assert res["success"] is False and "hermes curator unlock locked-skill" in res["error"], (op, res)
+            assert res["success"] is False and "routster curator unlock locked-skill" in res["error"], (op, res)
         assert after == before
 
     def test_batch_refuses_before_any_sibling_op_is_applied(self, tmp_path, monkeypatch):

@@ -348,7 +348,7 @@ def _parse_truncation_params(rid, sid, session, params, history):
         rid, 4029,
         "truncation parameters require confirm_truncate=true; "
         "an ordinary prompt.submit must not drop session history "
-        "(update your Hermes client if a rewind was intended)")
+        "(update your Routster client if a rewind was intended)")
 
 
 def _resolve_truncation_ordinal(rid, sid, session, params, history):

@@ -35,7 +35,7 @@ def test_render_handles_raw_rich_ragged_and_malformed_cells():
         [_raw(""), None],
         [_raw("Hermes"), _rich("ok"), {"type": "mystery"}],
     ])
-    assert _render_slack_table_block(block) == "Name | Status\nHermes | ok | "
+    assert _render_slack_table_block(block) == "Name | Status\nRoutster | ok | "
     assert _render_slack_table_block({"type": "table"}) == ""
     assert _render_slack_table_block({"type": "table", "rows": "bad"}) == ""
 

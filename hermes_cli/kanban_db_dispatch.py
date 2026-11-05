@@ -2558,7 +2558,8 @@ def _resolve_hermes_argv() -> list[str]:
     except Exception:
         pass
 
-    hermes_bin = _safe_which_no_cwd("hermes") if _kb._IS_WINDOWS else shutil.which("hermes")
+    # Routster fork: `hermes` on PATH may be a separate Hermes install.
+    hermes_bin = _safe_which_no_cwd("routster") if _kb._IS_WINDOWS else shutil.which("routster")
     if hermes_bin:
         return _hermes_path_argv(hermes_bin)
     return _module_hermes_argv()
@@ -2888,8 +2889,8 @@ def _default_spawn(task: Task, workspace: str, *, board: Optional[str] = None) -
     except FileNotFoundError:
         log_f.close()
         raise RuntimeError(
-            "`hermes` executable not found on PATH. "
-            "Install Hermes Agent or activate its venv before running the kanban dispatcher."
+            "`routster` executable not found on PATH. "
+            "Install Routster Agent or activate its venv before running the kanban dispatcher."
         )
     # Intentionally NOT closing log_f: the child keeps writing after return;
     # the OS-level FD stays open in the child until it exits.

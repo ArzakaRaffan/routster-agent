@@ -78,9 +78,9 @@ while [ $# -gt 0 ]; do
             echo
             echo "  --channel       stable (default): the latest published release, then release"
             echo "                  to release. main: every commit. Also HERMES_INSTALL_CHANNEL;"
-            echo "                  an explicit choice is saved like 'hermes update --set-channel'."
+            echo "                  an explicit choice is saved like 'routster update --set-channel'."
             echo "  --skip-browser  Do not install the browser (Chromium). Alias: --no-playwright."
-            echo "                  Remembered by later installs and 'hermes update';"
+            echo "                  Remembered by later installs and 'routster update';"
             echo "                  undo with 'hermes pm install chromium'."
             echo "  --skip-computer-use"
             echo "                  Do not install the computer-use driver (cua-driver). Remembered"
@@ -1166,7 +1166,7 @@ stage_gateway() {
     return 0
     if [ "$NON_INTERACTIVE" = true ]; then return 0; fi
     if ! has_terminal; then
-        log "gateway setup skipped (no terminal); run 'hermes gateway install' after install"
+        log "gateway setup skipped (no terminal); run 'routster gateway install' after install"
         return 0
     fi
     # Setup installs the service when it handles the gateway; ask only if it did not.

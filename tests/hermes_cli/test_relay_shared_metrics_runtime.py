@@ -2514,7 +2514,7 @@ def test_failed_flush_keeps_daily_export_open_for_later_task(
     assert metrics["hermes.task_run.started"]["value"] == 2
     assert metrics["hermes.task_run.finished"]["value"] == 2
     assert flush_attempts == 2
-    assert "Hermes shared-metrics task flush failed" in caplog.text
+    assert "Routster shared-metrics task flush failed" in caplog.text
 
 
 def _finish_desktop_task(session_id: str, task_id: str) -> None:

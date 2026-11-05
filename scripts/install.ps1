@@ -522,7 +522,7 @@ function Get-Uv {
     $target = "win32-$(Get-WindowsArch)"
     $pin = $script:UvPinFiles[$target]
     if (-not $pin) {
-        Fail "no pinned uv artifact for $target; Hermes does not support this host" unsupported_platform
+        Fail "no pinned uv artifact for $target; Routster does not support this host" unsupported_platform
     }
     $entry = Join-Path (Get-PmStoreRoot) "uv-$($script:UvPinVersion)-$target"
     $uvExe = Join-Path $entry "uv.exe"
@@ -1031,7 +1031,7 @@ function Stage-Repository {
         $item = Get-Item -LiteralPath $InstallDir -Force
         $empty = $item.PSIsContainer -and -not $item.LinkType -and -not (Get-ChildItem -LiteralPath $InstallDir -Force | Select-Object -First 1)
         if (-not $empty) {
-            Fail "$InstallDir exists and is not a Hermes git checkout. Move it aside, or install elsewhere with -InstallDir <path>." dir_not_checkout
+            Fail "$InstallDir exists and is not a Routster git checkout. Move it aside, or install elsewhere with -InstallDir <path>." dir_not_checkout
         }
     }
     if (-not (Ensure-Git)) { Fail "no pinned Git artifact for this Windows architecture" unsupported_platform }
@@ -1102,7 +1102,7 @@ function Stage-Repository {
             if ("$partialFilter".Trim() -eq 'tree:0') {
                 Invoke-Logged -MayFail "Fetching directory history once (treeless checkout)" { git -C $InstallDir -c gc.auto=0 -c maintenance.auto=false fetch --refetch --filter=blob:none origin "+refs/heads/${Branch}:refs/remotes/origin/${Branch}" }
                 if ($LASTEXITCODE) {
-                    Write-Warn "could not fetch the directory history; the next hermes update retries it"
+                    Write-Warn "could not fetch the directory history; the next routster update retries it"
                 } else {
                     Invoke-Native { git -C $InstallDir config remote.origin.partialclonefilter blob:none }
                     if ($LASTEXITCODE) { Write-Warn "could not record the blobless filter in $InstallDir" }
@@ -1110,7 +1110,7 @@ function Stage-Repository {
             }
         }
         if ($chosen) {
-            Log "Keeping its checkout: ``hermes update`` moves it (``hermes update --set-channel main`` follows main)"
+            Log "Keeping its checkout: ``routster update`` moves it (``routster update --set-channel main`` follows main)"
             return
         }
         if ($release -and -not (Receive-StableRelease $InstallDir $release)) {
@@ -1124,12 +1124,12 @@ function Stage-Repository {
             # session stores this checkout wrote (update_downgrade_guard).
             Invoke-Native { git -C $InstallDir merge-base --is-ancestor $release HEAD 2>$null } | Out-Null
             if (-not $LASTEXITCODE) {
-                Log "Keeping its checkout: it already has $release (``hermes update`` moves it to the next release)"
+                Log "Keeping its checkout: it already has $release (``routster update`` moves it to the next release)"
                 return
             }
             Invoke-Native { git -C $InstallDir merge-base --is-ancestor HEAD $release 2>$null } | Out-Null
             if ($LASTEXITCODE) {
-                Log "Keeping its checkout: $release does not descend from it (``hermes update`` decides that move)"
+                Log "Keeping its checkout: $release does not descend from it (``routster update`` decides that move)"
                 return
             }
         } else {

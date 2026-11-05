@@ -97,7 +97,7 @@ def _record_evidence(root: Path, recipe, result, *, partial: bool) -> None:
             root=root,
             session_id=os.environ.get("HERMES_SESSION_ID"),
             ok=result.ok,
-            command="hermes verify",
+            command="routster verify",
             scope="targeted" if partial else "full",
             output="\n".join(tails),
         )
