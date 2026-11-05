@@ -26,8 +26,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_DIRS = ("hermes_cli", "gateway", "agent", "tools", "tui_gateway", "cron", "plugins",
                "acp_adapter", "pm", "providers")
-SOURCE_FILES = ("cli.py", "run_agent.py", "model_tools.py", "toolsets.py", "hermes_constants.py",
-                "hermes_logging.py", "hermes_state.py", "utils.py")
 
 # `hermes <subcommand>`: a command the user is told to run. Only `routster` is on PATH. Top-level
 # names from the live parser (plus plugin-registered ones); add new upstream commands here.
@@ -131,12 +129,13 @@ def iter_sources():
         for path in sorted((ROOT / name).rglob("*.py")):
             if "tests" not in path.relative_to(ROOT).parts:
                 yield path
-    for name in SOURCE_FILES:
-        yield ROOT / name
+    # Root modules (facades and their hermes_state_*/hermes_* siblings), not build/test plumbing.
+    yield from (p for p in sorted(ROOT.glob("*.py")) if p.name not in ("setup.py", "conftest.py"))
     yield from sorted((ROOT / "locales").glob("*.yaml"))
     # Skills are instructions the agent follows: a `hermes …` line there is a command it would run.
     for name in ("skills", "optional-skills"):
         yield from (p for p in sorted((ROOT / name).rglob("*.md")) if p.name != "AGENTS.md")
+        yield from (p for p in sorted((ROOT / name).rglob("*.py")) if "tests" not in p.parts)
 
 
 def main(argv=None) -> int:
