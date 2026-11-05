@@ -19,7 +19,7 @@ export const defaultSaveName = (format: string, now = new Date()) =>
  *  file resolves against `cwd` (the user's launch folder: the launcher starts Node inside the
  *  install), else `<HERMES_HOME>/sessions/saved/<the owner's filename>`. Returns the path written. */
 export function writeSessionExport(payload: SessionExportPayload, filename?: string, cwd = process.cwd()): string {
-  const home = process.env.HERMES_HOME ?? join(homedir(), '.hermes')
+  const home = process.env.HERMES_HOME ?? join(homedir(), '.routster')
 
   const path = filename
     ? isAbsolute(filename.replace(/^~(?=$|\/)/, homedir()))

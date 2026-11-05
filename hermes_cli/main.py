@@ -252,7 +252,7 @@ def _early_interface_config_path() -> str:
     home = os.environ.get("HERMES_HOME")
     if home:
         return os.path.join(home, "config.yaml")
-    return os.path.join(os.path.expanduser("~"), ".hermes", "config.yaml")
+    return os.path.join(os.path.expanduser("~"), ".routster", "config.yaml")
 
 
 def _config_default_interface_early() -> str:
@@ -1723,12 +1723,7 @@ def cmd_chat(args):
         os.environ["HERMES_SESSION_SOURCE_EXPLICIT"] = "1"
 
     _pin_kanban_board_env()
-    from hermes_cli.observability.shared_metrics_consent import offer_consent_before_chat
-
-    # Not before setup: a blank install meets "Setup Required" first. The offer stays
-    # undecided, so it is asked on the first launch with a provider.
-    if provider_configured:
-        offer_consent_before_chat(args)
+    # Routster fork: no "send shared metrics to Nous?" offer before chat (metrics stay off).
     _confirm_startup_expensive_model_override(args)
 
     passthrough = {k: getattr(args, k, d) for k, d in _CHAT_PASSTHROUGH}

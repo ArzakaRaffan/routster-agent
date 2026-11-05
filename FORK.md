@@ -47,7 +47,12 @@ Most Routster behaviour lives in a file upstream never edits:
 | `web/` (`index.html`, `index.css`, `themes/presets.ts`, `App.tsx`, `i18n/*.ts`) | dashboard default theme = Routster palette, brand text, no Cron/Channels/Webhooks/Pairing nav items |
 | `hermes_cli/update_cmd_git.py`, `hermes_cli/update_cmd_zip.py` | "official" repo = ArzakaRaffan/routster-agent (no Hermes upstream prompt or push for users; ZIP fallback and repair hints point at the fork) |
 | `hermes_cli/_launchers.py`, `hermes_cli/_install_repair.py` | `routster` launcher next to `hermes` / `hermes-acp` |
-| `scripts/install.sh`, `scripts/install.ps1` | default repo = the fork, `routster` wording, gateway service stage disabled |
+| `scripts/install.sh`, `scripts/install.ps1`, `scripts/install.cmd` | default repo = the fork, home `~/.routster`, Routster banner and wording, setup runs `routster setup`, gateway service stage disabled |
+| `hermes_constants.py` (`HOME_DIRNAME`) + the stray `~/.hermes` fallbacks (`agent/file_safety.py`, `agent/nous_rate_guard.py`, `agent/transports/codex_app_server.py`, `hermes_cli/{dashboard_procs,env_loader,gateway,gateway_runtime_service_identity,main,main_dashboard,stdio,update_fleet_scope,update_lock}.py`, `hermes_state_holders.py`, `ui-tui/src/**` home fallbacks, `scripts/_activation.sh`, `scripts/run_tests.sh`, `setup-hermes.sh`, `activate.ps1`) | data folder is `~/.routster` (Windows `%LOCALAPPDATA%
+outster`), never a Hermes home; the checkout inside it keeps the `hermes-agent` folder name (backup/uninstall/doctor key on it) |
+| `hermes_cli/_launchers.py::expose_cli` | only `routster` is published to `~/.local/bin`; `hermes` stays free for a real Hermes install |
+| `hermes_cli/setup.py`, `hermes_cli/setup_quick.py` | `routster setup` = Routster key + model, nothing else (no mode menu, agent import, terminal prompt or Nous metrics offer); `--reconfigure` = full wizard, `--quick` = missing items |
+| `hermes_cli/main.py::cmd_chat` | no shared-metrics (Nous telemetry) offer before chat |
 
 ## Routster gateway contract (what the profile relies on)
 
@@ -81,7 +86,10 @@ Most Routster behaviour lives in a file upstream never edits:
   dashboard, TUI and upstream merges depend on them). Many hints still say `hermes <cmd>`; the
   `hermes` command keeps working, so they are cosmetic.
 - `routster debug share` still uploads to paste.rs/dpaste and points at Nous support.
-- One-line install is wired (`scripts/install.sh` / `install.ps1` default to this fork, follow
-  `main`, publish `routster`) but has not been run end-to-end on a clean machine.
+- One-line install reads `scripts/install.sh` from `main`. It installs into `~/.routster`, so an
+  existing Hermes checkout in `~/.hermes` (origin NousResearch, tracks Hermes stable tags) is never
+  reused. Not yet run end-to-end on a clean machine.
+- Windows: `%LOCALAPPDATA%
+outsterin` still holds a `hermes` launcher and goes on the User PATH.
 - `routster` with no model configured and only `ROUTSTER_API_KEY` in the environment fails with
   upstream's `storage_unavailable`; `routster login` (Enter keeps the env key) fixes it.

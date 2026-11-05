@@ -13,6 +13,8 @@ import shlex
 import stat
 from typing import NoReturn
 
+from hermes_constants import HOME_DIRNAME
+
 
 SYSTEMD_IDENTITY_PROPERTIES = (
     "User", "DynamicUser", "ExecStart", "Environment", "EnvironmentFiles",
@@ -41,7 +43,7 @@ class ForeignRoot(ValueError):
 def _install_root(home: Path) -> Path:
     # <root>/.hermes or <root>/.hermes/profiles/<name>: the root is the HOME that anchors it.
     parts = home.parts
-    if len(parts) >= 3 and parts[-3] == ".hermes" and parts[-2] == "profiles":
+    if len(parts) >= 3 and parts[-3] in (HOME_DIRNAME, ".hermes") and parts[-2] == "profiles":
         return home.parents[2]
     return home.parent
 
@@ -201,7 +203,7 @@ def verify_systemd(props: dict[str, str], manager_env: str, home: Path, *, syste
             env.pop(key, None)
     configured = env.get("HERMES_HOME", "").strip()
     if not configured:
-        configured = str(_absolute(env.get("HOME") or pwd.getpwuid(uid).pw_dir) / ".hermes")
+        configured = str(_absolute(env.get("HOME") or pwd.getpwuid(uid).pw_dir) / HOME_DIRNAME)
     verify_home(home, configured)
     match = re.fullmatch(r"\{ path=(.*?) ; argv\[\]=(.*?) ; ignore_errors=(?:yes|no) ;(?:.*?)\}", props["ExecStart"])
     if not match or any(char in match[2] for char in ("$", "\\", "{", "}")):

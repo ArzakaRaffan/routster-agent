@@ -27,8 +27,9 @@ mengulang sampai tugasnya selesai.
    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArzakaRaffan/routster-agent/main/scripts/install.ps1)))
    ```
 
-   Installer menyiapkan Python lewat `uv`, meng-clone repo ini, lalu memasang perintah `routster`
-   (dan alias `hermes`). Tidak ada service background yang dipasang.
+   Installer menyiapkan Python lewat `uv`, meng-clone repo ini ke `~/.routster`, lalu memasang
+   perintah `routster`. Semua data Routster ada di `~/.routster`, terpisah dari Hermes Agent
+   (`~/.hermes` dan perintah `hermes` tidak disentuh). Tidak ada service background yang dipasang.
 
    <details><summary>Instal manual dari source</summary>
 
@@ -59,7 +60,7 @@ mengulang sampai tugasnya selesai.
 | `routster -z "tugas"` | Satu tugas sekali jalan, tanpa interaksi |
 | `routster login` | Simpan dan validasi API key Routster, jadikan Routster provider default |
 | `routster model` | Pilih model. Multiplier input/output tiap model ditampilkan |
-| `routster setup` | Wizard setup lengkap (Quick Setup = Routster) |
+| `routster setup` | API key Routster + pilih model (`--reconfigure` untuk pengaturan lengkap) |
 | `routster doctor` | Cek konfigurasi |
 | `routster update` | Update ke versi terbaru dari repo ini (branch `main`) |
 | `routster dashboard` | Dashboard web lokal (port 9119) |
@@ -79,7 +80,7 @@ dan satu tugas agent bisa memanggil API berkali-kali. Daftar model selalu diambi
 
 ## Keamanan
 
-- API key disimpan di `~/.hermes/.env` dengan permission `600`, atau dibaca dari env `ROUTSTER_API_KEY`.
+- API key disimpan di `~/.routster/.env` dengan permission `600`, atau dibaca dari env `ROUTSTER_API_KEY`.
   Jangan commit key ke repo.
 - Perintah shell yang berbahaya meminta persetujuan dulu (mode approval `smart` bawaan Hermes).
   `--yolo` mematikan konfirmasi, jadi gunakan dengan hati-hati.

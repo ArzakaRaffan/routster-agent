@@ -108,7 +108,7 @@ def test_sandbox_home_keeps_its_launchers_off_the_user_path(user_path_writes, tm
 
 
 @pytest.mark.platforms("windows")
-@pytest.mark.parametrize("hermes_home", [None, ("hermes",), ("hermes", "profiles", "work")])
+@pytest.mark.parametrize("hermes_home", [None, ("routster",), ("routster", "profiles", "work")])
 def test_the_home_new_consoles_use_registers_its_bin(user_path_writes, hermes_home, tmp_path, monkeypatch):
     local = tmp_path / "local"
     monkeypatch.setenv("LOCALAPPDATA", str(local))
@@ -121,7 +121,7 @@ def test_the_home_new_consoles_use_registers_its_bin(user_path_writes, hermes_ho
     result = _launchers._expose_windows_user_bin(tmp_path / "checkout", create=True)
 
     assert result["path"] == "added"
-    assert user_path_writes == [local / "hermes" / "bin"]
+    assert user_path_writes == [local / "routster" / "bin"]
 
 
 @pytest.mark.platforms("windows")
@@ -195,7 +195,7 @@ def _windows_home(tmp_path, monkeypatch) -> Path:
     monkeypatch.setattr(_launchers, "_new_console_environment", lambda: {"LOCALAPPDATA": str(local)})
     monkeypatch.setattr(_launchers, "_load_script_maker", lambda: None)
     monkeypatch.setattr(_launchers, "_store_script_maker", lambda python_exe: None)
-    home = local / "hermes"
+    home = local / "routster"
     _store_python(home).parent.mkdir(parents=True)
     _store_python(home).touch()
     (home / "tools" / "facts.json").write_text(
@@ -338,19 +338,16 @@ class TestExposeCli:
         assert _launchers.expose_cli(create=False) == {"ok": True, "written": []}
 
     @posix_only
-    def test_writes_all_three_wrappers_fresh(self, fake_install):
+    def test_publishes_only_routster(self, fake_install):
         home, root = fake_install
         result = _launchers.expose_cli()
-        assert result["ok"] is True
-        assert sorted(result["written"]) == ["hermes", "hermes-acp", "hermes-agent"]
+        assert result == {"ok": True, "written": ["routster"]}
+        wrapper = home / ".local" / "bin" / "routster"
+        body = wrapper.read_text(encoding="utf-8-sig")
+        assert str(root / ".hermes" / "bin") in body
+        assert os.access(wrapper, os.X_OK)
         for name in ("hermes", "hermes-agent", "hermes-acp"):
-            wrapper = home / ".local" / "bin" / name
-            body = wrapper.read_text(encoding="utf-8-sig")
-            assert str(root) in body
-            assert str(root / ".hermes" / "bin") in body
-            assert os.access(wrapper, os.X_OK)
-
-
+            assert not (home / ".local" / "bin" / name).exists()
 
     @posix_only
     def test_leaves_another_installs_wrapper_alone(self, fake_install):
@@ -359,12 +356,12 @@ class TestExposeCli:
         wrapper_dir = home / ".local" / "bin"
         wrapper_dir.mkdir(parents=True)
         foreign = f'#!/bin/sh\nexec "{other}/venv/bin/python" "{other}/hermes" "$@"\n'
-        (wrapper_dir / "hermes").write_text(foreign, encoding="utf-8")
+        for name in ("hermes", "routster"):
+            (wrapper_dir / name).write_text(foreign, encoding="utf-8")
         result = _launchers.expose_cli()
-        assert (wrapper_dir / "hermes").read_text(encoding="utf-8-sig") == foreign
-        assert "hermes" not in result["written"]
-        # The other two had no file at all — those ARE written.
-        assert sorted(result["written"]) == ["hermes-acp", "hermes-agent"]
+        for name in ("hermes", "routster"):
+            assert (wrapper_dir / name).read_text(encoding="utf-8-sig") == foreign
+        assert result == {"ok": True, "written": []}
 
     @posix_only
     def test_config_gate_disables(self, fake_install, monkeypatch):
@@ -432,15 +429,15 @@ class TestExposeCli:
         home, root = fake_install
         wrapper_dir = home / ".local" / "bin"
         wrapper_dir.mkdir(parents=True)
-        console_script = root / "venv" / "bin" / "hermes"
+        console_script = root / "venv" / "bin" / "routster"
         console_script.write_text("# real console script\n", encoding="utf-8")
-        (wrapper_dir / "hermes").symlink_to(console_script)
+        (wrapper_dir / "routster").symlink_to(console_script)
         result = _launchers.expose_cli()
-        assert "hermes" in result["written"]
+        assert "routster" in result["written"]
         # The venv console script survives untouched…
         assert console_script.read_text(encoding="utf-8-sig") == "# real console script\n"
         # …and the link-dir entry is now a real file, not a symlink.
-        assert not (wrapper_dir / "hermes").is_symlink()
+        assert not (wrapper_dir / "routster").is_symlink()
 
 
 @pytest.mark.platforms("macos")

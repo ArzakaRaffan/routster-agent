@@ -73,8 +73,8 @@ _has_pytest() { [ -n "$1" ] && [ -x "$1" ] && "$1" -c 'import pytest' 2>/dev/nul
 _account_tool_store() {
   local account py_minor
   [ -z "${HERMES_RUNTIME_DIR:-}" ] || return 1
-  case "${HERMES_HOME:-}" in "" | "$HOME/.hermes" | "$HOME/.hermes/"*) ;; *) return 1 ;; esac
-  [ ! -f "$HOME/.hermes/tools/facts.json" ] || return 1
+  case "${HERMES_HOME:-}" in "" | "$HOME/.routster" | "$HOME/.routster/"*) ;; *) return 1 ;; esac
+  [ ! -f "$HOME/.routster/tools/facts.json" ] || return 1
   account="$(getent passwd "$(id -u)" 2>/dev/null | cut -d: -f6)"
   [ -n "$account" ] || account="$(dscl . -read "/Users/$(id -un)" NFSHomeDirectory 2>/dev/null | sed -n 's/^NFSHomeDirectory: *//p')"
   [ -n "$account" ] && [ -d "$account" ] && [ ! "$account" -ef "$HOME" ] || return 1

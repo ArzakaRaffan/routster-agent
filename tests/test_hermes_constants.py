@@ -28,11 +28,11 @@ class TestGetDefaultHermesRoot:
 
     @pytest.mark.platforms("linux")
     def test_no_hermes_home_returns_native(self, tmp_path, monkeypatch):
-        """When HERMES_HOME is not set, returns ~/.hermes."""
+        """When HERMES_HOME is not set, returns ~/.routster (the Routster fork's own folder)."""
         monkeypatch.delenv("HERMES_HOME", raising=False)
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
-        assert get_default_hermes_root() == tmp_path / ".hermes"
+        assert get_default_hermes_root() == tmp_path / ".routster"
 
 
 
@@ -67,7 +67,7 @@ class TestGetDefaultHermesRoot:
         monkeypatch.setenv("LOCALAPPDATA", str(local_appdata))
         monkeypatch.setattr(Path, "home", lambda: tmp_path / "Home")
 
-        assert get_default_hermes_root() == local_appdata / "hermes"
+        assert get_default_hermes_root() == local_appdata / "routster"
 
     @pytest.mark.platforms("windows")
     def test_root_for_another_environment_ignores_this_process(self, tmp_path, monkeypatch):
@@ -78,16 +78,16 @@ class TestGetDefaultHermesRoot:
         user = tmp_path / "user"
         custom = tmp_path / "data"
         cases = [
-            ({"LOCALAPPDATA": str(local)}, local / "hermes"),
-            ({"LOCALAPPDATA": str(local), "HERMES_HOME": str(local / "hermes" / "profiles" / "work")},
-             local / "hermes"),
+            ({"LOCALAPPDATA": str(local)}, local / "routster"),
+            ({"LOCALAPPDATA": str(local), "HERMES_HOME": str(local / "routster" / "profiles" / "work")},
+             local / "routster"),
             ({"LOCALAPPDATA": str(local), "HERMES_HOME": str(custom / "profiles" / "work")}, custom),
-            ({"LOCALAPPDATA": str(local), "HERMES_DATA_DIR_SUFFIX": "-magic"}, local / "hermes-magic"),
+            ({"LOCALAPPDATA": str(local), "HERMES_DATA_DIR_SUFFIX": "-magic"}, local / "routster-magic"),
             ({"localappdata": str(local), "HERMES_HOME": "%LocalAppData%\\data"}, local / "data"),
             ({"LOCALAPPDATA": str(local), "HERMES_HOME": "$LOCALAPPDATA\\data"}, local / "data"),
             ({"LOCALAPPDATA": str(local), "HERMES_HOME": "${LOCALAPPDATA}\\data"}, local / "data"),
             ({"LOCALAPPDATA": str(local), "USERPROFILE": str(user), "HERMES_HOME": "~\\data"}, user / "data"),
-            ({"USERPROFILE": str(user)}, user / "AppData" / "Local" / "hermes"),
+            ({"USERPROFILE": str(user)}, user / "AppData" / "Local" / "routster"),
             ({"LOCALAPPDATA": str(local), "HERMES_HOME": "relative\\data"}, None),
             ({"LOCALAPPDATA": str(local), "HERMES_HOME": "%UNDEFINED%\\data"}, None),
             ({"LOCALAPPDATA": str(local), "HERMES_HOME": "~\\data"}, None),
@@ -123,7 +123,7 @@ class TestGetHermesHome:
         monkeypatch.setattr(Path, "home", lambda: tmp_path / "Home")
         monkeypatch.setattr(hermes_constants, "_profile_fallback_warned", False)
 
-        assert get_hermes_home() == local_appdata / "hermes"
+        assert get_hermes_home() == local_appdata / "routster"
 
 
 class TestGetProcessHermesHome:

@@ -101,6 +101,8 @@ def installation_command(repo_root: Path, args=(), *, module: str = "hermes_cli.
 #: Launcher command names — keep in lockstep with scripts/install.ps1
 #: Publish-UserCommand and hermes_cli/_install_repair.py.
 WINDOWS_BIN_LAUNCHERS = ("hermes", "hermes-acp", "routster")
+#: POSIX user-bin names expose_cli only repairs, never creates (Routster fork).
+_HERMES_PATH_NAMES = ("hermes", "hermes-acp", "hermes-agent")
 
 #: command name -> (entry module, callable) — mirrors pyproject.toml
 #: [project.scripts].
@@ -918,7 +920,11 @@ def expose_cli(project_root: Path | None = None, *, create: bool = True) -> dict
                 dirs.append(directory)
         written = []
         for directory in dirs:
-            published = _publish_conveniences(root, directory, (*WINDOWS_BIN_LAUNCHERS, "hermes-agent"), create=create)
+            # Routster fork: only `routster` is created on PATH; `hermes*` stay free for a real
+            # Hermes Agent install (internals reach this checkout through .hermes/bin and argv[0]),
+            # and only ones this checkout already owns are repaired.
+            published = {**_publish_conveniences(root, directory, ("routster",), create=create),
+                         **_publish_conveniences(root, directory, _HERMES_PATH_NAMES, create=False)}
             written.extend(path.name for path, changed in published.items() if changed)
         return {"ok": True, "written": written}
     except OSError as exc:

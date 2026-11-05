@@ -13,6 +13,11 @@ from collections.abc import Callable, Mapping, MutableMapping
 from contextvars import ContextVar, Token
 from pathlib import Path
 
+# Routster fork: its own data folder (~/.routster, %LOCALAPPDATA%\routster), never a Hermes home.
+HOME_DIRNAME = ".routster"
+WINDOWS_HOME_DIRNAME = "routster"
+_DEFAULT_HOME_NAMES = (HOME_DIRNAME, ".hermes")
+
 _profile_fallback_warned: bool = False
 _UNSET = object()
 _HERMES_HOME_OVERRIDE: ContextVar[str | object] = ContextVar("_HERMES_HOME_OVERRIDE", default=_UNSET)
@@ -60,8 +65,8 @@ def _platform_default_hermes_home(environ: Mapping[str, str], user_home: Callabl
     if sys.platform == "win32":
         local_appdata = environ.get("LOCALAPPDATA", "").strip()
         base = Path(local_appdata) if local_appdata else user_home() / "AppData" / "Local"
-        return base / ("hermes" + suffix)
-    return user_home() / (".hermes" + suffix)
+        return base / (WINDOWS_HOME_DIRNAME + suffix)
+    return user_home() / (HOME_DIRNAME + suffix)
 
 
 def _get_platform_default_hermes_home() -> Path:
@@ -155,7 +160,7 @@ def sudo_invoker_default_home() -> Path | None:
     import pwd
 
     try:
-        return Path(pwd.getpwnam(sudo_user).pw_dir) / ".hermes"
+        return Path(pwd.getpwnam(sudo_user).pw_dir) / HOME_DIRNAME
     except KeyError:  # SUDO_USER not in passwd (chroot/container)
         return None
 
@@ -327,7 +332,7 @@ def _is_hermes_profiles_root(profiles_dir: Path) -> bool:
     ``profiles/.deleted`` tombstone dir (only ``profile delete`` creates it), or the default root.
     """
     root = profiles_dir.parent
-    if root.name == ".hermes":
+    if root.name in _DEFAULT_HOME_NAMES:
         return True
     try:
         if (profiles_dir / _DELETED_PROFILES_DIR).is_dir() or any(
@@ -353,7 +358,7 @@ def named_profile_home(path: str | Path) -> Path | None:
         if (candidate.parent.name == "profiles" and not candidate.name.startswith(".")
                 and _is_hermes_profiles_root(candidate.parent)):
             return candidate
-        if candidate.name == ".hermes":  # default home: a coincidental profiles/ ancestor is not a root
+        if candidate.name in _DEFAULT_HOME_NAMES:  # default home: a coincidental profiles/ ancestor is not a root
             return None
     return None
 

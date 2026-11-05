@@ -580,7 +580,6 @@ from hermes_cli.setup_terminal import setup_terminal_backend
 from hermes_cli.setup_platforms import setup_gateway
 from hermes_cli.setup_summary import _print_setup_summary
 from hermes_cli.setup_migration import _skip_configured_section
-from hermes_cli.setup_agent_import import offer_agent_import
 from hermes_cli.setup_quick import _run_portal_one_shot, _run_quick_setup
 
 
@@ -649,15 +648,6 @@ def _run_full_setup(config: dict, hermes_home, *, is_existing: bool, imported_fr
         _step("tools", "Tools", lambda: setup_tools(config, first_install=not is_existing))])
 
 
-# First-time mode picker: (menu label, setup_quick runner name) — None falls through to Full Setup.
-_FIRST_TIME_MODES = (
-    ("Quick Setup (Routster) — one API key, Rupiah billing, model + terminal (recommended)",
-     "_run_first_time_quick_setup"),
-    ("Full setup — configure every provider, tool & option yourself (bring your own keys)", None),
-    ("Blank Slate — everything off except the bare minimum; opt in to each capability", "_run_blank_slate_setup"),
-)
-
-
 def _run_setup_wizard_impl(args):
     """Run the interactive setup wizard: full/quick (auto-detected), ``--portal``, or one
     ``hermes setup <section>`` from SETUP_SECTIONS."""
@@ -700,41 +690,22 @@ def _run_setup_wizard_impl(args):
                   "├─────────────────────────────────────────────────────────┤",
                   "│  Let's configure your Routster Agent installation.     │",
                   "│  Press Ctrl+C at any time to exit.                     │")
-    imported_from = ""
-    if is_existing:
-        # Full reconfigure wizard is the default (Enter keeps each current value); `--quick`
-        # narrows it to missing items (partial import, cleared key). --reconfigure is a
-        # backwards-compatible no-op here.
-        if quick_requested:
-            _run_setup_steps([("Quick Setup", lambda: _run_quick_setup(config, hermes_home))])
-            _record_setup_completed(config)
-            return
-        print_header("Reconfigure", gap=True)
-        print_success("You already have Hermes configured.")
-        _info("Running the full wizard — each prompt shows your current value.",
-              "Press Enter to keep it, or type a new value to change it.", "",
-              "Tip: jump straight to a section with 'hermes setup model|terminal|",
-              "     gateway|tools|agent', or fill only missing items with --quick.")
-    else:
-        # First-time setup (--reconfigure / --quick are meaningless here; fall through)
-        print()
-        if reconfigure_requested or quick_requested:
-            _info("No existing configuration found — running first-time setup.", None)
-        # Before configuration begins. The plugin install and the import write config.yaml from
-        # outside this dict (the import from another process), so reload it.
-        imported_from = offer_agent_import(hermes_home)
-        config = load_config()
-        setup_mode = prompt_choice("How would you like to set up Routster Agent?", [label for label, _ in _FIRST_TIME_MODES], 0)
-        label, runner = _FIRST_TIME_MODES[setup_mode]
-        if runner is not None:
-            from hermes_cli import setup_quick
-            # Quick Setup offers to keep a model the import brought (Full setup acknowledges it below).
-            run_args = (config, hermes_home, is_existing) + (
-                (imported_from,) if runner == "_run_first_time_quick_setup" else ())
-            _run_setup_steps([(label, lambda: getattr(setup_quick, runner)(*run_args))])
-            _record_setup_completed(config)
-            return
-    _run_full_setup(config, hermes_home, is_existing=is_existing, imported_from=imported_from)
+    if is_existing and quick_requested:
+        # `--quick` fills only missing items (partial import, cleared key).
+        _run_setup_steps([("Quick Setup", lambda: _run_quick_setup(config, hermes_home))])
+        _record_setup_completed(config)
+        return
+    if not (is_existing and reconfigure_requested):
+        # Routster fork: `routster setup` is two steps, API key then model; everything else keeps
+        # its defaults. The full wizard is `routster setup --reconfigure` or one section at a time.
+        from hermes_cli.setup_quick import _run_first_time_quick_setup
+        _run_setup_steps([("Routster", lambda: _run_first_time_quick_setup(config, hermes_home, is_existing))])
+        _record_setup_completed(config)
+        return
+    print_header("Full setup", gap=True)
+    _info("Each prompt shows your current value. Press Enter to keep it.", "",
+          "Tip: jump straight to one part with 'routster setup model|terminal|tools|agent'.")
+    _run_full_setup(config, hermes_home, is_existing=is_existing)
 
     # Save and show summary
     save_config(config)
@@ -747,11 +718,8 @@ def _run_setup_wizard_impl(args):
 
 
 def _record_setup_completed(config: dict) -> None:
-    """Count a wizard run that finished. Every setup flow ends here, so the one-time
-    shared-metrics offer runs first: a user who opts in now is counted; the API checks enablement."""
-    from hermes_cli.observability.shared_metrics_consent import offer_consent_if_undecided
-
-    offer_consent_if_undecided(config)
+    """Count a wizard run that finished (locally; nothing is sent while shared metrics are off)."""
+    # Routster fork: no shared-metrics offer (it sends to Nous); metrics stay off.
     from hermes_cli.observability.shared_metrics_events import record_setup_completed
     model = config.get("model")
     record_setup_completed(surface="cli", provider=model.get("provider") if isinstance(model, dict) else None)

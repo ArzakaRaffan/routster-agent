@@ -27,7 +27,8 @@ INSTALL_COMMIT=""
 # official repository's main line) or main (every commit). An explicit choice is persisted.
 CHANNEL="${HERMES_INSTALL_CHANNEL:-}"
 INSTALL_DIR="${HERMES_INSTALL_DIR:-}"
-HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+# Routster fork: its own folder, so an existing Hermes Agent install (~/.hermes) is never touched.
+HERMES_HOME="${HERMES_HOME:-$HOME/.routster}"
 STAGE=""
 WANT_MANIFEST=false
 JSON=false
@@ -191,9 +192,9 @@ stage_signal() {
 print_banner() {
     printf '\n%s%s' "$C_MAGENTA" "$C_BOLD"
     printf '%s\n' "┌─────────────────────────────────────────────────────────┐"
-    printf '%s\n' "│             ☤ Hermes Agent Installer                    │"
+    printf '%s\n' "│             ◆ Routster Agent Installer                  │"
     printf '%s\n' "├─────────────────────────────────────────────────────────┤"
-    printf '%s\n' "│  An open source AI agent by Nous Research.              │"
+    printf '%s\n' "│  Agent coding di terminal, pakai API key Routster.      │"
     printf '%s\n' "└─────────────────────────────────────────────────────────┘"
     printf '%s\n' "$C_NC"
 }
@@ -366,10 +367,10 @@ ensure_uv() {
     # its own packaged toolchain.
     local _target
     if ! _target="$(uv_bootstrap_target)"; then
-        fail "no pinned uv build for this platform ($(uname -s) $(uname -m)); Hermes does not support this host" unsupported_platform
+        fail "no pinned uv build for this platform ($(uname -s) $(uname -m)); Routster Agent does not support this host" unsupported_platform
     fi
     if ! uv_bootstrap_pin "$_target"; then
-        fail "no pinned uv artifact for $_target; Hermes does not support this host" unsupported_platform
+        fail "no pinned uv artifact for $_target; Routster Agent does not support this host" unsupported_platform
     fi
     local _store="${HERMES_RUNTIME_DIR:-$HERMES_HOME/tools}"
     local _entry="$_store/uv-$UV_PIN_VERSION-$_target"
@@ -510,7 +511,7 @@ products_record() {
 stage_record() {
     case "$1" in
         prerequisites) echo "System prerequisites|runtime|false" ;;
-        repository)    echo "Download Hermes Agent|runtime|false" ;;
+        repository)    echo "Download Routster Agent|runtime|false" ;;
         venv)          echo "Create Python environment|runtime|false" ;;
         python-deps)   echo "Install Python dependencies|runtime|false" ;;
         config)        echo "Prepare config and skills|configuration|false" ;;
@@ -781,12 +782,12 @@ stage_repository() {
                     git -C "$INSTALL_DIR" config remote.origin.partialclonefilter blob:none \
                         || log_warn "could not record the blobless filter in $INSTALL_DIR"
                 else
-                    log_warn "could not fetch the directory history; the next hermes update retries it"
+                    log_warn "could not fetch the directory history; the next routster update retries it"
                 fi
             fi
         fi
         if [ -n "$channel" ]; then
-            log "Keeping its checkout: \`hermes update\` moves it (\`hermes update --set-channel main\` follows main)"
+            log "Keeping its checkout: \`routster update\` moves it (\`routster update --set-channel main\` follows main)"
             return 0
         fi
         if [ -n "$release" ] && ! fetch_release "$INSTALL_DIR"; then
@@ -799,11 +800,11 @@ stage_repository() {
             # one that cannot tell) is `hermes update`'s: it refuses a release that predates the
             # session stores this checkout wrote (update_downgrade_guard).
             if git -C "$INSTALL_DIR" merge-base --is-ancestor "$release" HEAD 2>/dev/null; then
-                log "Keeping its checkout: it already has $release (\`hermes update\` moves it to the next release)"
+                log "Keeping its checkout: it already has $release (\`routster update\` moves it to the next release)"
                 return 0
             fi
             if ! git -C "$INSTALL_DIR" merge-base --is-ancestor HEAD "$release" 2>/dev/null; then
-                log "Keeping its checkout: $release does not descend from it (\`hermes update\` decides that move)"
+                log "Keeping its checkout: $release does not descend from it (\`routster update\` decides that move)"
                 return 0
             fi
         else
@@ -825,9 +826,9 @@ stage_repository() {
                 git -C "$INSTALL_DIR" reset -q || fail "cannot clear the unmerged index in $INSTALL_DIR" local_changes_blocked
             fi
             run_logged "Stashing local changes" \
-                git -C "$INSTALL_DIR" stash push --include-untracked -m "hermes-install-autostash-$stamp" \
+                git -C "$INSTALL_DIR" stash push --include-untracked -m "routster-install-autostash-$stamp" \
                 || fail "could not stash local changes in $INSTALL_DIR; commit or move them aside, then rerun" local_changes_blocked
-            log_warn "local changes stashed as hermes-install-autostash-$stamp"
+            log_warn "local changes stashed as routster-install-autostash-$stamp"
         fi
         if [ -n "$release" ]; then
             # Detached at the release commit, the way `hermes update` places a stable checkout;
@@ -881,7 +882,7 @@ stage_repository() {
             if [ -d "$INSTALL_DIR" ] && [ ! -L "$INSTALL_DIR" ] && [ -z "$(ls -A "$INSTALL_DIR")" ]; then
                 rmdir "$INSTALL_DIR" || fail "cannot replace empty $INSTALL_DIR" filesystem_error
             else
-                fail "$INSTALL_DIR exists and is not a Hermes git checkout. Move it aside, or install elsewhere with --dir <path>." dir_not_checkout
+                fail "$INSTALL_DIR exists and is not a Routster Agent git checkout. Move it aside, or install elsewhere with --dir <path>." dir_not_checkout
             fi
         fi
         mkdir -p "$(dirname "$INSTALL_DIR")"
@@ -969,7 +970,7 @@ stage_repository() {
             || log_warn "could not disable gc.writeCommitGraph in $INSTALL_DIR"
         git -C "$INSTALL_DIR" config fetch.writeCommitGraph false \
             || log_warn "could not disable fetch.writeCommitGraph in $INSTALL_DIR"
-        log_success "Hermes Agent cloned"
+        log_success "Routster Agent cloned"
     fi
     if [ -n "$INSTALL_COMMIT" ] && [ "$pinned" = false ]; then
         # A rerun over an existing checkout pins here (a fresh clone pinned
@@ -1071,7 +1072,7 @@ append_shell_path() {
         return 0
     fi
     mkdir -p "$(dirname "$rc")"
-    printf '\n# Hermes Agent command\n%s\n' "$line" >> "$rc" || fail "cannot update PATH in $rc" filesystem_error
+    printf '\n# Routster Agent command\n%s\n' "$line" >> "$rc" || fail "cannot update PATH in $rc" filesystem_error
     log_success "added ~/.local/bin to PATH in $rc"
 }
 
@@ -1156,7 +1157,7 @@ stage_setup() {
         log "setup skipped (no terminal); run 'routster setup' after install"
         return 0
     fi
-    "$INSTALL_DIR/.hermes/bin/hermes" setup </dev/tty || fail "setup failed" setup_failed
+    "$INSTALL_DIR/.hermes/bin/routster" setup </dev/tty || fail "setup failed" setup_failed
 }
 
 stage_gateway() {
@@ -1202,7 +1203,7 @@ print_path_reload_hint() {
         bash|"") rc="source ~/.bashrc" ;;
         *) rc=". ~/.profile" ;;
     esac
-    log "Reload your shell to use hermes: open a new terminal, or run: $rc"
+    log "Reload your shell to use routster: open a new terminal, or run: $rc"
 }
 
 run_stage() (

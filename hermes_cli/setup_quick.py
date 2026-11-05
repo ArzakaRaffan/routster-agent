@@ -8,6 +8,8 @@ import os
 import sys
 from pathlib import Path
 
+from hermes_constants import display_hermes_home
+
 logger = logging.getLogger("hermes_cli.setup")
 
 # (env-var name substring, platform label, emoji) — order matters: first match wins.
@@ -85,38 +87,6 @@ def _run_portal_one_shot(config: dict) -> None:
     _record_setup_completed(config)
 
 
-def _imported_model_label(config: dict) -> str:
-    """``"<provider> · <model>"`` when *config* (just written by an agent import) names a model
-    Hermes has credentials for, else ``""``."""
-    from hermes_cli.auth import AuthError, resolve_provider
-    from hermes_cli.models import provider_label
-    from hermes_cli.setup_migration import _model_section_has_credentials
-    model = config.get("model")
-    name = model.get("default") if isinstance(model, dict) else model
-    if not (isinstance(name, str) and name.strip()) or not _model_section_has_credentials(config):
-        return ""
-    try:
-        provider = resolve_provider()
-    except AuthError:
-        return ""
-    return f"{provider_label(provider)} · {name.strip()}"
-
-
-def _keep_imported_model(config: dict, imported_from: str) -> bool:
-    """After an import that brought a model, ask whether to keep it (the default) or switch to
-    Routster; True keeps it."""
-    from hermes_cli.setup import _info, print_header, prompt_choice
-    label = _imported_model_label(config) if imported_from else ""
-    if not label:
-        return False
-    print_header("Model & Provider", gap=True)
-    _info(f"Settings were imported from {imported_from}.")
-    return prompt_choice(f"Keep your imported model ({label}) or switch to Routster?", [
-        f"Keep {label}",
-        "Switch to Routster — one API key, many models, Rupiah billing",
-    ], 0, description=f"  Settings were imported from {imported_from}.") == 0
-
-
 def _quick_setup_routster(config: dict) -> None:
     """Quick Setup's Routster step: API key (validated, saved), model pick with multipliers."""
     from hermes_cli.setup import _info, print_header
@@ -129,30 +99,22 @@ def _quick_setup_routster(config: dict) -> None:
         _reload_config_into(config)
 
 
-def _run_first_time_quick_setup(config: dict, hermes_home, is_existing: bool, imported_from: str = ""):
-    """Streamlined first-time setup via Routster: API key, model, terminal; everything else gets
-    defaults. A model brought by an agent import (*imported_from* names the agents) is offered first
-    and kept by default, which skips the Routster step. Messaging is not offered here (Routster
-    Agent is a terminal coding agent; `routster setup gateway` still exists)."""
-    from hermes_cli.setup import (
-        _apply_default_agent_settings, _info, _print_setup_summary, print_success, save_config,
-        setup_terminal_backend
-    )
-    # Step 1: the imported model, or Routster.
-    if not _keep_imported_model(config, imported_from):
-        _quick_setup_routster(config)
-
-    # Step 2: Terminal Backend; Step 3: defaults for everything else.
-    setup_terminal_backend(config)
-    _apply_default_agent_settings(config)
+def _run_first_time_quick_setup(config: dict, hermes_home, is_existing: bool):
+    """`routster setup`: Routster API key, then a model; everything else keeps its defaults
+    (local terminal, default agent settings). Other providers: `routster setup model`."""
+    from hermes_cli.setup import _apply_default_agent_settings, _info, print_success, save_config
+    _quick_setup_routster(config)
+    if not is_existing:
+        _apply_default_agent_settings(config)
     save_config(config)
 
     print()
-    print_success("Setup selesai! Jalankan `routster` untuk mulai.")
-    _info(None, "  Ganti model:          routster model", "  Semua pengaturan:     routster setup")
+    print_success("Setup selesai! Ketik `routster` untuk mulai.")
+    _info(None, "  Ganti model:          routster model",
+          "  Pakai provider lain:  routster setup model",
+          "  Pengaturan lengkap:   routster setup --reconfigure",
+          f"  Data tersimpan di:    {display_hermes_home()}")
     _print_macos_fda_tip()
-    print()
-    _print_setup_summary(config, hermes_home)
 
 
 def _print_macos_fda_tip() -> None:
