@@ -4,6 +4,7 @@
   "description": "A terminal coding agent: one Routster API key, many models, billed in Rupiah.",
   "private": true,
   "workspaces": [
+    "apps/shared",
     "ui-tui",
     "ui-tui/packages/*",
     "web",
