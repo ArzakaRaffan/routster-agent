@@ -34,6 +34,21 @@ def _check_record_selection(parser: argparse.ArgumentParser, args: argparse.Name
         parser.error("--record-selection records the --extra list of a project environment build")
 
 
+def _precompile_source(source: Path, python: Path | None) -> None:
+    """Best-effort: byte-compile the source tree so the first run skips the ~10s cold .pyc build.
+    A version-mismatched or failed compile is harmless — CPython ignores stale .pyc and recompiles —
+    so this never fails the install. Compiles with the target interpreter when known (matching the
+    venv's bytecode magic), else the one running pm."""
+    import subprocess
+
+    interp = str(python) if python else sys.executable
+    try:
+        subprocess.run([interp, "-m", "compileall", "-q", "-j", "0", str(source)],
+                       check=False, timeout=600)
+    except Exception:
+        pass
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     import pm
 
@@ -134,6 +149,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             if args.record_selection:
                 _record_selection(args.source, args.extras)
+            _precompile_source(args.source, args.python)
     except (pm.InstallError, OSError, ValueError) as exc:
         print(f"python environment: {exc}", file=sys.stderr)
         return 1
