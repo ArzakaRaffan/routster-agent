@@ -685,7 +685,7 @@ stable_target() {
     case "$CHANNEL" in
         main) return 0 ;;
         stable) ;;
-        *) [ "$BRANCH" = main ] && is_official_repo "$1" || return 0 ;;
+        *) return 0 ;;  # Routster cuts no release tags; a no-channel install tracks the main tip
     esac
     local release
     release="$(latest_stable_release "$1")"
