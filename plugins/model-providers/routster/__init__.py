@@ -163,18 +163,21 @@ def multiplier_note(row: dict[str, Any]) -> str:
     return note + (" · recommended for agents" if row.get("id") in ROUTSTER_AGENT_MODELS else "")
 
 
-def _total_multiplier(catalog: list[dict[str, Any]], model_id: str) -> float:
-    """input+output multiplier for *model_id*; +inf when unknown so `--cheap` sorts it last."""
+def _model_multipliers(catalog: list[dict[str, Any]], model_id: str):
+    """``(input_multiplier, output_multiplier)`` for *model_id*, or None when unknown."""
     row = next((r for r in catalog if r.get("id") == model_id), None)
     if not row:
-        return float("inf")
-    total = 0.0
-    for key in ("input_multiplier", "output_multiplier"):
-        value = row.get(key)
-        if not isinstance(value, (int, float)):
-            return float("inf")
-        total += value
-    return total
+        return None
+    in_m, out_m = row.get("input_multiplier"), row.get("output_multiplier")
+    if not isinstance(in_m, (int, float)) or not isinstance(out_m, (int, float)):
+        return None
+    return float(in_m), float(out_m)
+
+
+def _total_multiplier(catalog: list[dict[str, Any]], model_id: str) -> float:
+    """input+output multiplier for *model_id*; +inf when unknown so `--cheap` sorts it last."""
+    mult = _model_multipliers(catalog, model_id)
+    return float("inf") if mult is None else mult[0] + mult[1]
 
 
 def _resolve_base_url(args: Any) -> str:
@@ -258,6 +261,25 @@ class RoutsterProfile(ProviderProfile):
 
     def get_max_tokens(self, model: str | None) -> int | None:
         return min(self.default_max_tokens or ROUTSTER_DEFAULT_MAX_TOKENS, ROUTSTER_MAX_TOKENS_CAP)
+
+    def session_balance_units(self, rows, base_url: str = ""):
+        """``([(model, input_tokens, output_tokens, units|None)], total_units)`` for per-model usage rows.
+
+        ``units = input_tokens x input_multiplier + output_tokens x output_multiplier`` — exactly what the
+        gateway deducts from the balance. ``units`` is None when a model has no live ``/v1/models``
+        multiplier (e.g. a non-Routster route). Rupiah is deliberately not computed: the client only
+        knows relative multipliers, not the balance-unit-to-Rupiah rate (that needs a balance endpoint)."""
+        catalog = fetch_catalog(base_url or ROUTSTER_DEFAULT_BASE_URL)
+        lines, total = [], 0.0
+        for r in rows:
+            model = r.get("model") or "unknown"
+            in_tok, out_tok = int(r.get("input_tokens") or 0), int(r.get("output_tokens") or 0)
+            mult = _model_multipliers(catalog, model)
+            units = None if mult is None else in_tok * mult[0] + out_tok * mult[1]
+            if units is not None:
+                total += units
+            lines.append((model, in_tok, out_tok, units))
+        return lines, total
 
     def missing_credentials_hint(self) -> str | None:
         return (f"Run `routster login` with an API key from {ROUTSTER_DASHBOARD_URL} "

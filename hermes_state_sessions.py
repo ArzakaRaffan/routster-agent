@@ -874,6 +874,19 @@ class SessionSessionsMixin:
         )
         return dict(row) if row else None
 
+    def get_session_model_usage(self, session_id: str) -> list[dict[str, Any]]:
+        """Per-model main-loop token totals for a session (``task = ''``), newest route first.
+        Feeds ``/cost``; auxiliary rows (``task <> ''``) are excluded so the figure is the
+        agent's own spend, not vision/compression side calls."""
+        self.flush_for_read()
+        return [dict(r) for r in self._read_all(
+            """SELECT model, billing_provider, billing_base_url,
+                      input_tokens, output_tokens, api_call_count
+                 FROM session_model_usage
+                WHERE session_id = ? AND task = '' AND model <> 'unknown'
+                ORDER BY last_seen DESC, rowid DESC""",
+            (session_id,))]
+
     def resolve_session_id(self, session_id_or_prefix: str) -> Optional[str]:
         """Exact id, else the single unambiguous prefix match, else None."""
         exact = self.get_session(session_id_or_prefix)

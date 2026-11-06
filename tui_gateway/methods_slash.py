@@ -327,9 +327,37 @@ def _format_live_status_output(sid: str, session: dict, arg: str) -> str:
     return str(response.get("result", {}).get("output") or "")
 
 
+def _format_live_cost_output(sid: str, session: dict, arg: str) -> str:
+    from providers import get_provider_profile
+    rows: list = []
+    with _session_db(session) as db:
+        if db is not None:
+            with contextlib.suppress(Exception):
+                rows = db.get_session_model_usage(sid)
+    if not rows:
+        return "No model usage recorded in this session yet."
+    profile = get_provider_profile("routster")
+    if profile is None or not hasattr(profile, "session_balance_units"):
+        return "Routster provider unavailable; cannot compute balance units."
+    base_url = next((r.get("billing_base_url") for r in rows
+                     if (r.get("billing_provider") or "") == "routster" and r.get("billing_base_url")), "")
+    lines, total = profile.session_balance_units(rows, base_url)
+    out = ["Routster Session Cost (balance units)",
+           "────────────────────────────────────────"]
+    for model, in_tok, out_tok, units in lines:
+        value = "n/a (not a Routster model)" if units is None else f"{units:,.0f} units"
+        out.append(model)
+        out.append(f"    input {in_tok:,} · output {out_tok:,}  →  {value}")
+    out.append("────────────────────────────────────────")
+    out.append(f"Total: {total:,.0f} balance units")
+    out.append("(Rupiah value needs the gateway balance endpoint, so it is not shown.)")
+    return "\n".join(out)
+
+
 # name → (reply when there is no session, formatter(sid, session, arg) or a fixed reply).
 # A None no-session reply means the formatter handles a missing session itself.
 _LIVE_SLASH_OUTPUT = {
+    "cost": ("No model usage recorded in this session yet.", _format_live_cost_output),
     "compress": ("no active session for /compress",
                  lambda sid, session, arg: _mirror_slash_side_effects(sid, session, f"/compress {arg}".strip())),
     "usage": (_NO_AGENT_USAGE, _format_live_usage_output),
