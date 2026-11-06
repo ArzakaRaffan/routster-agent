@@ -12,6 +12,7 @@ from hermes_cli.curses_ui import curses_single_select
 from hermes_cli.mcp_catalog import (
     CatalogEntry, CatalogError, catalog_diagnostics, install_entry, is_enabled, is_installed,
     list_catalog, installed_servers, remove_server, server_enabled, uninstall_entry, _say,
+    FEATURED_SERVERS,
 )
 from hermes_cli.config import load_config, save_config
 
@@ -44,6 +45,10 @@ def _build_rows() -> list[_Row]:
 
     rows: list[_Row] = []
     for entry in catalog_entries:
+        # Curated default: show the featured set plus anything already installed. The rest of the
+        # catalog stays reachable via `routster mcp catalog` and `routster mcp add <name>`.
+        if entry.name not in FEATURED_SERVERS and entry.name not in servers:
+            continue
         cfg = servers.get(entry.name)
         if entry.name not in servers:
             status = _STATUS_NOT_INSTALLED

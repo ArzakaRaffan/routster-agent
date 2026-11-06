@@ -350,6 +350,15 @@ def _parse_manifest(path: Path) -> CatalogEntry:
 _CATALOG_DIAGNOSTICS: list[tuple] = []
 
 
+# Routster features a small, dev-focused subset in the interactive picker so the default list is not
+# 66 entries long. The full catalog is still browsable with `routster mcp catalog`, and any entry is
+# installable by name with `routster mcp add <name>`. Edit this set to taste.
+FEATURED_SERVERS = frozenset({
+    "context7", "deepwiki", "semgrep", "hugging_face",
+    "cloudflare", "vercel", "supabase", "sentry",
+})
+
+
 def list_catalog() -> list[CatalogEntry]:
     """Return all valid catalog entries, sorted by name.
 
