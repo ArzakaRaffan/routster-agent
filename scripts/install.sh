@@ -107,8 +107,11 @@ if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
     C_RED=$'\033[0;31m' C_GREEN=$'\033[0;32m' C_YELLOW=$'\033[0;33m'
     C_CYAN=$'\033[0;36m' C_MAGENTA=$'\033[0;35m' C_BOLD=$'\033[1m'
     C_DIM=$'\033[2m' C_NC=$'\033[0m'
+    # Routster route palette: gold done, amber in-flight, bronze rail.
+    C_GOLD=$'\033[38;5;220m' C_AMBER=$'\033[38;5;214m' C_BRONZE=$'\033[38;5;130m'
 else
     C_RED="" C_GREEN="" C_YELLOW="" C_CYAN="" C_MAGENTA="" C_BOLD="" C_DIM="" C_NC=""
+    C_GOLD="" C_AMBER="" C_BRONZE=""
 fi
 
 log() { printf '%s→%s %s\n' "$C_CYAN" "$C_NC" "$1"; }
@@ -191,13 +194,29 @@ stage_signal() {
 }
 
 print_banner() {
-    printf '\n%s%s' "$C_MAGENTA" "$C_BOLD"
-    printf '%s\n' "┌─────────────────────────────────────────────────────────┐"
-    printf '%s\n' "│             ◆ Routster Agent Installer                  │"
-    printf '%s\n' "├─────────────────────────────────────────────────────────┤"
-    printf '%s\n' "│  A coding agent in your terminal, on one Routster key.  │"
-    printf '%s\n' "└─────────────────────────────────────────────────────────┘"
-    printf '%s\n' "$C_NC"
+    printf '\n'
+    printf '%s%s      ●━━━●━━━●%s  %s%sROUTSTER%s\n' "$C_GOLD" "$C_BOLD" "$C_NC" "$C_BOLD" "$C_GOLD" "$C_NC"
+    printf '%s%s    ━━┫       ┣━━%s  %sone key for every model worth using%s\n' "$C_AMBER" "$C_BOLD" "$C_NC" "$C_DIM" "$C_NC"
+    printf '%s%s      ●━━━●━━━●%s  %sfirst run — this part takes a minute%s\n' "$C_BRONZE" "$C_BOLD" "$C_NC" "$C_DIM" "$C_NC"
+    printf '\n'
+}
+
+# Route-node progress line. $1 = 1-based current stage index, $2 = total,
+# $3 = stage title. Filled nodes are gold (done), the current node amber
+# (in flight), the rest a dim rail — the bar advances one node per stage,
+# so the whole install reads as one animated route coming online.
+route_progress() {
+    local idx="$1" total="$2" title="$3" i node bar="" pct=$(( $1 * 100 / $2 ))
+    for i in $(seq 1 "$total"); do
+        if [ "$i" -gt 1 ]; then
+            if [ "$i" -le "$idx" ]; then bar="${bar}${C_GOLD}━━${C_NC}"; else bar="${bar}${C_DIM}┄┄${C_NC}"; fi
+        fi
+        if [ "$i" -lt "$idx" ]; then bar="${bar}${C_GOLD}●${C_NC}"
+        elif [ "$i" -eq "$idx" ]; then bar="${bar}${C_AMBER}${C_BOLD}◆${C_NC}"
+        else bar="${bar}${C_DIM}○${C_NC}"; fi
+    done
+    printf '\n  %b   %s%s%3d%%%s\n' "$bar" "$C_GOLD" "$C_BOLD" "$pct" "$C_NC"
+    printf '  %s▸%s %s%s%s  %s(%d/%d)%s\n' "$C_AMBER" "$C_NC" "$C_BOLD" "$title" "$C_NC" "$C_DIM" "$idx" "$total" "$C_NC"
 }
 
 # Interactive runs collapse child-process output (git, uv, pm, the builds)
@@ -1187,7 +1206,9 @@ stage_complete() {
         "$INSTALL_DIR/.hermes/bin/hermes" update --set-channel "$CHANNEL" \
             || fail "could not save the $CHANNEL update channel" other
     fi
-    log_success "Routster Agent install complete. Run: routster"
+    printf '\n  %s%s●━━━●━━━●━━━●━━━●%s   %s%s100%%%s\n' "$C_GOLD" "$C_BOLD" "$C_NC" "$C_GOLD" "$C_BOLD" "$C_NC"
+    printf '  %s✦%s %s%sall routes online%s %s— run%s %s%srouster%s %sto begin%s\n\n' \
+        "$C_AMBER" "$C_NC" "$C_BOLD" "$C_GOLD" "$C_NC" "$C_DIM" "$C_NC" "$C_BOLD" "$C_GOLD" "$C_NC" "$C_DIM" "$C_NC"
 }
 
 print_path_reload_hint() {
@@ -1277,9 +1298,14 @@ if [ "${BASH_SOURCE[0]:-$0}" = "$0" ]; then
     # No --stage: run the whole ladder — the same authoritative list the
     # manifest prints, so --include-desktop inserts desktop here too.
     print_banner
+    _stage_total=0; for _s in $(stage_names); do _stage_total=$((_stage_total + 1)); done
+    _stage_idx=0
     for s in $(stage_names); do
         # A TERM/HUP noted while the previous stage ran stops the run before this one.
         [ -z "$INSTALL_SIGNAL" ] || install_interrupted
+        _stage_idx=$((_stage_idx + 1))
+        IFS='|' read -r _stage_title _ _ <<< "$(stage_record "$s")"
+        route_progress "$_stage_idx" "$_stage_total" "${_stage_title:-$s}"
         INSTALL_IN_STAGE=true
         run_stage "$s"
         rc=$?

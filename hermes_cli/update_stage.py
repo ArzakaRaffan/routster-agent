@@ -77,6 +77,7 @@ def publish_stage(message: str) -> None:
     mirrors the shim's write_status — a polling reader must never observe a
     half-written file.
     """
+    _render_stage_milestone(message)  # interactive terminal bar (independent of any desktop UI)
     path = status_file()
     if path is None:
         return
@@ -88,6 +89,81 @@ def publish_stage(message: str) -> None:
         os.replace(tmp, path)
     except OSError:
         pass
+
+
+# === Interactive terminal progress (route-node bar) =========================
+# An interactive `routster update` sets ROUTSTER_UPDATE_TTY=1; the completion
+# child inherits it AND the terminal stdout (run_completion spawns with
+# stdout=None), so hooking publish_stage here advances one bar across both
+# processes. Every other context — the desktop shim, captured subprocesses,
+# non-update builds — has the env unset or a non-tty stdout and renders
+# nothing. Stdlib-only and never raises: a progress hiccup must not fail an update.
+
+TTY_ENV = "ROUTSTER_UPDATE_TTY"
+_last_pct = -1
+
+# message substring -> (monotonic percent, label). First match wins.
+_MILESTONES = (
+    ("download", 12, "pulling the latest"),
+    ("python dep", 45, "rebuilding the runtime"),
+    ("dependenc", 45, "rebuilding the runtime"),
+    ("building", 74, "building the apps"),
+    ("packaging", 74, "building the apps"),
+    ("webapp", 74, "building the apps"),
+    ("web ui", 74, "building the apps"),
+    ("tui", 74, "building the apps"),
+    ("restart", 92, "restarting the gateway"),
+)
+
+
+def _tty_enabled() -> bool:
+    import sys
+    if os.environ.get(TTY_ENV) != "1" or os.environ.get("NO_COLOR"):
+        return False
+    try:
+        return bool(sys.stdout.isatty())
+    except Exception:
+        return False
+
+
+def render_route(pct: int, label: str) -> None:
+    """Print one monotonic route-node line to the terminal. Best-effort, never raises."""
+    global _last_pct
+    import sys
+    if not _tty_enabled():
+        return
+    try:
+        pct = 100 if pct > 100 else 0 if pct < 0 else int(pct)
+        if pct <= _last_pct:
+            return
+        _last_pct = pct
+        g, a, d, r = "\033[38;5;220m", "\033[1;38;5;214m", "\033[2m", "\033[0m"
+        n = 6
+        idx = round(pct / 100 * n) or 1
+        done = pct >= 100
+        parts = []
+        for k in range(1, n + 1):
+            if k > 1:
+                parts.append(f"{g}━━{r}" if k <= idx else f"{d}┄┄{r}")
+            if done or k < idx:
+                parts.append(f"{g}●{r}")
+            elif k == idx:
+                parts.append(f"{a}◆{r}")
+            else:
+                parts.append(f"{d}○{r}")
+        mark = f"{a}✦{r}" if done else f"{a}▸{r}"
+        sys.stdout.write(f"  {''.join(parts)}  {g}{pct:>3}%{r}  {mark} {d}{label}{r}\n")
+        sys.stdout.flush()
+    except Exception:
+        pass
+
+
+def _render_stage_milestone(message: str) -> None:
+    low = (message or "").lower()
+    for key, pct, label in _MILESTONES:
+        if key in low:
+            render_route(pct, label)
+            return
 
 
 def _ui_present_in_log(log_text: str) -> bool:

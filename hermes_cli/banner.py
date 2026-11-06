@@ -357,6 +357,63 @@ def _defer_update_notice(max_wait: float = 30.0) -> None:
     _daemon("update-notice", _wait_and_print)  # never break the session over an update notice
 
 
+# === Startup route-warming animation ===
+# A short branded loader on stderr while the banner's inputs compute (cold tool
+# enumeration is ~0.5-0.9s). stderr-only so it never pollutes the banner's stdout
+# or any output-capturing test; a no-op off a TTY, under pytest, or with NO_COLOR.
+
+_startup_loader_thread: Optional[threading.Thread] = None
+_startup_loader_stop: Optional[threading.Event] = None
+
+
+def startup_loader() -> None:
+    """Start the route-warming animation (idempotent; auto-stopped by the banner)."""
+    global _startup_loader_thread, _startup_loader_stop
+    if _startup_loader_thread is not None:
+        return
+    if _skip_background_prefetch() or os.environ.get("NO_COLOR"):
+        return
+    if not _quiet(lambda: sys.stderr.isatty(), False):
+        return
+    stop = threading.Event()
+    _startup_loader_stop = stop
+
+    def _run() -> None:
+        gold, amber, dim, rst = "\033[38;5;220m", "\033[1;38;5;214m", "\033[2m", "\033[0m"
+        labels = ("checking your key", "loading tools", "reading skills", "opening the gateway")
+        n = 5
+        i = 0
+        while not stop.wait(0.09):
+            pos = i % n
+            cells = []
+            for k in range(n):
+                if k > 0:
+                    cells.append(f"{gold}━━{rst}" if k <= pos else f"{dim}┄┄{rst}")
+                cells.append(f"{amber}◆{rst}" if k == pos else
+                             f"{gold}●{rst}" if k < pos else f"{dim}○{rst}")
+            label = labels[(i // n) % len(labels)]
+            _quiet(lambda: (sys.stderr.write(f"\r  {''.join(cells)}  {dim}routster · {label}…{rst}\033[K"),
+                            sys.stderr.flush()))
+            i += 1
+
+    t = threading.Thread(target=_run, name="routster-startup-loader", daemon=True)
+    _startup_loader_thread = t
+    t.start()
+
+
+def stop_startup_loader() -> None:
+    """Stop the route-warming animation and erase its line (idempotent)."""
+    global _startup_loader_thread, _startup_loader_stop
+    if _startup_loader_stop is not None:
+        _startup_loader_stop.set()
+    t = _startup_loader_thread
+    _startup_loader_thread = None
+    _startup_loader_stop = None
+    if t is not None:
+        _quiet(lambda: t.join(timeout=0.3))
+        _quiet(lambda: (sys.stderr.write("\r\033[K"), sys.stderr.flush()))
+
+
 # === Welcome banner ===
 
 def _plural(n: int, word: str) -> str:
@@ -675,6 +732,7 @@ def build_welcome_banner(
     """
     from rich.panel import Panel
     from rich.table import Table
+    stop_startup_loader()  # erase the route-warming line before the banner lands
     if get_toolset_for_tool is None:
         from model_tools import get_toolset_for_tool
     tools = tools or []
@@ -742,9 +800,7 @@ def build_welcome_banner(
     layout_table.add_column("right", justify="left")
     layout_table.add_row("\n".join(left_lines), "\n".join(right_lines))
     version_label = format_banner_version_label()
-    release_info = get_latest_release_tag()
-    if release_info:
-        version_label = f"[link={release_info[1]}]{version_label}[/link]"
+    # Routster fork: the title stays plain text — no outbound repo link in the banner.
     outer_panel = Panel(
         layout_table, title=f"[bold {_skin_color('banner_title', '#FFD700')}]{version_label}[/]",
         border_style=_skin_color("banner_border", "#CD7F32"), padding=(0, 2))

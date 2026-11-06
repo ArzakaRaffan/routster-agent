@@ -679,12 +679,36 @@ function Write-Err([string]$msg) { Write-Host "[X] $msg" -ForegroundColor Red }
 
 function Write-Banner {
     Write-Host ""
-    Write-Host "+---------------------------------------------------------+" -ForegroundColor Magenta
-    Write-Host "|             * Routster Agent Installer                  |" -ForegroundColor Magenta
-    Write-Host "+---------------------------------------------------------+" -ForegroundColor Magenta
-    Write-Host "|  A coding agent in your terminal, on one Routster key.  |" -ForegroundColor Magenta
-    Write-Host "+---------------------------------------------------------+" -ForegroundColor Magenta
+    Write-Host "      " -NoNewline
+    Write-Host "@==@==@" -NoNewline -ForegroundColor Yellow
+    Write-Host "  ROUTSTER" -ForegroundColor Yellow
+    Write-Host "    ==|     |==" -NoNewline -ForegroundColor DarkYellow
+    Write-Host "  one key for every model worth using" -ForegroundColor DarkGray
+    Write-Host "      " -NoNewline
+    Write-Host "@==@==@" -NoNewline -ForegroundColor DarkYellow
+    Write-Host "  first run - this part takes a minute" -ForegroundColor DarkGray
     Write-Host ""
+}
+
+# Route-node progress line (one per stage) -- the gold rail fills in as the
+# install advances, reading as one route coming online. Index is 1-based.
+function Write-RouteProgress([int]$Index, [int]$Total, [string]$Title) {
+    $pct = [math]::Floor($Index * 100 / $Total)
+    Write-Host ""
+    Write-Host "  " -NoNewline
+    for ($i = 1; $i -le $Total; $i++) {
+        if ($i -gt 1) {
+            if ($i -le $Index) { Write-Host "==" -NoNewline -ForegroundColor Yellow }
+            else { Write-Host ".." -NoNewline -ForegroundColor DarkGray }
+        }
+        if ($i -lt $Index) { Write-Host "@" -NoNewline -ForegroundColor Yellow }
+        elseif ($i -eq $Index) { Write-Host "O" -NoNewline -ForegroundColor White }
+        else { Write-Host "o" -NoNewline -ForegroundColor DarkGray }
+    }
+    Write-Host ("   {0,3}%" -f $pct) -ForegroundColor Yellow
+    Write-Host "  > " -NoNewline -ForegroundColor White
+    Write-Host $Title -NoNewline
+    Write-Host ("  ({0}/{1})" -f $Index, $Total) -ForegroundColor DarkGray
 }
 
 # Windows PowerShell 5.1 turns a native command's stderr into an ErrorRecord
@@ -1565,7 +1589,16 @@ function Stage-Complete {
         $marker | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $InstallDir ".hermes-bootstrap-complete") -Encoding UTF8
     }
     if ($Channel) { Invoke-InstalledHermes @('update', '--set-channel', $Channel) }
-    if ($commit) { Write-Ok "Routster Agent install complete (pinned $commit). Run: routster" }
+    Write-Host ""
+    Write-Host "  @==@==@==@==@" -NoNewline -ForegroundColor Yellow
+    Write-Host "   100%" -ForegroundColor Yellow
+    Write-Host "  * " -NoNewline -ForegroundColor White
+    Write-Host "all routes online" -NoNewline -ForegroundColor Yellow
+    Write-Host "  - run " -NoNewline -ForegroundColor DarkGray
+    Write-Host "routster" -NoNewline -ForegroundColor Yellow
+    Write-Host " to begin" -ForegroundColor DarkGray
+    if ($commit) { Write-Verbose "Routster Agent install complete (pinned $commit)." }
+    Write-Host ""
 }
 
 function New-DesktopShortcuts {
@@ -1718,9 +1751,13 @@ $script:InstallStage = "prerequisites"
 $script:InstallReceiptWritten = $false
 try {
     Write-Banner
+    $stageTotal = $Stages.Count
+    $stageIndex = 0
     foreach ($s in $Stages) {
+        $stageIndex++
         $script:InstallStage = $s.name
         $script:FailureClass = ""
+        Write-RouteProgress $stageIndex $stageTotal $s.title
         Invoke-StageByName $s.name
     }
     Write-InstallReceipt "success" "none" "none"

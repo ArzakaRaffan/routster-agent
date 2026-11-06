@@ -327,6 +327,9 @@ def _print_update_completion(message: str) -> None:
     See #47359, #58764.
     """
     from hermes_cli.update_cmd import _branch_head_suffix
+    if message.startswith("✓"):
+        from hermes_cli.update_stage import render_route
+        render_route(100, "all routes synced")  # no-op unless the interactive bar is armed
     print(f"{message}{_branch_head_suffix()}")
     action_id = os.environ.get("HERMES_ACTION_ID", "")
     if len(action_id) == 32 and all(char in "0123456789abcdef" for char in action_id):

@@ -1813,6 +1813,19 @@ def _cmd_update_impl(args, gateway_mode: bool):
     # _old_updater.in_historical_update(); historical on-disk updaters do not
     # declare this local, so only they hand off through retired shims.
     _hermes_current_updater_frame = True
+    # Arm the interactive route-progress bar (update_stage renders it from every
+    # publish_stage milestone, across this process and the completion child).
+    # Interactive TTY only, so gateway/fleet/JSON output stays clean.
+    try:
+        import os as _os
+        if not gateway_mode and sys.stdout.isatty() and not _os.environ.get("NO_COLOR"):
+            _os.environ["ROUTSTER_UPDATE_TTY"] = "1"
+            _g, _b, _r = "\033[38;5;220m", "\033[1m", "\033[0m"
+            print(f"\n  {_g}{_b}ROUTSTER{_r}  \033[2mpulling in the new build — sit tight\033[0m")
+            from hermes_cli.update_stage import render_route
+            render_route(4, "checking the source")
+    except Exception:
+        pass
     _commit.begin_update_attempt()  # nothing an earlier update in this process armed is ours (O5)
     from hermes_cli.update_proxy_env import prefer_dotenv_proxy_env
     prefer_dotenv_proxy_env()  # the .env loaded at import beats a system proxy the Desktop injected

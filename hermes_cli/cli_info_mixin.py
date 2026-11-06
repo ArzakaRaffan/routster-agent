@@ -147,13 +147,15 @@ class CLIInfoMixin:
     def show_banner(self):
         """Display the welcome banner in Claude Code style."""
         from cli import _build_compact_banner, get_tool_definitions, logger
-        from hermes_cli.banner import build_welcome_banner
+        from hermes_cli.banner import build_welcome_banner, startup_loader, stop_startup_loader
         self.console.clear()
+        startup_loader()  # branded route-warming animation while the banner's inputs compute
         store, gateway_inventory, ctx_len, banner_kw = banner_plan(self, self.console)
         on_gateway = store is not None  # its tools come from the gateway: never enumerated here
 
         # Auto-compact for narrow terminals — the full banner needs ~80 columns to avoid wrapping.
         if banner_kw is None:
+            stop_startup_loader()  # erase the route-warming line before the compact banner
             self._console_print(_build_compact_banner())
             self._show_status()
         else:
