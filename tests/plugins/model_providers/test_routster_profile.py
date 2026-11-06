@@ -85,9 +85,10 @@ class TestErrorMapping:
     @pytest.mark.parametrize("status,error,reason,retryable", [
         (401, {"message": "invalid api key"}, "auth_permanent", False),
         (403, {"message": "email belum diverifikasi. verifikasi dulu di https://x/login"}, "auth_permanent", False),
-        (402, {"message": "saldo token habis. top-up dulu.", "type": "quota"}, "billing", False),
-        (429, {"message": "token quota 24h tercapai", "type": "quota"}, "billing", False),
-        (429, {"message": "rate limit per key tercapai. pelan dikit ya.", "type": "rate_limit"}, "rate_limit", True),
+        (403, {"message": "email not verified. verify it at https://x/login"}, "auth_permanent", False),
+        (402, {"message": "token balance exhausted. top up first.", "type": "quota"}, "billing", False),
+        (429, {"message": "24h token quota reached", "type": "quota"}, "billing", False),
+        (429, {"message": "per-key rate limit reached. slow down.", "type": "rate_limit"}, "rate_limit", True),
         (400, {"message": "unknown_model"}, "model_not_found", False),
         (409, {"message": "model_pricing_pending"}, "model_not_found", False),
         (503, {"message": "This model is unavailable.", "code": "model_unavailable"}, "model_not_found", False),
@@ -110,7 +111,7 @@ class TestErrorMapping:
 
         class Fake402(Exception):
             status_code = 402
-            body = {"error": {"message": "saldo token habis. top-up dulu.", "type": "quota"}}
+            body = {"error": {"message": "token balance exhausted. top up first.", "type": "quota"}}
 
         classified = classify_api_error(Fake402("402"), provider="routster", model="routster/glm-5.3")
         assert classified.reason is FailoverReason.billing
@@ -140,11 +141,11 @@ class TestKeyCheck:
 
     def test_bad_key_is_rejected(self, plugin_module, gateway):
         ok, message = plugin_module.check_api_key("rk-wrong", gateway.base_url)
-        assert not ok and "ditolak" in message
+        assert not ok and "rejected" in message
 
     def test_unreachable_gateway_is_reported(self, plugin_module):
         ok, message = plugin_module.check_api_key(GOOD_KEY, "http://127.0.0.1:9/v1")
-        assert not ok and "Tidak bisa menghubungi" in message
+        assert not ok and "Cannot reach" in message
 
 
 def test_catalog_notes_show_multipliers(plugin_module, gateway):

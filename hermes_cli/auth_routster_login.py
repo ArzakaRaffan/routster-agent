@@ -19,4 +19,4 @@ def login_command(args) -> None:
     current = str((model_cfg.get("default") if isinstance(model_cfg, dict) else model_cfg) or "")
     if flow is None or flow({}, current, args, pick_model=False) is None:
         raise SystemExit(1)
-    print("\n  Siap! Jalankan `routster` untuk mulai, atau `routster model` untuk ganti model.")
+    print("\n  Ready! Run `routster` to start, or `routster model` to change the model.")

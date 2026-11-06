@@ -1,21 +1,21 @@
 # Routster Agent
 
-Coding agent di terminal yang ditenagai **[Routster](https://routster.trackster.dev)**: satu API
-key, banyak model (DeepSeek, GLM, Kimi, MiniMax, dan lain-lain), saldo dalam Rupiah.
+A terminal coding agent powered by **[Routster](https://routster.trackster.dev)**: one API key,
+many models (DeepSeek, GLM, Kimi, MiniMax, and more), billed in Rupiah.
 
-Ketik tugas, lalu agent membaca file, mengedit, menjalankan perintah shell (dengan konfirmasi), dan
-mengulang sampai tugasnya selesai.
+Type a task, and the agent reads files, edits them, runs shell commands (with confirmation), and
+keeps going until the task is done.
 
-> Routster Agent adalah fork dari **[Hermes Agent](https://github.com/NousResearch/hermes-agent)
-> buatan Nous Research** (lisensi MIT). Seluruh TUI, agent loop, tools, dan sandbox berasal dari
-> Hermes. README asli Hermes ada di [README.hermes.md](README.hermes.md), dan perubahan fork ini
-> dicatat di [FORK.md](FORK.md).
+> Routster Agent is a fork of **[Hermes Agent](https://github.com/NousResearch/hermes-agent)
+> by Nous Research** (MIT license). The whole TUI, agent loop, tools, and sandbox come from
+> Hermes. The original Hermes README is in [README.hermes.md](README.hermes.md), and the fork's
+> changes are listed in [FORK.md](FORK.md).
 
-## Mulai dalam 2 menit
+## Get started in 2 minutes
 
-1. **Ambil API key.** Daftar di <https://routster.trackster.dev>, top up saldo (QRIS), lalu salin
-   API key dari [dashboard](https://routster.trackster.dev/dashboard).
-2. **Instal (satu baris):**
+1. **Get an API key.** Sign up at <https://routster.trackster.dev>, top up your balance (QRIS), then
+   copy your API key from the [dashboard](https://routster.trackster.dev/dashboard).
+2. **Install (one line):**
 
    ```bash
    # macOS / Linux / WSL
@@ -27,11 +27,11 @@ mengulang sampai tugasnya selesai.
    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/ArzakaRaffan/routster-agent/main/scripts/install.ps1)))
    ```
 
-   Installer menyiapkan Python lewat `uv`, meng-clone repo ini ke `~/.routster`, lalu memasang
-   perintah `routster`. Semua data Routster ada di `~/.routster`, terpisah dari Hermes Agent
-   (`~/.hermes` dan perintah `hermes` tidak disentuh). Tidak ada service background yang dipasang.
+   The installer sets up Python via `uv`, clones this repo into `~/.routster`, then installs the
+   `routster` command. All Routster data lives in `~/.routster`, separate from Hermes Agent
+   (`~/.hermes` and the `hermes` command are left untouched). No background service is installed.
 
-   <details><summary>Instal manual dari source</summary>
+   <details><summary>Manual install from source</summary>
 
    ```bash
    git clone https://github.com/ArzakaRaffan/routster-agent.git
@@ -41,74 +41,74 @@ mengulang sampai tugasnya selesai.
    mkdir -p ~/.local/bin && ln -sf ~/.local/share/routster-agent/venv/bin/routster ~/.local/bin/routster
    ```
 
-   `pip install`/`uv tool install` biasa **tidak** bisa dipakai, karena pin dependensi upstream
-   hanya bisa di-resolve lewat `uv.lock` + PM.
+   A plain `pip install`/`uv tool install` does **not** work, because the upstream dependency pins
+   only resolve through `uv.lock` + PM.
    </details>
 
-3. **Login dan mulai:**
+3. **Log in and start:**
 
    ```bash
-   routster login     # tempel API key (input disembunyikan), divalidasi tanpa memotong saldo
-   routster           # mulai sesi di folder project kamu
+   routster login     # paste your API key (input hidden); validated without spending balance
+   routster           # start a session in your project folder
    ```
 
-## Perintah penting
+## Key commands
 
-| Perintah | Fungsi |
+| Command | What it does |
 |---|---|
-| `routster` | Sesi interaktif (TUI) |
-| `routster -z "tugas"` | Satu tugas sekali jalan, tanpa interaksi |
-| `routster login` | Simpan dan validasi API key Routster, jadikan Routster provider default |
-| `routster model` | Pilih model. Multiplier input/output tiap model ditampilkan |
-| `routster setup` | API key Routster + pilih model (`--reconfigure` untuk pengaturan lengkap) |
-| `routster doctor` | Cek konfigurasi |
-| `routster update` | Update ke versi terbaru dari repo ini (branch `main`) |
-| `routster dashboard` | Dashboard web lokal (port 9119) |
-| `routster auth add <provider>` | Sambungkan API key provider kamu sendiri |
+| `routster` | Interactive session (TUI) |
+| `routster -z "task"` | One-shot task, no interaction |
+| `routster login` | Save and validate your Routster API key, make Routster the default provider |
+| `routster model` | Pick a model. Shows each model's input/output multiplier |
+| `routster setup` | Routster API key + model pick (`--reconfigure` for the full settings) |
+| `routster doctor` | Check your configuration |
+| `routster update` | Update to the latest version from this repo (`main` branch) |
+| `routster dashboard` | Local web dashboard (port 9119) |
+| `routster auth add <provider>` | Connect your own provider API key |
 
-## Model dan biaya
+## Models and cost
 
-Saldo dipotong `input_tokens × input_multiplier + output_tokens × output_multiplier` per request,
-dan satu tugas agent bisa memanggil API berkali-kali. Daftar model selalu diambil dari
-`/v1/models`, dan picker `routster model` menampilkan multiplier-nya.
+Each request costs `input_tokens × input_multiplier + output_tokens × output_multiplier` from your
+balance, and one agent task can call the API many times. The model list always comes from
+`/v1/models`, and the `routster model` picker shows the multipliers.
 
-- Default: `routster/deepseek-v4.1-flash` (multiplier 1×/1×, murah).
-- Direkomendasikan untuk agent (dikurasi manual): `routster/deepseek-v4-pro`, `routster/glm-5.3`,
+- Default: `routster/deepseek-v4.1-flash` (multiplier 1×/1×, cheap).
+- Recommended for agent work (hand-curated): `routster/deepseek-v4-pro`, `routster/glm-5.3`,
   `routster/glm-5.3-flash`, `routster/kimi-k2.7`, `routster/minimax-m3`.
-- Agent selalu mengirim `max_tokens` (default 8192). Gateway memesan saldo sebesar `max_tokens`
-  sebelum request jalan, jadi naikkan lewat `model.max_tokens` di config hanya kalau perlu.
+- The agent always sends `max_tokens` (default 8192). The gateway reserves balance for the full
+  `max_tokens` before the request runs, so only raise `model.max_tokens` in config when you need to.
 
-## Keamanan
+## Security
 
-- API key disimpan di `~/.routster/.env` dengan permission `600`, atau dibaca dari env `ROUTSTER_API_KEY`.
-  Jangan commit key ke repo.
-- Perintah shell yang berbahaya meminta persetujuan dulu (mode approval `smart` bawaan Hermes).
-  `--yolo` mematikan konfirmasi, jadi gunakan dengan hati-hati.
-- Sandbox: secara default perintah dijalankan langsung di mesin kamu. Untuk isolasi, pilih backend
-  Docker, SSH, Modal, Daytona, atau Vercel Sandbox lewat `routster setup terminal`.
-- Routster tidak menyimpan isi prompt/response, hanya metadata (jumlah token, model, status).
+- Your API key is stored in `~/.routster/.env` with permission `600`, or read from the
+  `ROUTSTER_API_KEY` env var. Never commit your key to a repo.
+- Dangerous shell commands ask for approval first (Hermes's built-in `smart` approval mode).
+  `--yolo` turns confirmation off, so use it with care.
+- Sandbox: by default commands run directly on your machine. For isolation, pick a Docker, SSH,
+  Modal, Daytona, or Vercel Sandbox backend with `routster setup terminal`.
+- Routster does not store prompt/response content, only metadata (token counts, model, status).
 
-## Konfigurasi lanjutan
+## Advanced configuration
 
-| Variabel / key | Fungsi |
+| Variable / key | What it does |
 |---|---|
-| `ROUTSTER_API_KEY` | API key (alternatif dari `routster login`) |
-| `ROUTSTER_BASE_URL` | Ganti gateway, misalnya staging atau `http://localhost:8000/v1` |
-| `model.max_tokens` (config.yaml) | Batas output per request (maks. 32768) |
+| `ROUTSTER_API_KEY` | API key (alternative to `routster login`) |
+| `ROUTSTER_BASE_URL` | Use a different gateway, e.g. staging or `http://localhost:8000/v1` |
+| `model.max_tokens` (config.yaml) | Output limit per request (max 32768) |
 
-Provider lain (OpenRouter, Anthropic, dan lain-lain) tetap bisa dipakai lewat `routster model` atau
-config. Routster cuma jadi default.
+Other providers (OpenRouter, Anthropic, and more) still work through `routster model` or the
+config. Routster is just the default.
 
 ## Status
 
-Ini versi awal. Yang belum dikerjakan:
+This is an early version. Not done yet:
 
-- Installer satu baris belum diuji end-to-end di mesin bersih.
-- Saldo belum tampil di status bar, karena gateway belum punya endpoint saldo berbasis API key.
-- Fitur bawaan Hermes yang tidak relevan (messaging gateway, kanban, cron, desktop app, akun Nous)
-  disembunyikan dari menu, tapi kodenya masih ada. Detail di [FORK.md](FORK.md).
+- The one-line installer has not been tested end-to-end on a clean machine.
+- Balance is not shown in the status bar, because the gateway has no API-key-based balance endpoint yet.
+- Built-in Hermes features that don't apply here (messaging gateway, kanban, cron, desktop app,
+  Nous account) are hidden from the menus, but the code is still there. Details in [FORK.md](FORK.md).
 
-## Lisensi
+## License
 
-MIT, sama seperti Hermes Agent. Copyright (c) 2025 Nous Research untuk kode Hermes. Lihat
+MIT, same as Hermes Agent. Copyright (c) 2025 Nous Research for the Hermes code. See
 [LICENSE](LICENSE).

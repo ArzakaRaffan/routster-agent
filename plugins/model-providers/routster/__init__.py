@@ -55,7 +55,8 @@ _STOP = {"retryable": False, "should_rotate_credential": False, "should_fallback
 # (status, matcher, verdict). Matchers see (message, type, code); first hit wins.
 _RULES: tuple[tuple[int, Any, dict[str, Any]], ...] = (
     (401, lambda m, t, c: True, {"reason": "auth_permanent", **_STOP}),
-    (403, lambda m, t, c: "verifikasi" in m, {"reason": "auth_permanent", **_STOP}),
+    (403, lambda m, t, c: "verif" in m,  # gateway: "email belum diverifikasi" / "verify"
+     {"reason": "auth_permanent", **_STOP}),
     (402, lambda m, t, c: True, {"reason": "billing", **_STOP}),
     (429, lambda m, t, c: t == "quota", {"reason": "billing", **_STOP}),
     (429, lambda m, t, c: t == "rate_limit",
@@ -63,6 +64,7 @@ _RULES: tuple[tuple[int, Any, dict[str, Any]], ...] = (
     (400, lambda m, t, c: m == "unknown_model", {"reason": "model_not_found", **_STOP}),
     (409, lambda m, t, c: "model_pricing_pending" in m, {"reason": "model_not_found", **_STOP}),
     (503, lambda m, t, c: c == "model_unavailable", {"reason": "model_not_found", **_STOP}),
+    # The gateway's literal (Indonesian) messages: "content too long", "too many messages".
     (400, lambda m, t, c: m in {"konten terlalu panjang", "terlalu banyak messages"},
      {"reason": "payload_too_large", "should_compress": True}),
     (400, lambda m, t, c: m.startswith("max_tokens must be"), {"reason": "format_error", **_STOP}),
@@ -120,7 +122,7 @@ def check_api_key(api_key: str, base_url: str) -> tuple[bool, str]:
 
     ``/v1/models`` is public (it ignores the key), so this posts an empty ``messages`` list: the
     gateway checks the key (401/403) before it parses the body, and rejects an empty list (400
-    "messages kosong") before reserving any balance. It costs one request of the per-key rate limit.
+    "messages kosong", i.e. "messages empty") before reserving any balance. It costs one request of the per-key rate limit.
     """
     status, body = _request(f"{base_url.rstrip('/')}/chat/completions", api_key=api_key,
                             body={"model": ROUTSTER_DEFAULT_MODEL, "messages": [], "max_tokens": 1})
@@ -128,14 +130,14 @@ def check_api_key(api_key: str, base_url: str) -> tuple[bool, str]:
     if status == 400:
         return True, "API key valid."
     if status == 401:
-        return False, f"API key ditolak (invalid). Cek lagi key kamu di {ROUTSTER_DASHBOARD_URL}"
+        return False, f"API key rejected (invalid). Check your key at {ROUTSTER_DASHBOARD_URL}"
     if status == 403:
-        return False, f"Akun belum bisa dipakai: {msg or 'forbidden'}"
+        return False, f"Account cannot be used yet: {msg or 'forbidden'}"
     if status == 429:
-        return True, "API key valid (sedang kena rate limit, coba lagi sebentar lagi)."
+        return True, "API key valid (currently rate limited, try again shortly)."
     if status == 0:
-        return False, f"Tidak bisa menghubungi {base_url}. Cek koneksi internet / ROUTSTER_BASE_URL."
-    return False, f"Jawaban tak terduga dari gateway (HTTP {status}): {msg or body!r}"
+        return False, f"Cannot reach {base_url}. Check your internet connection / ROUTSTER_BASE_URL."
+    return False, f"Unexpected response from the gateway (HTTP {status}): {msg or body!r}"
 
 
 def fetch_catalog(base_url: str, *, timeout: float = 8.0) -> list[dict[str, Any]]:
@@ -158,7 +160,7 @@ def multiplier_note(row: dict[str, Any]) -> str:
     def fmt(value: Any) -> str:
         return "?" if value is None else f"{value:g}" if isinstance(value, (int, float)) else str(value)
     note = f"input x{fmt(row.get('input_multiplier'))} / output x{fmt(row.get('output_multiplier'))}"
-    return note + (" · rekomendasi agent" if row.get("id") in ROUTSTER_AGENT_MODELS else "")
+    return note + (" · recommended for agents" if row.get("id") in ROUTSTER_AGENT_MODELS else "")
 
 
 def _resolve_base_url(args: Any) -> str:
@@ -180,14 +182,14 @@ def _obtain_api_key(args: Any, base_url: str) -> str | None:
         key = given
         if not key:
             if attempt == 0:
-                _say("", f"  Ambil API key di {ROUTSTER_DASHBOARD_URL} (daftar + top up saldo dulu).")
-            hint = f" [Enter = pakai key tersimpan …{saved[-4:]}]" if saved else ""
+                _say("", f"  Get an API key at {ROUTSTER_DASHBOARD_URL} (sign up + top up your balance first).")
+            hint = f" [Enter = use saved key …{saved[-4:]}]" if saved else ""
             answer = _ask(f"  Routster API key{hint}: ", secret=True)
             if answer is None:
                 return None
             key = answer or saved
         if not key:
-            print("  Tidak ada API key. Dibatalkan.")
+            print("  No API key. Cancelled.")
             return None
         ok, message = check_api_key(key, base_url)
         print(f"  {'✓' if ok else '✗'} {message}")
@@ -228,7 +230,7 @@ def routster_model_setup_flow(config: Any, current_model: str = "", args: Any = 
             ordered, "Model name: ", current_model=current_model or ROUTSTER_DEFAULT_MODEL,
             confirm_provider="routster", confirm_base_url=base_url, confirm_api_key=api_key, notes=notes)
     if ids and selected and selected not in ids:
-        print(f"  ⚠ {selected} tidak ada di /v1/models saat ini; tetap disimpan.")
+        print(f"  ⚠ {selected} is not in /v1/models right now; saved anyway.")
     custom_base = base_url != ROUTSTER_DEFAULT_BASE_URL
     return _finish_model(selected, "routster", f"  ✓ Model default: {selected} (via Routster)",
                          base_url=base_url if custom_base else None, drop_base_url=not custom_base,

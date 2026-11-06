@@ -92,7 +92,7 @@ def _quick_setup_routster(config: dict) -> None:
     from hermes_cli.setup import _info, print_header
     from providers import get_provider_profile
     print_header("Routster", gap=True)
-    _info(None, "  Satu API key Routster untuk semua model, saldo dalam Rupiah.", None)
+    _info(None, "  One Routster API key for every model, billed in Rupiah.", None)
     flow = getattr(get_provider_profile("routster"), "model_setup_flow", None)
     model = config.get("model") if isinstance(config.get("model"), dict) else {}
     if flow is not None and flow(config, str(model.get("default") or ""), None) is not None:
@@ -109,11 +109,11 @@ def _run_first_time_quick_setup(config: dict, hermes_home, is_existing: bool):
     save_config(config)
 
     print()
-    print_success("Setup selesai! Ketik `routster` untuk mulai.")
-    _info(None, "  Ganti model:          routster model",
-          "  Pakai provider lain:  routster setup model",
-          "  Pengaturan lengkap:   routster setup --reconfigure",
-          f"  Data tersimpan di:    {display_hermes_home()}")
+    print_success("Setup complete! Type `routster` to start.")
+    _info(None, "  Change model:         routster model",
+          "  Use another provider: routster setup model",
+          "  Full settings:        routster setup --reconfigure",
+          f"  Data stored in:       {display_hermes_home()}")
     _print_macos_fda_tip()
 
 

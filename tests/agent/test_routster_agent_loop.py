@@ -62,8 +62,8 @@ def test_streamed_tool_call_round_trips_with_explicit_max_tokens(tmp_path):
 
 @pytest.mark.parametrize("status,error,expect", [
     (401, {"message": "invalid api key"}, "API key"),
-    (402, {"message": "saldo token habis. top-up dulu.", "type": "quota"}, "routster.trackster.dev/dashboard"),
-    (429, {"message": "token quota 24h tercapai (1000 token). coba lagi nanti.", "type": "quota"}, "quota"),
+    (402, {"message": "token balance exhausted. top up first.", "type": "quota"}, "routster.trackster.dev/dashboard"),
+    (429, {"message": "24h token quota reached (1000 tokens).", "type": "quota"}, "quota"),
 ], ids=["bad-key", "balance-empty", "key-quota"])
 def test_terminal_rejections_end_the_turn_without_retrying(status, error, expect):
     result, main = _turn([_error(status, **error)] * 5, retries=3)
@@ -74,7 +74,7 @@ def test_terminal_rejections_end_the_turn_without_retrying(status, error, expect
 
 
 def test_per_key_rate_limit_backs_off_then_answers():
-    limited = _error(429, message="rate limit per key tercapai. pelan dikit ya.", type="rate_limit")
+    limited = _error(429, message="per-key rate limit reached. slow down.", type="rate_limit")
     result, main = _turn([limited, Text("answered")], retries=3)
 
     assert result.get("completed") and result.get("final_response") == "answered", result

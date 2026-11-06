@@ -194,7 +194,7 @@ print_banner() {
     printf '%s\n' "┌─────────────────────────────────────────────────────────┐"
     printf '%s\n' "│             ◆ Routster Agent Installer                  │"
     printf '%s\n' "├─────────────────────────────────────────────────────────┤"
-    printf '%s\n' "│  Agent coding di terminal, pakai API key Routster.      │"
+    printf '%s\n' "│  A coding agent in your terminal, on one Routster key.  │"
     printf '%s\n' "└─────────────────────────────────────────────────────────┘"
     printf '%s\n' "$C_NC"
 }

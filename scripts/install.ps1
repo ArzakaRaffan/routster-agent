@@ -682,7 +682,7 @@ function Write-Banner {
     Write-Host "+---------------------------------------------------------+" -ForegroundColor Magenta
     Write-Host "|             * Routster Agent Installer                  |" -ForegroundColor Magenta
     Write-Host "+---------------------------------------------------------+" -ForegroundColor Magenta
-    Write-Host "|  Agent coding di terminal, pakai API key Routster.      |" -ForegroundColor Magenta
+    Write-Host "|  A coding agent in your terminal, on one Routster key.  |" -ForegroundColor Magenta
     Write-Host "+---------------------------------------------------------+" -ForegroundColor Magenta
     Write-Host ""
 }
