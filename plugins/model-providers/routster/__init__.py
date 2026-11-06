@@ -163,6 +163,20 @@ def multiplier_note(row: dict[str, Any]) -> str:
     return note + (" · recommended for agents" if row.get("id") in ROUTSTER_AGENT_MODELS else "")
 
 
+def _total_multiplier(catalog: list[dict[str, Any]], model_id: str) -> float:
+    """input+output multiplier for *model_id*; +inf when unknown so `--cheap` sorts it last."""
+    row = next((r for r in catalog if r.get("id") == model_id), None)
+    if not row:
+        return float("inf")
+    total = 0.0
+    for key in ("input_multiplier", "output_multiplier"):
+        value = row.get(key)
+        if not isinstance(value, (int, float)):
+            return float("inf")
+        total += value
+    return total
+
+
 def _resolve_base_url(args: Any) -> str:
     from hermes_cli.config import get_env_value
 
@@ -226,6 +240,8 @@ def routster_model_setup_flow(config: Any, current_model: str = "", args: Any = 
         ordered = [m for m in ROUTSTER_AGENT_MODELS if not ids or m in ids]
         ordered += [m for m in ids if m not in ordered]
         notes = {row["id"]: multiplier_note(row) for row in catalog}
+        if getattr(args, "cheap", False):
+            ordered = sorted(ordered, key=lambda mid: _total_multiplier(catalog, mid))
         selected = _pick_model_or_prompt(
             ordered, "Model name: ", current_model=current_model or ROUTSTER_DEFAULT_MODEL,
             confirm_provider="routster", confirm_base_url=base_url, confirm_api_key=api_key, notes=notes)

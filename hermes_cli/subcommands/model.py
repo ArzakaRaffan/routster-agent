@@ -14,6 +14,9 @@ def build_model_parser(subparsers, *, cmd_model: Callable) -> None:
         "--refresh", action="store_true",
         help="Wipe the model picker disk cache and re-fetch every provider's live /v1/models list.")
     model_parser.add_argument(
+        "--cheap", action="store_true",
+        help="Order the Routster model picker cheapest first (by input+output multiplier).")
+    model_parser.add_argument(
         "--portal-url", help="Portal base URL for Nous login (default: production portal)")
     model_parser.add_argument(
         "--inference-url",
