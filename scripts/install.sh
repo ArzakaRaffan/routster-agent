@@ -76,9 +76,10 @@ while [ $# -gt 0 ]; do
             echo "                  [--non-interactive] [--include-desktop] [--verbose]"
             echo "                  [--skip-browser] [--skip-computer-use]"
             echo
-            echo "  --channel       stable (default): the latest published release, then release"
-            echo "                  to release. main: every commit. Also HERMES_INSTALL_CHANNEL;"
-            echo "                  an explicit choice is saved like 'routster update --set-channel'."
+            echo "  --channel       main (default): follow every commit. stable: the latest"
+            echo "                  published release — Routster publishes none yet, so use main."
+            echo "                  Also HERMES_INSTALL_CHANNEL; an explicit choice is saved like"
+            echo "                  'routster update --set-channel'."
             echo "  --skip-browser  Do not install the browser (Chromium). Alias: --no-playwright."
             echo "                  Remembered by later installs and 'routster update';"
             echo "                  undo with 'hermes pm install chromium'."
