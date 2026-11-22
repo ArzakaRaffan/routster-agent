@@ -34,7 +34,11 @@ ROUTSTER_AGENT_MODELS = (
     "routster/glm-5.3",
     "routster/glm-5.3-flash",
     "routster/kimi-k2.7",
+    "routster/kimi-k3",
     "routster/minimax-m3",
+    "routster/gemini-3.8-flash",
+    "routster/gpt-6.1-sol",
+    "routster/claude-sonnet-5-5",
 )
 
 

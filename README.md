@@ -72,9 +72,10 @@ Each request costs `input_tokens × input_multiplier + output_tokens × output_m
 balance, and one agent task can call the API many times. The model list always comes from
 `/v1/models`, and the `routster model` picker shows the multipliers.
 
-- Default: `routster/deepseek-v4.1-flash` (multiplier 1×/1×, cheap).
+- Default: `routster/deepseek-v4.1-flash` (cheap; `routster model` shows its current multiplier).
 - Recommended for agent work (hand-curated): `routster/deepseek-v4-pro`, `routster/glm-5.3`,
-  `routster/glm-5.3-flash`, `routster/kimi-k2.7`, `routster/minimax-m3`.
+  `routster/glm-5.3-flash`, `routster/kimi-k2.7`, `routster/kimi-k3`, `routster/minimax-m3`,
+  `routster/gemini-3.8-flash`, `routster/gpt-6.1-sol`, `routster/claude-sonnet-5-5`.
 - The agent always sends `max_tokens` (default 8192). The gateway reserves balance for the full
   `max_tokens` before the request runs, so only raise `model.max_tokens` in config when you need to.
 
