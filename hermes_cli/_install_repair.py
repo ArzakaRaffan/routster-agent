@@ -22,6 +22,9 @@ def _is_windows() -> bool:
 #: on the user PATH. Keep in lockstep with WINDOWS_BIN_LAUNCHERS in
 #: hermes_cli/_launchers.py and scripts/install.ps1.
 _WINDOWS_BIN_LAUNCHERS = ("hermes", "hermes-acp", "routster")
+#: What the user-PATH bin carries (mirrors USER_PATH_COMMANDS in _launchers.py): ``hermes``
+#: stays free on PATH for a separate Hermes Agent install.
+_USER_PATH_COMMANDS = ("routster",)
 
 
 def _normalize_windows_path(value) -> str:
@@ -159,11 +162,11 @@ def ensure_windows_bin_launchers(
             # predates the exact-install command and may lack the runtime query.
             try:
                 canonical.mkdir(parents=True, exist_ok=True)
-                restored.extend(ensure_install_launchers(root, canonical))
+                restored.extend(ensure_install_launchers(root, canonical, _USER_PATH_COMMANDS))
             except OSError:
                 return []
         if not restored and any(
-            _needs_attention(canonical, name) for name in _WINDOWS_BIN_LAUNCHERS
+            _needs_attention(canonical, name) for name in _USER_PATH_COMMANDS
         ):
             targets.append(canonical)
 
@@ -174,7 +177,7 @@ def ensure_windows_bin_launchers(
     # network shares. An entry stored some other way (8.3 short path,
     # subst drive) misses the re-stage, which fails safe: no-op.
     legacy = root / "bin"
-    if any(_needs_attention(legacy, name) for name in _WINDOWS_BIN_LAUNCHERS):
+    if any(_needs_attention(legacy, name) for name in _USER_PATH_COMMANDS):
         if user_path_entries is None:
             user_path_entries = _windows_user_path_entries()
         configured = {_normalize_windows_path(entry) for entry in user_path_entries}
@@ -189,7 +192,7 @@ def ensure_windows_bin_launchers(
             target.mkdir(parents=True, exist_ok=True)
         except OSError:
             continue
-        for name in _WINDOWS_BIN_LAUNCHERS:
+        for name in _USER_PATH_COMMANDS:
             if not _needs_attention(target, name):
                 # Already a store-python launcher (or a form this heal does
                 # not understand but that does not boot the venv): leave it.
@@ -297,7 +300,7 @@ def migrate_windows_bin_path(
     home_bin = home / "bin"
     if any(
         not ((home_bin / f"{name}.exe").is_file() or (home_bin / f"{name}.cmd").is_file())
-        for name in _WINDOWS_BIN_LAUNCHERS
+        for name in _USER_PATH_COMMANDS
     ):
         return False  # staging incomplete — leave the PATH alone
 

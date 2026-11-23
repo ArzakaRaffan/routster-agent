@@ -1414,7 +1414,7 @@ function Publish-UserCommand {
     $bootPy = Get-BootstrapPython
     Push-Location $InstallDir
     try {
-        Invoke-Logged "Publishing the routster command" { & $bootPy -I -X utf8 hermes_cli/_launchers.py $binDir }
+        Invoke-Logged "Publishing the routster command" { & $bootPy -I -X utf8 hermes_cli/_launchers.py --user-path $binDir }
         $code = $LASTEXITCODE
     } finally {
         Pop-Location

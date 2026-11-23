@@ -83,7 +83,7 @@ def user_path_writes(monkeypatch):
     decision, and publication has its own tests."""
     registered = []
     monkeypatch.setattr(_launchers, "ensure_install_launchers",
-                        lambda root, out: [str(out / f"{name}.exe") for name in _launchers.WINDOWS_BIN_LAUNCHERS])
+                        lambda root, out, names=_launchers.WINDOWS_BIN_LAUNCHERS: [str(out / f"{name}.exe") for name in names])
     monkeypatch.setattr(_launchers, "_register_windows_user_path",
                         lambda entry: registered.append(Path(entry)) or "added")
     return registered
@@ -103,7 +103,7 @@ def test_sandbox_home_keeps_its_launchers_off_the_user_path(user_path_writes, tm
     result = _launchers._expose_windows_user_bin(tmp_path / "checkout", create=True)
 
     assert result["ok"] and result["skipped"]
-    assert result["written"] == [f"{name}.exe" for name in _launchers.WINDOWS_BIN_LAUNCHERS]
+    assert result["written"] == [f"{name}.exe" for name in _launchers.USER_PATH_COMMANDS]
     assert user_path_writes == []
 
 
@@ -223,9 +223,9 @@ def _write_exe_launcher(target: Path, python: Path, root: Path) -> None:
 
 
 def _command(home: Path) -> Path:
-    """The ``hermes`` a console runs: PATHEXT resolves .exe before .cmd."""
-    exe = home / "bin" / "hermes.exe"
-    return exe if exe.exists() else home / "bin" / "hermes.cmd"
+    """The ``routster`` a console runs: PATHEXT resolves .exe before .cmd."""
+    exe = home / "bin" / "routster.exe"
+    return exe if exe.exists() else home / "bin" / "routster.cmd"
 
 
 @pytest.fixture
@@ -248,7 +248,7 @@ def test_review_tree_leaves_the_installed_commands_alone(form, path_registration
     review = _checkout(home / "reviews" / "pr-1" / "rebuild-wt")
     if form == "exe":
         (home / "bin").mkdir()
-        for name in _launchers.WINDOWS_BIN_LAUNCHERS:
+        for name in _launchers.USER_PATH_COMMANDS:
             _write_exe_launcher(home / "bin" / f"{name}.exe", _store_python(home), installed)
     else:
         assert _launchers._expose_windows_user_bin(installed, create=True)["path"] == "added"
@@ -257,7 +257,7 @@ def test_review_tree_leaves_the_installed_commands_alone(form, path_registration
     result = _launchers._expose_windows_user_bin(review, create=True)
 
     assert {path.name: path.read_bytes() for path in (home / "bin").iterdir()} == before
-    assert result == {"ok": True, "skipped": f"{home / 'bin' / f'hermes.{form}'} starts another checkout"}
+    assert result == {"ok": True, "skipped": f"{home / 'bin' / f'routster.{form}'} starts another checkout"}
     assert _launchers._launcher_checkout(_command(home)) == installed
     assert path_registrations == ([] if form == "exe" else [home / "bin"])
 

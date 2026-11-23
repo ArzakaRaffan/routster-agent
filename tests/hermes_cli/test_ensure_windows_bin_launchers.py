@@ -33,6 +33,7 @@ pytestmark = pytest.mark.platforms("windows")
 
 from hermes_cli import _launchers
 from hermes_cli._install_repair import (
+    _USER_PATH_COMMANDS,
     _WINDOWS_BIN_LAUNCHERS,
     _normalize_windows_path,
     ensure_windows_bin_launchers,
@@ -128,8 +129,8 @@ def test_store_python_launcher_boot_the_store_not_the_venv(tmp_path, monkeypatch
 
     restored = ensure_windows_bin_launchers(root, windows=True, user_path_entries=[])
 
-    assert len(restored) == len(_WINDOWS_BIN_LAUNCHERS)
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    assert len(restored) == len(_USER_PATH_COMMANDS)
+    for name in _USER_PATH_COMMANDS:
         staged = [p for p in map(Path, restored) if p.stem == name]
         assert staged, name
         _assert_boot_is_store_not_venv(staged[0], root, store)
@@ -145,15 +146,15 @@ def test_legacy_venv_trampoline_is_replaced_by_store_launcher(
     bin_dir = home / "bin"
     bin_dir.mkdir()
     venv_python = str(root / "venv" / "Scripts" / "python.exe")
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    for name in _USER_PATH_COMMANDS:
         (bin_dir / f"{name}.exe").write_bytes(
             b"MZ legacy trampoline " + venv_python.encode("utf-8")
         )
 
     restored = ensure_windows_bin_launchers(root, windows=True, user_path_entries=[])
 
-    assert set(Path(p).stem for p in map(Path, restored)) == set(_WINDOWS_BIN_LAUNCHERS)
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    assert set(Path(p).stem for p in map(Path, restored)) == set(_USER_PATH_COMMANDS)
+    for name in _USER_PATH_COMMANDS:
         exe = bin_dir / f"{name}.exe"
         launcher = exe if exe.exists() and b"legacy trampoline" not in exe.read_bytes() else bin_dir / f"{name}.cmd"
         _assert_boot_is_store_not_venv(launcher, root, store)
@@ -191,7 +192,7 @@ def test_healthy_canonical_layout_with_placeholder_cmds_gets_upgraded(
 
     ensure_windows_bin_launchers(root, windows=True, user_path_entries=[])
 
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    for name in _USER_PATH_COMMANDS:
         exe = bin_dir / f"{name}.exe"
         launcher = exe if exe.exists() and b"legacy trampoline" not in exe.read_bytes() else bin_dir / f"{name}.cmd"
         _assert_boot_is_store_not_venv(launcher, root, store)
@@ -206,8 +207,8 @@ def test_legacy_bin_restaged_only_while_on_user_path(managed_install):
     )
 
     stems = {Path(p).stem for p in map(Path, restored)}
-    assert set(_WINDOWS_BIN_LAUNCHERS) <= stems
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    assert set(_USER_PATH_COMMANDS) <= stems
+    for name in _USER_PATH_COMMANDS:
         assert _launcher_files(legacy, name)
         assert _launcher_files(home / "bin", name)
 
@@ -253,8 +254,8 @@ def test_profile_session_still_heals_the_shared_bin(tmp_path, monkeypatch):
 
     restored = ensure_windows_bin_launchers(root, windows=True, user_path_entries=[])
 
-    assert len(restored) == len(_WINDOWS_BIN_LAUNCHERS)
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    assert len(restored) == len(_USER_PATH_COMMANDS)
+    for name in _USER_PATH_COMMANDS:
         assert _launcher_files(home / "bin", name)
     assert not (home / "profiles" / "work" / "bin").exists()
 
@@ -310,7 +311,7 @@ def test_migration_moves_path_to_home_bin_and_strips_legacy(managed_install):
     assert _normalize_windows_path(legacy_bin) not in keys
     assert _normalize_windows_path(legacy_scripts) not in keys
     assert _normalize_windows_path(r"C:\Windows\system32") in keys  # untouched
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    for name in _USER_PATH_COMMANDS:
         assert _launcher_files(home / "bin", name)
     # Legacy FILES stay: editor/ACP configs holding absolute launcher paths
     # keep working. Only the PATH entry (the sweepable resolution route) goes.
@@ -327,7 +328,7 @@ def test_migration_works_when_only_legacy_copy_exists(tmp_path, monkeypatch):
     )
 
     assert ok
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    for name in _USER_PATH_COMMANDS:
         assert _launcher_files(home / "bin", name)
     keys = [_normalize_windows_path(e) for e in state["entries"]]
     assert _normalize_windows_path(home / "bin") in keys
@@ -380,7 +381,7 @@ def test_migration_leaves_path_when_new_consoles_use_another_home(managed_instal
 
     assert not ok
     assert state["writes"] == 0
-    for name in _WINDOWS_BIN_LAUNCHERS:
+    for name in _USER_PATH_COMMANDS:
         assert _launcher_files(home / "bin", name)
 
 
@@ -470,3 +471,24 @@ def test_repo_gitignores_the_legacy_bin_dir():
         "bin/hermes.exe is not gitignored — routster update's autostash "
         "(--include-untracked) would sweep pre-migration launchers off disk"
     )
+
+
+def test_own_hermes_commands_leave_the_user_bin_foreign_ones_stay(managed_install):
+    """Routster fork: `hermes` on PATH belongs to a separate Hermes Agent install. Older releases
+    published this checkout's `hermes`/`hermes-acp` into the user bin; a republish drops ours
+    and leaves another install's `hermes` alone."""
+    home, root = managed_install
+    bin_dir = home / "bin"
+    ensure_windows_bin_launchers(root, windows=True, user_path_entries=[])
+    assert _launchers.stage_launcher("hermes-acp", root, bin_dir) is not None  # an older release's
+    staging = home.parent / "staging"
+    staging.mkdir()
+    foreign = _launchers.stage_launcher("hermes", home.parent / "real-hermes", staging)
+    assert foreign is not None
+    foreign = foreign.replace(bin_dir / foreign.name)  # another install's `hermes`, same bin
+
+    _launchers.ensure_install_launchers(root, bin_dir, _launchers.USER_PATH_COMMANDS)
+
+    left = {p.name for p in bin_dir.iterdir() if not p.name.endswith(".deleteme")}
+    assert {Path(n).stem for n in left} == {"routster", "hermes"}
+    assert foreign.exists()
